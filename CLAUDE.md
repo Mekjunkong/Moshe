@@ -45,6 +45,23 @@
 └── outbox/          # ready to share / deliver
 ```
 
+## Obsidian Vault
+
+**Vault**: MyVault at `/Users/pasuthunjunkong/Documents/MyVault`
+
+Key folders in vault:
+- `WIRO 4x4/` — Wiro4x4 business notes
+- `00-Inbox/` — quick capture
+- `01-Areas/` — ongoing areas of responsibility
+- `02-Projects/` — project notes
+- `Daily/` — daily notes
+
+**Usage**:
+- Read/write vault notes via the `obsidian` MCP tool (available in this project)
+- Use `obsidian-cli search "query"` to find notes
+- Use `obsidian-cli search-content "query"` to search inside notes
+- After important sessions, save key decisions to Obsidian as well as ψ/
+
 ## Projects
 
 - **Wiro4x4**: Adventure tour business in Indochina (Thailand, Laos, Vietnam)
