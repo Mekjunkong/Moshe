@@ -45,6 +45,17 @@
 └── outbox/          # ready to share / deliver
 ```
 
+## Runtime
+
+Moshe runs in two places — same brain, different interface:
+
+| Runtime | How to access | Best for |
+|---------|--------------|----------|
+| **Claude Code** | `cd ~/workspace/Moshe && claude` | Coding, files, deep work |
+| **Hermes (Telegram)** | Message the Telegram bot | Quick tasks, daily assistant, on the go |
+
+Both read from the same ψ/ vault and Obsidian. Sessions on Telegram are saved to `ψ/memory/retrospectives/` so Claude Code picks them up next time.
+
 ## Obsidian Vault
 
 **Vault**: MyVault at `/Users/pasuthunjunkong/Documents/MyVault`
