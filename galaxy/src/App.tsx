@@ -135,6 +135,7 @@ export default function App() {
         clusters={kmClusters}
         nebulae={kmNebulae}
         typeColors={CLUSTER_COLORS}
+        embedded
         onDocumentClick={() => undefined}
         onClusterClick={(cluster) =>
           setActive((prev) => (prev === cluster.id ? null : cluster.id))

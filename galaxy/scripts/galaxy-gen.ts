@@ -38,7 +38,7 @@ function readDirSafe(dir: string): string[] {
 function orbitParams(clusterId: string, index: number, total: number) {
   const isActive = clusterId === 'projects'
   return {
-    orbitRadius: isActive ? rand(30, 60)  : rand(40, 90),
+    orbitRadius: isActive ? rand(8, 18)  : rand(10, 25),
     orbitSpeed:  isActive ? rand(0.3, 0.8): rand(0.05, 0.3),
     orbitPhase:  (index / Math.max(total, 1)) * Math.PI * 2,
     orbitTilt:   rand(-0.3, 0.3),
@@ -47,7 +47,7 @@ function orbitParams(clusterId: string, index: number, total: number) {
 
 function clusterCenter(clusterId: string) {
   const c = CLUSTERS.find(c => c.id === clusterId)!
-  return { x: c.cx + rand(-20, 20), y: c.cy + rand(-10, 10), z: c.cz + rand(-20, 20) }
+  return { x: c.cx + rand(-5, 5), y: c.cy + rand(-3, 3), z: c.cz + rand(-5, 5) }
 }
 
 export function generate(): GalaxyData {
