@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'bun:test'
 import { CLUSTERS, NEBULAE } from '../src/clusters'
-import { assignCluster } from './galaxy-gen'
+import { assignCluster, generate } from './galaxy-gen'
 
 describe('CLUSTERS', () => {
   test('has exactly 5 clusters', () => {
@@ -81,5 +81,20 @@ describe('assignCluster', () => {
   })
   test('outbox → projects', () => {
     expect(assignCluster('/workspace/Moshe/ψ/outbox/ready.md')).toBe('projects')
+  })
+  test('unknown path → soul (default)', () => {
+    expect(assignCluster('/some/unrecognized/path/file.md')).toBe('soul')
+  })
+})
+
+describe('generate', () => {
+  test('returns valid GalaxyData shape', () => {
+    const data = generate()
+    expect(Array.isArray(data.clusters)).toBe(true)
+    expect(Array.isArray(data.documents)).toBe(true)
+    expect(Array.isArray(data.nebulae)).toBe(true)
+    expect(data.clusters.length).toBeGreaterThan(0)
+    expect(data.documents.length).toBeGreaterThan(0)
+    expect(data.nebulae.length).toBeGreaterThan(0)
   })
 })
