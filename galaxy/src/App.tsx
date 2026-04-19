@@ -65,7 +65,7 @@ function adaptNebulae(
     const cy = a && b ? (a.cy + b.cy) / 2 : 0
     const cz = a && b ? (a.cz + b.cz) / 2 : 0
     return {
-      id: `nebula-${i}`,
+      id: `${n.clusterA}-${n.clusterB}`,
       clusterA: n.clusterA,
       clusterB: n.clusterB,
       cx,
@@ -83,14 +83,26 @@ function adaptNebulae(
 
 export default function App() {
   const [data, setData]            = useState<GalaxyData | null>(null)
+  const [error, setError]          = useState<string | null>(null)
   const [search, setSearch]        = useState('')
   const [activeCluster, setActive] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/galaxy-data.json')
-      .then((r) => r.json())
+    const controller = new AbortController()
+    fetch('/galaxy-data.json', { signal: controller.signal })
+      .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() as Promise<GalaxyData> })
       .then(setData)
+      .catch((err: Error) => { if (err.name !== 'AbortError') setError(err.message) })
+    return () => controller.abort()
   }, [])
+
+  if (error) {
+    return (
+      <div style={{ color: '#f87171', fontFamily: 'monospace', padding: 32, background: '#000', height: '100vh' }}>
+        Failed to load galaxy: {error}
+      </div>
+    )
+  }
 
   if (!data) {
     return (
@@ -123,7 +135,7 @@ export default function App() {
         clusters={kmClusters}
         nebulae={kmNebulae}
         typeColors={CLUSTER_COLORS}
-        onDocumentClick={(doc) => console.log('node:', doc.sourceFile)}
+        onDocumentClick={() => undefined}
         onClusterClick={(cluster) =>
           setActive((prev) => (prev === cluster.id ? null : cluster.id))
         }
