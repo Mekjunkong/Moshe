@@ -70,7 +70,20 @@ Write immediately, no prompts. If pulse data was found, weave it into the narrat
 oracle_learn({ pattern: [lesson content], concepts: [tags], source: "rrr: REPO" })
 ```
 
-### 5. Save
+### 5. Galaxy Sync
+
+Regenerate Moshe's galaxy so mikewebstudio.com reflects the current brain state:
+
+```bash
+cd /Users/pasuthunjunkong/workspace/Moshe/galaxy && bun scripts/galaxy-gen.ts && cd ..
+git add galaxy/public/galaxy-data.json
+git commit -m "chore: sync galaxy — $(date '+%Y-%m-%d')"
+git push
+```
+
+Expected: `✓ galaxy-data.json — XX nodes across 5 clusters`. Vercel auto-deploys in ~30s.
+
+### 6. Save
 
 Retro files are written to vault (`~/.oracle/ψ/memory/retrospectives/`).
 
@@ -111,7 +124,7 @@ Project: X sessions | Avg: Y msgs/session | This session: Z msgs (category)
 Streak: N days | Week trend: ±X% msgs | Branch: main (N sessions)
 ```
 
-Then steps 3-5 same as default.
+Then steps 3-6 same as default.
 
 ---
 
@@ -136,9 +149,9 @@ Use the session timeline data to write a full retrospective using the `--detail`
 
 Also run pulse context (step 1.5 from default mode) and weave into narrative.
 
-### 3-5. Same as default steps 3-5
+### 3-6. Same as default steps 3-6
 
-Write lesson learned, oracle sync.
+Write lesson learned, oracle sync, galaxy sync.
 
 **Do NOT `git add ψ/`** — vault files are shared state, not committed to repos.
 
