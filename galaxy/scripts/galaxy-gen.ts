@@ -1,4 +1,4 @@
-import { readdirSync, writeFileSync, mkdirSync } from 'node:fs'
+import { readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { join, basename } from 'node:path'
 import type { MapDocument, GalaxyData } from '../src/types'
 import { CLUSTERS, NEBULAE } from '../src/clusters'
@@ -35,6 +35,21 @@ function readDirSafe(dir: string): string[] {
   try { return readdirSync(dir) } catch { return [] }
 }
 
+function readExcerpt(filePath: string, maxChars = 400): string {
+  try {
+    const content = readFileSync(filePath, 'utf8')
+    const stripped = content
+      .replace(/^---[\s\S]*?---\n?/, '')  // strip frontmatter
+      .replace(/#+\s+/g, '')               // strip headings markers
+      .trim()
+    return stripped.length > maxChars
+      ? stripped.slice(0, maxChars).trimEnd() + '…'
+      : stripped
+  } catch {
+    return ''
+  }
+}
+
 function orbitParams(clusterId: string, index: number, total: number) {
   const isActive = clusterId === 'projects'
   return {
@@ -67,17 +82,20 @@ export function generate(): GalaxyData {
   ]
 
   for (const folder of psiFolders) {
-    const fullPath = join(PSI, folder)
-    const files    = readDirSafe(fullPath).filter(f => !f.startsWith('.'))
+    const fullPath  = join(PSI, folder)
+    const files     = readDirSafe(fullPath).filter(f => !f.startsWith('.'))
     const clusterId = assignCluster(join(PSI, folder))
 
     files.forEach((file, i) => {
+      const filePath = join(fullPath, file)
       documents.push({
         id: `psi-${id++}`,
         title: basename(file, '.md'),
         ...clusterCenter(clusterId),
         clusterId,
         type: folder.split('/')[0],
+        filePath,
+        excerpt: readExcerpt(filePath),
         ...orbitParams(clusterId, i, files.length),
       })
     })
@@ -85,21 +103,24 @@ export function generate(): GalaxyData {
 
   const skills = readDirSafe(SKILLS_DIR).filter(f => !f.startsWith('.') && f !== 'VERSION.md')
   skills.forEach((skill, i) => {
+    const skillFile = join(SKILLS_DIR, skill, 'SKILL.md')
     documents.push({
       id: `skill-${id++}`,
       title: skill,
       ...clusterCenter('skills'),
       clusterId: 'skills',
       type: 'skill',
+      filePath: skillFile,
+      excerpt: readExcerpt(skillFile),
       ...orbitParams('skills', i, skills.length),
     })
   })
 
   const RUNTIME_NODES = [
-    { title: 'Claude Code',       type: 'runtime' },
-    { title: 'Hermes / Telegram', type: 'runtime' },
-    { title: 'Obsidian Vault',    type: 'runtime' },
-    { title: 'Wiro4x4',           type: 'runtime' },
+    { title: 'Claude Code',       type: 'runtime', excerpt: 'Primary coding interface — deep work, file editing, git, and long sessions.' },
+    { title: 'Hermes / Telegram', type: 'runtime', excerpt: 'Telegram bot interface — quick tasks, daily assistant, on the go.' },
+    { title: 'Obsidian Vault',    type: 'runtime', excerpt: 'MyVault — Wiro4x4 business notes, daily notes, project areas, quick capture inbox.' },
+    { title: 'Wiro4x4',           type: 'runtime', excerpt: 'Adventure tour business in Indochina — Thailand, Laos, Vietnam. Hebrew and English audience.' },
   ]
   RUNTIME_NODES.forEach((node, i) => {
     documents.push({

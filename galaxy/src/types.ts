@@ -11,6 +11,8 @@ export interface MapDocument {
   orbitTilt: number
   parentId?: string
   type?: string
+  excerpt?: string
+  filePath?: string
 }
 
 export interface ClusterMeta {

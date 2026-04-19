@@ -5,9 +5,10 @@ import type {
   ClusterMeta as KmClusterMeta,
   NebulaMeta as KmNebulaMeta,
 } from 'knowledge-map-3d'
-import type { GalaxyData } from './types'
+import type { GalaxyData, MapDocument } from './types'
 import { CLUSTER_COLORS } from './clusters'
 import GalaxyChrome from './GalaxyChrome'
+import NodeDetailPanel from './NodeDetailPanel'
 
 // ---------------------------------------------------------------------------
 // Adapters — bridge our galaxy-data.json schema to knowledge-map-3d types
@@ -86,6 +87,7 @@ export default function App() {
   const [error, setError]          = useState<string | null>(null)
   const [search, setSearch]        = useState('')
   const [activeCluster, setActive] = useState<string | null>(null)
+  const [selectedNode, setSelected] = useState<MapDocument | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -136,12 +138,18 @@ export default function App() {
         nebulae={kmNebulae}
         typeColors={CLUSTER_COLORS}
         embedded
-        onDocumentClick={() => undefined}
+        onDocumentClick={(kmDoc) => {
+          const local = data.documents.find(d => d.id === kmDoc.id) ?? null
+          setSelected(local)
+        }}
         onClusterClick={(cluster) =>
           setActive((prev) => (prev === cluster.id ? null : cluster.id))
         }
         highlightIds={highlightIds}
       />
+      {selectedNode && (
+        <NodeDetailPanel node={selectedNode} onClose={() => setSelected(null)} />
+      )}
       <GalaxyChrome
         clusters={data.clusters}
         documents={data.documents}
