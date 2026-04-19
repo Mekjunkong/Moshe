@@ -4,3 +4,6 @@ declare module '*.module.css' {
   const classes: Record<string, string>
   export default classes
 }
+
+// Plain CSS imports (side-effect only)
+declare module '*.css'

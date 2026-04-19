@@ -1,0 +1,103 @@
+.chrome {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 24px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.chrome-brand {
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+}
+
+.chrome-title {
+  font-family: monospace;
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 5px;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(255,255,255,0.3);
+}
+
+.chrome-sub {
+  font-family: monospace;
+  font-size: 10px;
+  color: #444;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.chrome-legend {
+  display: flex;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.legend-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 20px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  color: inherit;
+  font-family: monospace;
+}
+
+.legend-btn:hover,
+.legend-btn.active {
+  background: rgba(255,255,255,0.09);
+  border-color: rgba(255,255,255,0.18);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.lbl {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: #bbb;
+}
+
+.cnt {
+  font-size: 9px;
+  color: #555;
+}
+
+.chrome-search {
+  margin-left: auto;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 6px 14px;
+  color: #ccc;
+  font-family: monospace;
+  font-size: 12px;
+  outline: none;
+  pointer-events: auto;
+  width: 180px;
+  transition: border-color 0.2s;
+}
+
+.chrome-search:focus {
+  border-color: rgba(255,255,255,0.25);
+}
+
+.chrome-search::placeholder {
+  color: #444;
+}
