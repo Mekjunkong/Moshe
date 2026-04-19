@@ -1,5 +1,6 @@
 import { describe, test, expect } from 'bun:test'
 import { CLUSTERS, NEBULAE } from '../src/clusters'
+import { assignCluster } from './galaxy-gen'
 
 describe('CLUSTERS', () => {
   test('has exactly 5 clusters', () => {
@@ -50,5 +51,35 @@ describe('NEBULAE', () => {
       expect(n.strength).toBeGreaterThan(0)
       expect(n.strength).toBeLessThanOrEqual(1)
     }
+  })
+})
+
+describe('assignCluster', () => {
+  test('resonance → soul', () => {
+    expect(assignCluster('/workspace/Moshe/ψ/memory/resonance/oracle.md')).toBe('soul')
+  })
+  test('writing → soul', () => {
+    expect(assignCluster('/workspace/Moshe/ψ/writing/draft.md')).toBe('soul')
+  })
+  test('lab → soul', () => {
+    expect(assignCluster('/workspace/Moshe/ψ/lab/experiment.md')).toBe('soul')
+  })
+  test('memory/learnings → memory', () => {
+    expect(assignCluster('/workspace/Moshe/ψ/memory/learnings/lesson.md')).toBe('memory')
+  })
+  test('memory/retrospectives → memory', () => {
+    expect(assignCluster('/workspace/Moshe/ψ/memory/retrospectives/session.md')).toBe('memory')
+  })
+  test('active → projects', () => {
+    expect(assignCluster('/workspace/Moshe/ψ/active/project.md')).toBe('projects')
+  })
+  test('inbox → projects', () => {
+    expect(assignCluster('/workspace/Moshe/ψ/inbox/idea.md')).toBe('projects')
+  })
+  test('archive → projects', () => {
+    expect(assignCluster('/workspace/Moshe/ψ/archive/done.md')).toBe('projects')
+  })
+  test('outbox → projects', () => {
+    expect(assignCluster('/workspace/Moshe/ψ/outbox/ready.md')).toBe('projects')
   })
 })
