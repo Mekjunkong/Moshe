@@ -1,0 +1,79 @@
+{
+  "generated": "2026-05-02T17:55:41.604Z",
+  "stats": {
+    "learnings": 2,
+    "retrospectives": 2,
+    "activeProjects": 1,
+    "inboxItems": 1,
+    "writingDocs": 0,
+    "labExperiments": 0
+  },
+  "learnings": [
+    {
+      "name": "Learning — Wiro4x4 Homepage Push 2026-05-02",
+      "file": "2026-05-02-wiro-homepage-push.md",
+      "modified": "2026-05-02",
+      "excerpt": "- For Wiro4x4 homepage conversion work, keep changes surgical and commit only intended homepage files because the repo m…"
+    },
+    {
+      "name": "Lesson: /rrr is the only thing that gives Moshe memory between sessions",
+      "file": "2026-04-24_rrr-habit-and-memory-gaps.md",
+      "modified": "2026-04-23",
+      "excerpt": "date: 2026-04-24 slug: rrr-habit-and-memory-gaps tags: [memory, retrospective, habit, moshe]"
+    }
+  ],
+  "retrospectives": [
+    {
+      "name": "Oracle OS Dashboard Prototype — 2026-05-03",
+      "file": "2026-05-03-oracle-os-dashboard-prototype.md",
+      "modified": "2026-05-02",
+      "excerpt": "What changed Built the first Level 3 Oracle OS dashboard prototype inside the existing Moshe Galaxy app.  Files changed"
+    },
+    {
+      "name": "Oracle OS Level 3 — Real Data Connected",
+      "file": "2026-05-03-oracle-os-real-data.md",
+      "modified": "2026-05-02",
+      "excerpt": "2026-05-03 — Moshe  What changed Connected the Oracle OS dashboard to real data via oracleData.ts. Dashboard now has 3 t…"
+    }
+  ],
+  "projects": [
+    {
+      "name": "Wiro4x4",
+      "modified": "2026-05-02",
+      "excerpt": "Adventure tour business in Indochina"
+    },
+    {
+      "name": "Aum Hippie Young",
+      "modified": "2026-05-01",
+      "excerpt": "Lifestyle brand website"
+    },
+    {
+      "name": "Etsy Digital Products",
+      "modified": "2026-04-30",
+      "excerpt": "Digital product business validation"
+    },
+    {
+      "name": "Smart Farm",
+      "modified": "2026-04-28",
+      "excerpt": "Longan orchard 50 trees Chiangmai"
+    }
+  ],
+  "cronJobs": [
+    {
+      "name": "Weekly Oracle Report",
+      "schedule": "Mon 09:00 +07",
+      "nextRun": "2026-05-04",
+      "status": "active"
+    }
+  ],
+  "wiro": {
+    "lastPush": "2026-05-02",
+    "commit": "aaaf3d2",
+    "status": "updating",
+    "url": "https://www.wiro4x4indochina.com"
+  },
+  "memory": {
+    "totalLearnings": 2,
+    "totalRetrospectives": 2
+  }
+}
