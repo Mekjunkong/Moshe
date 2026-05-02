@@ -9,6 +9,7 @@ import type { GalaxyData, MapDocument } from './types'
 import { CLUSTER_COLORS } from './clusters'
 import GalaxyChrome from './GalaxyChrome'
 import NodeDetailPanel from './NodeDetailPanel'
+import OracleCommandCenter from './OracleCommandCenter'
 
 // ---------------------------------------------------------------------------
 // Adapters — bridge our galaxy-data.json schema to knowledge-map-3d types
@@ -212,6 +213,7 @@ export default function App() {
             activeCluster={activeCluster}
             onClusterToggle={(id: string) => setActive((prev) => (prev === id ? null : id))}
           />
+          <OracleCommandCenter data={data} />
         </>
       )}
     </div>
