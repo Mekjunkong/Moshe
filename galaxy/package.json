@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "node scripts/generateOracleData.mjs && tsc && vite build",
     "preview": "vite preview",
     "generate": "bun scripts/galaxy-gen.ts",
-    "dev:full": "concurrently \"bun scripts/galaxy-gen.ts\" \"vite\""
+    "generate:oracle": "node scripts/generateOracleData.mjs",
+    "dev:full": "concurrently \"bun scripts/galaxy-gen.ts\" \"node scripts/generateOracleData.mjs\" \"vite\""
   },
   "dependencies": {
     "knowledge-map-3d": "github:Bombbaza/Multi-Planet-System-Knowledge-Map-3D",
