@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-03T10:59:32.390Z",
+  "generated": "2026-05-03T11:01:08.537Z",
   "born": "2026-04-18",
   "level3Phase": "Phase 2A: Better Read-only Intelligence — incidents, CI status, recommendations, deploy timeline",
   "stats": {
@@ -73,7 +73,7 @@
   "projects": [
     {
       "name": "Moshe Oracle OS",
-      "url": "",
+      "url": "https://www.mikewebstudio.com",
       "status": "Building",
       "note": "Phase 2A active: incidents, CI status, recommendations, deploy timeline.",
       "accent": "orange"
@@ -102,20 +102,20 @@
   "websites": [
     {
       "name": "Moshe Oracle Dashboard",
-      "url": "local Vite / Vercel static app",
+      "url": "https://www.mikewebstudio.com",
       "ok": true,
       "status": 200,
-      "responseMs": null,
-      "checkedAt": "2026-05-03T10:59:21.544Z",
-      "note": "local build target; set ORACLE_DASHBOARD_URL after deploy for public uptime checks"
+      "responseMs": 1001,
+      "checkedAt": "2026-05-03T11:00:58.759Z",
+      "note": "reachable"
     },
     {
       "name": "Aum Hippie Young",
       "url": "https://aum-hippie-young.vercel.app/",
       "ok": true,
       "status": 200,
-      "responseMs": 264,
-      "checkedAt": "2026-05-03T10:59:21.808Z",
+      "responseMs": 162,
+      "checkedAt": "2026-05-03T11:00:57.943Z",
       "note": "reachable"
     },
     {
@@ -123,8 +123,8 @@
       "url": "https://www.wiro4x4indochina.com/",
       "ok": true,
       "status": 200,
-      "responseMs": 185,
-      "checkedAt": "2026-05-03T10:59:21.817Z",
+      "responseMs": 237,
+      "checkedAt": "2026-05-03T11:00:58.018Z",
       "note": "reachable"
     }
   ],
@@ -133,11 +133,11 @@
       "name": "Moshe",
       "path": "/Users/pasuthunjunkong/workspace/Moshe",
       "branch": "main",
-      "commit": "a8f3216",
-      "commitSubject": "feat(galaxy): Oracle OS Level 3 dashboard with real data",
+      "commit": "338477a",
+      "commitSubject": "feat(galaxy): add Oracle Phase 2A intelligence",
       "dirty": true,
-      "changedFiles": 22,
-      "lastCommitAt": "2026-05-03T01:16:28+07:00",
+      "changedFiles": 15,
+      "lastCommitAt": "2026-05-03T18:00:30+07:00",
       "github": "Mekjunkong/Moshe",
       "remoteHost": "github.com"
     },
@@ -200,7 +200,7 @@
       "apiStatus": "ok",
       "private": false,
       "defaultBranch": "main",
-      "pushedAt": "2026-05-02T18:16:30Z",
+      "pushedAt": "2026-05-03T11:00:40Z",
       "openIssues": 0,
       "openPullRequests": 0,
       "latestWorkflow": null,
@@ -284,9 +284,9 @@
       "severity": "warning",
       "category": "repo-dirty",
       "project": "Moshe",
-      "title": "Moshe: 22 uncommitted changes",
-      "detail": "Branch main · last commit: \"feat(galaxy): Oracle OS Level 3 dashboard with real data\"",
-      "detectedAt": "2026-05-03T01:16:28+07:00"
+      "title": "Moshe: 15 uncommitted changes",
+      "detail": "Branch main · last commit: \"feat(galaxy): add Oracle Phase 2A intelligence\"",
+      "detectedAt": "2026-05-03T18:00:30+07:00"
     },
     {
       "id": "creds-missing",
@@ -295,7 +295,7 @@
       "project": "Oracle OS",
       "title": "5 credential(s) not configured",
       "detail": "VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_PROJECT_NAME, VERCEL_TEAM_ID, GITHUB_TOKEN",
-      "detectedAt": "2026-05-03T10:59:32.390Z"
+      "detectedAt": "2026-05-03T11:01:08.537Z"
     }
   ],
   "recommendations": [
@@ -309,7 +309,7 @@
     {
       "project": "Moshe",
       "priority": "medium",
-      "reason": "Moshe: 22 uncommitted changes",
+      "reason": "Moshe: 15 uncommitted changes",
       "risk": "medium",
       "suggestedAction": "Review staged changes in Moshe and commit or stash to keep the branch clean."
     },
@@ -338,6 +338,14 @@
     }
   },
   "deployTimeline": [
+    {
+      "provider": "git",
+      "project": "Moshe",
+      "event": "commit",
+      "state": "uncommitted-changes",
+      "timestamp": "2026-05-03T18:00:30+07:00",
+      "note": "feat(galaxy): add Oracle Phase 2A intelligence"
+    },
     {
       "provider": "git",
       "project": "Wiro4x4",
@@ -372,14 +380,6 @@
       "url": "https://galaxy-2n8v1pu15-pasuthun-junkongs-projects.vercel.app",
       "timestamp": "2026-05-02T23:49:33.799Z",
       "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "git",
-      "project": "Moshe",
-      "event": "commit",
-      "state": "uncommitted-changes",
-      "timestamp": "2026-05-03T01:16:28+07:00",
-      "note": "feat(galaxy): Oracle OS Level 3 dashboard with real data"
     },
     {
       "provider": "git",
