@@ -1,2 +1,5 @@
+# Ignore origin symlinks from /learn
 **/origin
+
+# Ignore data files
 data/
