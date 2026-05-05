@@ -366,12 +366,15 @@ export default function OracleCommandCenter({ data }: Props) {
   const configuredCreds = oracle.credentials.filter((c) => c.configured).length
   const githubOk = oracle.github.filter((g) => g.apiStatus === 'ok').length
   const criticalIncidents = (oracle.incidents ?? []).filter((i) => i.severity === 'critical').length
+  const oracleModeLabel = oracle.automation?.sessionConfigured
+    ? 'PHASE 3B · SESSION-GATED ACTIONS'
+    : 'PHASE 2A · READ ONLY'
 
   return (
     <aside className="oracle-shell" aria-label="Oracle OS command center">
       <div className="oracle-hero-card">
         <div>
-          <p className="oracle-kicker">ORACLE OS · PHASE 2A · READ ONLY</p>
+          <p className="oracle-kicker">ORACLE OS · {oracleModeLabel}</p>
           <h1>MOSHE</h1>
           <p className="oracle-subtitle">
             Mike's external brain · generated {timeAgo(oracle.generated)}
