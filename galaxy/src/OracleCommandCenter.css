@@ -4,11 +4,11 @@
   top: 86px;
   bottom: 22px;
   z-index: 9;
-  width: min(430px, calc(100vw - 44px));
+  width: min(460px, calc(100vw - 44px));
   display: flex;
   flex-direction: column;
   gap: 10px;
-  color: #f8fafc;
+  color: #e5eefc;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   pointer-events: auto;
 }
@@ -24,14 +24,14 @@
 .oracle-metrics,
 .oracle-section,
 .oracle-tabs {
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.14);
   background:
-    linear-gradient(145deg, rgba(15, 23, 42, 0.93), rgba(3, 7, 18, 0.74)),
-    radial-gradient(circle at 20% 0%, rgba(245, 158, 11, 0.22), transparent 32%),
-    radial-gradient(circle at 80% 20%, rgba(34, 211, 238, 0.18), transparent 35%);
-  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.44), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+    linear-gradient(180deg, rgba(10, 16, 30, 0.92), rgba(6, 10, 20, 0.86)),
+    radial-gradient(circle at 18% 12%, rgba(34, 211, 238, 0.06), transparent 34%),
+    radial-gradient(circle at 82% 18%, rgba(167, 139, 250, 0.05), transparent 32%);
+  box-shadow: 0 22px 64px rgba(1, 5, 14, 0.46), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 /* ── Hero ── */
@@ -60,10 +60,8 @@
   font-size: 36px;
   line-height: 0.95;
   letter-spacing: -1px;
-  background: linear-gradient(115deg, #fff7ed, #f59e0b 38%, #22d3ee 75%, #a78bfa);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #f8fafc;
+  text-shadow: 0 0 18px rgba(34, 211, 238, 0.12);
 }
 
 .oracle-subtitle {
@@ -94,7 +92,8 @@
 
 /* ── Metrics ── */
 .oracle-metrics {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 1px;
   border-radius: 22px;
   overflow: hidden;
@@ -102,26 +101,35 @@
 }
 
 .oracle-metrics > div {
-  flex: 1;
-  padding: 12px 8px;
-  background: rgba(255, 255, 255, 0.04);
-  text-align: center;
+  min-width: 0;
+  padding: 12px 10px 11px;
+  background: rgba(255, 255, 255, 0.03);
+  text-align: left;
 }
 
-.oracle-metrics strong {
-  display: block;
-  font-size: 20px;
-  color: #fff;
+.oracle-metric dt,
+.oracle-metric dd {
+  margin: 0;
 }
 
-.oracle-metrics span {
-  display: block;
-  margin-top: 3px;
-  color: rgba(203, 213, 225, 0.5);
+.oracle-metric dt {
+  color: rgba(203, 213, 225, 0.52);
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 8px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.7px;
+}
+
+.oracle-metric dd {
+  margin-top: 5px;
+  color: #f8fafc;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.oracle-metric-alert dd {
+  color: #f87171;
 }
 
 /* ── Tabs ── */
@@ -130,38 +138,49 @@
   border-radius: 18px;
   padding: 4px;
   flex: 0 0 auto;
+  gap: 4px;
 }
 
 .oracle-tab {
   flex: 1;
-  padding: 7px 12px;
+  min-height: 44px;
+  padding: 9px 10px;
   border-radius: 14px;
-  border: none;
+  border: 1px solid transparent;
   background: transparent;
-  color: rgba(203, 213, 225, 0.55);
-  font-size: 11px;
+  color: rgba(203, 213, 225, 0.68);
+  font-size: 12px;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   cursor: pointer;
-  transition: background 150ms ease, color 150ms ease;
-  letter-spacing: 0.5px;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease, transform 150ms ease;
+  letter-spacing: 0.3px;
 }
 
 .oracle-tab:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(203, 213, 225, 0.85);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(248, 250, 252, 0.9);
+}
+
+.oracle-tab:focus-visible,
+.oracle-link:focus-visible,
+.oracle-project-link:focus-visible {
+  outline: 2px solid rgba(34, 211, 238, 0.8);
+  outline-offset: 2px;
 }
 
 .oracle-tab.active {
-  background: rgba(34, 211, 238, 0.18);
-  color: #22d3ee;
+  background: rgba(34, 211, 238, 0.14);
+  border-color: rgba(34, 211, 238, 0.22);
+  color: #7ce8f7;
 }
 
 /* ── Scrollable section ── */
 .oracle-scroll {
   flex: 1 1 0;
+  min-height: 0;
   overflow-y: auto;
   border-radius: 24px;
-  padding: 16px;
+  padding: 16px 16px 18px;
   scrollbar-width: thin;
   scrollbar-color: rgba(34, 211, 238, 0.65) rgba(255, 255, 255, 0.04);
 }
@@ -181,29 +200,30 @@
 }
 
 .oracle-link {
-  color: #22d3ee;
-  font-size: 10px;
+  color: #7ce8f7;
+  font-size: 11px;
   text-decoration: none;
+  word-break: break-word;
 }
 
 .oracle-link:hover {
   text-decoration: underline;
 }
-
 /* ── Cron cards ── */
 .oracle-cron-card {
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 12px;
-  margin-bottom: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  background: rgba(255, 255, 255, 0.04);
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.96), rgba(15, 23, 42, 0.92));
+  border: 1px solid rgba(34, 211, 238, 0.11);
+  margin-bottom: 10px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
 }
 
 .oracle-cron-card > div {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 12px;
   margin-bottom: 4px;
 }
 
@@ -215,14 +235,303 @@
 .oracle-cron-card p {
   margin: 0;
   font-size: 10px;
-  color: rgba(203, 213, 225, 0.6);
+  color: rgba(203, 213, 225, 0.9);
+  line-height: 1.45;
 }
 
 .oracle-cron-card small {
   font-size: 9px;
   color: rgba(203, 213, 225, 0.35);
+  display: block;
+  margin-top: 6px;
 }
 
+.oracle-policy-badges,
+.oracle-action-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.oracle-policy-badges {
+  margin-top: 10px;
+}
+
+.oracle-action-boundary {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.oracle-boundary-card {
+  border-radius: 14px;
+  padding: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: linear-gradient(180deg, rgba(7, 14, 28, 0.88), rgba(12, 18, 34, 0.96));
+}
+
+.oracle-boundary-card strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  color: #f8fafc;
+}
+
+.oracle-boundary-card ul {
+  margin: 0;
+  padding-left: 18px;
+  color: rgba(226, 232, 240, 0.9);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.oracle-boundary-card p {
+  margin: 0;
+  color: rgba(226, 232, 240, 0.88);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.oracle-boundary-card small {
+  display: block;
+  margin-top: 8px;
+  font-size: 9px;
+  color: rgba(203, 213, 225, 0.45);
+}
+
+.oracle-preview-panel {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(34, 211, 238, 0.14);
+  background: linear-gradient(180deg, rgba(8, 15, 29, 0.95), rgba(11, 18, 34, 0.98));
+}
+
+.oracle-preview-head,
+.oracle-preview-result-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.oracle-preview-result-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.oracle-preview-head strong,
+.oracle-preview-result-head strong {
+  display: block;
+  font-size: 12px;
+  color: #f8fafc;
+}
+
+.oracle-preview-head p,
+.oracle-preview-result p {
+  margin: 4px 0 0;
+  color: rgba(226, 232, 240, 0.86);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.oracle-preview-field {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.oracle-preview-field span {
+  font-size: 9px;
+  color: rgba(203, 213, 225, 0.52);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.oracle-preview-field textarea {
+  width: 100%;
+  min-height: 76px;
+  resize: vertical;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(2, 6, 23, 0.9);
+  color: #f8fafc;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.oracle-session-field {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.oracle-session-field span {
+  font-size: 9px;
+  color: rgba(203, 213, 225, 0.52);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.oracle-session-field input {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(2, 6, 23, 0.9);
+  color: #f8fafc;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.oracle-session-field input:focus {
+  outline: 2px solid rgba(34, 211, 238, 0.5);
+  outline-offset: 1px;
+}
+
+.oracle-session-actions {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.oracle-preview-actions {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.oracle-session-secondary {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(148, 163, 184, 0.08);
+  color: #e2e8f0;
+  border-radius: 999px;
+  padding: 9px 14px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+}
+
+.oracle-session-secondary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.oracle-execute-card small + small {
+  margin-top: 6px;
+}
+
+
+.oracle-preview-button {
+  border: 1px solid rgba(34, 211, 238, 0.24);
+  background: linear-gradient(180deg, rgba(34, 211, 238, 0.18), rgba(14, 165, 233, 0.12));
+  color: #e0f7fb;
+  border-radius: 999px;
+  padding: 9px 14px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+}
+
+.oracle-preview-button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.oracle-preview-actions small {
+  color: rgba(203, 213, 225, 0.46);
+  font-size: 9px;
+}
+
+.oracle-preview-result {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.oracle-execute-lane {
+  margin-top: 12px;
+}
+
+.oracle-execute-card {
+  border: 1px dashed rgba(248, 113, 113, 0.24);
+  background: rgba(127, 29, 29, 0.08);
+}
+
+.oracle-execute-card p {
+  margin-bottom: 10px;
+}
+
+.oracle-execute-card button {
+  margin-top: 4px;
+}
+
+.oracle-preview-result span {
+  color: #7ce8f7;
+  font-size: 9px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  text-transform: uppercase;
+}
+
+.oracle-preview-result small,
+.oracle-preview-result code {
+  display: block;
+  margin-top: 6px;
+  color: rgba(203, 213, 225, 0.52);
+  font-size: 9px;
+  word-break: break-word;
+}
+
+.oracle-action-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.oracle-action-card {
+  border-radius: 14px;
+  padding: 12px;
+  border: 1px solid rgba(34, 211, 238, 0.12);
+  background: linear-gradient(180deg, rgba(7, 14, 28, 0.92), rgba(15, 23, 42, 0.96));
+}
+
+.oracle-action-card strong {
+  font-size: 11px;
+  color: #fff;
+}
+
+.oracle-action-card p {
+  margin: 8px 0 0;
+  font-size: 10px;
+  line-height: 1.45;
+  color: rgba(226, 232, 240, 0.88);
+}
+
+.oracle-action-card small {
+  display: block;
+  margin-top: 8px;
+  font-size: 9px;
+  color: rgba(203, 213, 225, 0.45);
+}
 .cron-badge {
   border-radius: 999px;
   padding: 2px 8px;
@@ -262,14 +571,14 @@
 .oracle-credential {
   border-radius: 16px;
   padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(255, 255, 255, 0.025);
   margin-bottom: 8px;
 }
 
 .oracle-live-card {
-  border-color: rgba(34, 211, 238, 0.22);
-  background: linear-gradient(135deg, rgba(34, 211, 238, 0.11), rgba(167, 139, 250, 0.08));
+  border-color: rgba(34, 211, 238, 0.18);
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.08), rgba(167, 139, 250, 0.04));
 }
 
 .oracle-live-card strong {
@@ -303,6 +612,21 @@
   color: #22d3ee;
 }
 
+.oracle-feedback-card {
+  border-color: rgba(34, 211, 238, 0.26);
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.08), rgba(167, 139, 250, 0.06));
+}
+
+.oracle-feedback-card strong {
+  color: #f8fafc;
+}
+
+.oracle-feedback-card small {
+  display: block;
+  margin-top: 6px;
+  color: rgba(203, 213, 225, 0.7);
+}
+
 .oracle-status-card.ok {
   border-color: rgba(61, 214, 140, 0.26);
   background: rgba(61, 214, 140, 0.06);
@@ -334,19 +658,19 @@
 .oracle-status-head span,
 .oracle-credential strong {
   border-radius: 999px;
-  padding: 3px 8px;
-  background: rgba(245, 158, 11, 0.18);
-  color: #f59e0b;
+  padding: 4px 9px;
+  background: rgba(245, 158, 11, 0.16);
+  color: #f7b84b;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
 
 .oracle-status-card.ok .oracle-status-head span,
 .oracle-credential.ok strong {
-  background: rgba(61, 214, 140, 0.18);
-  color: #3dd68c;
+  background: rgba(61, 214, 140, 0.16);
+  color: #64df99;
 }
 
 .oracle-status-card.fail .oracle-status-head span {
@@ -398,7 +722,9 @@
 .oracle-wiro-row code {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 10px;
-  color: #f59e0b;
+  color: #f7b84b;
+  min-width: 0;
+  word-break: break-word;
 }
 
 .oracle-wiro-opp {
@@ -417,9 +743,10 @@
 .oracle-module {
   border-radius: 18px;
   padding: 13px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(255, 255, 255, 0.025);
   position: relative;
+  overflow: hidden;
 }
 
 .oracle-module-header {
@@ -488,11 +815,25 @@
   color: #22d3ee;
 }
 
-/* accent left borders */
-.oracle-module.orange { box-shadow: inset 3px 0 0 #f59e0b; }
-.oracle-module.cyan   { box-shadow: inset 3px 0 0 #22d3ee; }
-.oracle-module.violet { box-shadow: inset 3px 0 0 #a78bfa; }
-.oracle-module.green  { box-shadow: inset 3px 0 0 #3dd68c; }
+.oracle-module.orange {
+  border-color: rgba(245, 158, 11, 0.24);
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.08), rgba(255, 255, 255, 0.02));
+}
+
+.oracle-module.cyan {
+  border-color: rgba(34, 211, 238, 0.24);
+  background: linear-gradient(180deg, rgba(34, 211, 238, 0.08), rgba(255, 255, 255, 0.02));
+}
+
+.oracle-module.violet {
+  border-color: rgba(167, 139, 250, 0.24);
+  background: linear-gradient(180deg, rgba(167, 139, 250, 0.08), rgba(255, 255, 255, 0.02));
+}
+
+.oracle-module.green {
+  border-color: rgba(61, 214, 140, 0.24);
+  background: linear-gradient(180deg, rgba(61, 214, 140, 0.08), rgba(255, 255, 255, 0.02));
+}
 
 /* ── Learnings ── */
 .oracle-learning-card {
@@ -529,6 +870,12 @@
   line-height: 1.5;
 }
 
+.oracle-retro-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .oracle-retro-item {
   display: flex;
   align-items: baseline;
@@ -550,9 +897,9 @@
 .oracle-next-steps {
   margin: 0;
   padding-left: 20px;
-  color: rgba(203, 213, 225, 0.72);
+  color: rgba(203, 213, 225, 0.84);
   font-size: 11px;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
 .oracle-next-steps li + li {
@@ -572,12 +919,18 @@
   letter-spacing: 0;
 }
 
-/* ── Alert metric cell ── */
-.oracle-metric-alert strong {
-  color: #f87171 !important;
-}
+@media (prefers-reduced-motion: reduce) {
+  .oracle-pulse span,
+  .oracle-tab-dot {
+    animation: none;
+  }
 
-/* ── Tab alert dot ── */
+  .oracle-tab,
+  .oracle-link,
+  .oracle-project-link {
+    transition-duration: 0.01ms;
+  }
+}
 .oracle-tab.has-alert {
   position: relative;
 }
@@ -740,10 +1093,12 @@
 .oracle-rec-action {
   margin: 0;
   font-size: 11px;
-  color: rgba(203, 213, 225, 0.85);
+  color: rgba(226, 232, 240, 0.9);
   line-height: 1.45;
-  border-left: 2px solid rgba(167, 139, 250, 0.5);
-  padding-left: 8px;
+  background: rgba(167, 139, 250, 0.08);
+  border: 1px solid rgba(167, 139, 250, 0.16);
+  border-radius: 12px;
+  padding: 8px 10px;
 }
 
 /* ── Deploy Timeline ── */
@@ -811,21 +1166,63 @@
 .oracle-timeline-note {
   margin: 3px 0 0;
   font-size: 10px;
-  color: rgba(203, 213, 225, 0.62);
-  line-height: 1.4;
+  color: rgba(226, 232, 240, 0.7);
+  line-height: 1.45;
+  word-break: break-word;
 }
 
 /* ── Responsive ── */
 @media (max-width: 980px) {
   .oracle-shell {
-    top: auto;
-    left: 14px;
-    right: 14px;
-    bottom: 14px;
+    top: 68px;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
     width: auto;
+  }
+
+  .oracle-hero-card {
+    padding: 16px 18px;
   }
 
   .oracle-hero-card h1 {
     font-size: 28px;
+  }
+
+  .oracle-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .oracle-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .oracle-tab {
+    font-size: 11px;
+    min-height: 44px;
+    padding-inline: 8px;
+  }
+
+  .oracle-scroll {
+    padding: 14px;
+  }
+
+  .oracle-wiro-row,
+  .oracle-status-head,
+  .oracle-rec-head,
+  .oracle-timeline-head,
+  .oracle-module-header,
+  .oracle-learning-head {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .oracle-action-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .oracle-policy-badges {
+    gap: 6px;
   }
 }

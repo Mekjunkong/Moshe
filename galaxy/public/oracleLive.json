@@ -1,10 +1,10 @@
 {
-  "generated": "2026-05-03T11:01:08.537Z",
+  "generated": "2026-05-05T10:38:31.845Z",
   "born": "2026-04-18",
-  "level3Phase": "Phase 2A: Better Read-only Intelligence — incidents, CI status, recommendations, deploy timeline",
+  "level3Phase": "Phase 3B: Feedback loop — audit-derived learnings, auth, allowlist, audit log, preview mode",
   "stats": {
-    "learnings": 4,
-    "retrospectives": 7,
+    "learnings": 10,
+    "retrospectives": 10,
     "activeProjects": 2,
     "inboxItems": 1,
     "writingDocs": 0,
@@ -12,70 +12,67 @@
   },
   "recentLearnings": [
     {
-      "title": "Generated Artifacts Belong in .gitignore — and Retro Discipline",
-      "file": "2026-05-03_generated-artifacts-gitignore-and-retro-discipline.md",
-      "date": "2026-05-03",
-      "summary": "session: fd030ffe tags: [galaxy, git, testing, retrospectives]  Generated Artifacts Belong in .gitignore — and Retro Discipline"
+      "title": "Learning: session gate unlocks execution",
+      "date": "2026-05-05",
+      "summary": "Mike-only signed session cookie issued."
     },
     {
-      "title": "Learning — Wiro4x4 Homepage Push 2026-05-02",
-      "file": "2026-05-02-wiro-homepage-push.md",
-      "date": "2026-05-02",
-      "summary": "- For Wiro4x4 homepage conversion work, keep changes surgical and commit only intended homepage files because the repo may contain unrelated dirty fil…"
+      "title": "Learning: Wiro CI dispatch works",
+      "date": "2026-05-05",
+      "summary": "Wiro CI dispatch queued for Mekjunkong/Wiro4x4."
     },
     {
-      "title": "Oracle Dashboard Read-Only Monitor Pattern",
-      "file": "oracle-dashboard-read-only-monitor.md",
-      "date": "2026-05-02",
-      "summary": "Date: 2026-05-03  Learning For Moshe Oracle OS dashboard work, Phase 1 should be read-only and generated from safe snapshots before adding actions."
+      "title": "Learning: execution stays locked without session",
+      "date": "2026-05-05",
+      "summary": "Execution is not armed. Set ORACLE_SESSION_SECRET to enable signed session gating."
     },
     {
-      "title": "Lesson: /rrr is the only thing that gives Moshe memory between sessions",
-      "file": "2026-04-24_rrr-habit-and-memory-gaps.md",
-      "date": "2026-04-23",
-      "summary": "slug: rrr-habit-and-memory-gaps tags: [memory, retrospective, habit, moshe] source: rrr session ee7e2509"
+      "title": "Oracle Action Layer + Wiro Visibility Split",
+      "file": "2026-05-05-oracle-action-layer-and-wiro-visibility.md",
+      "date": "2026-05-05",
+      "summary": "Date: 2026-05-05  Learning Keep Oracle action-layer design separate from Wiro visibility work. Oracle should show future buttons as a preview-only con…"
+    },
+    {
+      "title": "Oracle Phase 2A Smoke Check Learning",
+      "file": "2026-05-05-oracle-phase-2a-smoke-check.md",
+      "date": "2026-05-05",
+      "summary": "Date: 2026-05-05  Learning The Oracle dashboard is safe to treat as a real read-only monitor only after both build-time data generation and a browser …"
     }
   ],
-  "retrospectivesCount": 7,
+  "retrospectivesCount": 10,
   "retrospectivesRecent": [
+    "2026-05-05 — Oracle Action Layer + Wiro Visibility — 2026-05-05",
+    "2026-05-05 — Oracle Phase 2A Smoke Check — 2026-05-05",
+    "2026-05-05 — Retrospective — Oracle Phase 3A Action API Foundation",
     "2026-05-03 — Oracle Option B + Daily Self-Learning Scan — 2026-05-03",
-    "2026-05-03 — Oracle Phase 2A Intelligence — 2026-05-03",
-    "2026-05-02 — Oracle Dashboard Custom Domain — 2026-05-03",
-    "2026-05-02 — Oracle Dashboard Phase 1 Read Only — 2026-05-03",
-    "2026-05-02 — Oracle Dashboard Vercel Deploy — 2026-05-03"
+    "2026-05-03 — Oracle Phase 2A Intelligence — 2026-05-03"
   ],
   "activeCrons": [
     {
       "name": "Wiro4x4 Daily QA Check",
       "schedule": "0 8 * * *",
-      "nextRun": "2026-05-04T08:00:00+07:00",
-      "status": "active"
-    },
-    {
-      "name": "Switch to Gemini (MiniMax expired)",
-      "schedule": "May 4 at 09:00",
-      "nextRun": "2026-05-04T09:00:00+07:00",
+      "nextRun": "2026-05-06T08:00:00+07:00",
       "status": "active"
     },
     {
       "name": "Weekly Oracle Report for Mike",
       "schedule": "0 9 * * 1",
-      "nextRun": "2026-05-04T09:00:00+07:00",
+      "nextRun": "2026-05-11T09:00:00+07:00",
       "status": "active"
     },
     {
       "name": "Daily Oracle Self-Learning Scan",
       "schedule": "0 7 * * *",
-      "nextRun": "2026-05-04T07:00:00+07:00",
+      "nextRun": "2026-05-06T07:00:00+07:00",
       "status": "active"
     }
   ],
   "projects": [
     {
       "name": "Moshe Oracle OS",
-      "url": "https://www.mikewebstudio.com",
+      "url": "",
       "status": "Building",
-      "note": "Phase 2A active: incidents, CI status, recommendations, deploy timeline.",
+      "note": "Phase 3A active: server-side action API foundation, auth, allowlist, audit log.",
       "accent": "orange"
     },
     {
@@ -102,20 +99,20 @@
   "websites": [
     {
       "name": "Moshe Oracle Dashboard",
-      "url": "https://www.mikewebstudio.com",
+      "url": "local Vite / Vercel static app",
       "ok": true,
       "status": 200,
-      "responseMs": 1001,
-      "checkedAt": "2026-05-03T11:00:58.759Z",
-      "note": "reachable"
+      "responseMs": null,
+      "checkedAt": "2026-05-05T10:38:19.522Z",
+      "note": "local build target; set ORACLE_DASHBOARD_URL after deploy for public uptime checks"
     },
     {
       "name": "Aum Hippie Young",
       "url": "https://aum-hippie-young.vercel.app/",
       "ok": true,
       "status": 200,
-      "responseMs": 162,
-      "checkedAt": "2026-05-03T11:00:57.943Z",
+      "responseMs": 238,
+      "checkedAt": "2026-05-05T10:38:19.760Z",
       "note": "reachable"
     },
     {
@@ -123,8 +120,8 @@
       "url": "https://www.wiro4x4indochina.com/",
       "ok": true,
       "status": 200,
-      "responseMs": 237,
-      "checkedAt": "2026-05-03T11:00:58.018Z",
+      "responseMs": 235,
+      "checkedAt": "2026-05-05T10:38:19.778Z",
       "note": "reachable"
     }
   ],
@@ -133,11 +130,12 @@
       "name": "Moshe",
       "path": "/Users/pasuthunjunkong/workspace/Moshe",
       "branch": "main",
-      "commit": "338477a",
-      "commitSubject": "feat(galaxy): add Oracle Phase 2A intelligence",
+      "commit": "1cf8156",
+      "commitFull": "1cf815675c9fa382efd692a85404328fb76426e5",
+      "commitSubject": "chore(gitignore): Add rules for origin symlinks and data/ directory",
       "dirty": true,
-      "changedFiles": 15,
-      "lastCommitAt": "2026-05-03T18:00:30+07:00",
+      "changedFiles": 32,
+      "lastCommitAt": "2026-05-04T10:40:59+07:00",
       "github": "Mekjunkong/Moshe",
       "remoteHost": "github.com"
     },
@@ -146,6 +144,7 @@
       "path": "/Users/pasuthunjunkong/workspace/aum-hippie-young",
       "branch": "main",
       "commit": "2c20b3a",
+      "commitFull": "2c20b3a53a422676f46c83654f9806a5fc2b8590",
       "commitSubject": "Improve homepage conversion and performance",
       "dirty": false,
       "changedFiles": 0,
@@ -157,11 +156,12 @@
       "name": "Wiro4x4",
       "path": "/Users/pasuthunjunkong/workspace/wiro4x4",
       "branch": "main",
-      "commit": "292b558",
-      "commitSubject": "fix: resolve Wiro CI lint errors",
-      "dirty": false,
-      "changedFiles": 0,
-      "lastCommitAt": "2026-05-03T09:08:43+07:00",
+      "commit": "f4068dc",
+      "commitFull": "f4068dc84fa3724c1ba34a6449ec82b9132ec4be",
+      "commitSubject": "fix(lint): resolve remaining floating promise warnings (#7)",
+      "dirty": true,
+      "changedFiles": 17,
+      "lastCommitAt": "2026-05-04T09:07:10+07:00",
       "github": "Mekjunkong/Wiro4x4",
       "remoteHost": "github.com"
     }
@@ -171,8 +171,24 @@
       "provider": "vercel",
       "project": "galaxy",
       "state": "READY",
+      "url": "https://galaxy-d3g8sflz8-pasuthun-junkongs-projects.vercel.app",
+      "createdAt": "2026-05-03T11:01:17.303Z",
+      "gitCommitSha": "338477a999be509755a96d4dd8eb2c8797f268a2",
+      "gitCommitMessage": "feat(galaxy): add Oracle Phase 2A intelligence",
+      "gitCommitRef": "main",
+      "gitDirty": true,
+      "note": "read via Vercel CLI auth; no token value exposed"
+    },
+    {
+      "provider": "vercel",
+      "project": "galaxy",
+      "state": "READY",
       "url": "https://galaxy-894ee2bf3-pasuthun-junkongs-projects.vercel.app",
       "createdAt": "2026-05-03T00:31:09.199Z",
+      "gitCommitSha": "a8f3216e121088df91a8ad006604ee614e1f50f2",
+      "gitCommitMessage": "feat(galaxy): Oracle OS Level 3 dashboard with real data",
+      "gitCommitRef": "main",
+      "gitDirty": true,
       "note": "read via Vercel CLI auth; no token value exposed"
     },
     {
@@ -181,14 +197,10 @@
       "state": "READY",
       "url": "https://galaxy-1rm73gk9s-pasuthun-junkongs-projects.vercel.app",
       "createdAt": "2026-05-02T23:50:23.862Z",
-      "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "vercel",
-      "project": "galaxy",
-      "state": "READY",
-      "url": "https://galaxy-2n8v1pu15-pasuthun-junkongs-projects.vercel.app",
-      "createdAt": "2026-05-02T23:49:33.799Z",
+      "gitCommitSha": "a8f3216e121088df91a8ad006604ee614e1f50f2",
+      "gitCommitMessage": "feat(galaxy): Oracle OS Level 3 dashboard with real data",
+      "gitCommitRef": "main",
+      "gitDirty": true,
       "note": "read via Vercel CLI auth; no token value exposed"
     }
   ],
@@ -200,7 +212,7 @@
       "apiStatus": "ok",
       "private": false,
       "defaultBranch": "main",
-      "pushedAt": "2026-05-03T11:00:40Z",
+      "pushedAt": "2026-05-04T03:41:01Z",
       "openIssues": 0,
       "openPullRequests": 0,
       "latestWorkflow": null,
@@ -226,17 +238,17 @@
       "apiStatus": "ok",
       "private": false,
       "defaultBranch": "main",
-      "pushedAt": "2026-05-03T02:09:09Z",
+      "pushedAt": "2026-05-04T02:07:13Z",
       "openIssues": 0,
       "openPullRequests": 0,
       "latestWorkflow": {
         "name": "CI",
         "status": "completed",
-        "conclusion": "failure",
+        "conclusion": "success",
         "branch": "main",
         "event": "push",
-        "updatedAt": "2026-05-03T02:10:47Z",
-        "url": "https://github.com/Mekjunkong/Wiro4x4/actions/runs/25267399520"
+        "updatedAt": "2026-05-04T02:18:03Z",
+        "url": "https://github.com/Mekjunkong/Wiro4x4/actions/runs/25297587201"
       },
       "note": "read via GitHub CLI auth; no token value exposed"
     }
@@ -270,23 +282,22 @@
   ],
   "incidents": [
     {
-      "id": "ci-fail-mekjunkong-wiro4x4",
-      "severity": "critical",
-      "category": "github-actions-failed",
-      "project": "Wiro4x4",
-      "title": "CI failure on main",
-      "detail": "Workflow \"CI\" failed.",
-      "detectedAt": "2026-05-03T02:10:47Z",
-      "url": "https://github.com/Mekjunkong/Wiro4x4/actions/runs/25267399520"
-    },
-    {
       "id": "repo-dirty-moshe",
       "severity": "warning",
       "category": "repo-dirty",
       "project": "Moshe",
-      "title": "Moshe: 15 uncommitted changes",
-      "detail": "Branch main · last commit: \"feat(galaxy): add Oracle Phase 2A intelligence\"",
-      "detectedAt": "2026-05-03T18:00:30+07:00"
+      "title": "Moshe: 32 uncommitted changes",
+      "detail": "Branch main · last commit: \"chore(gitignore): Add rules for origin symlinks and data/ di\"",
+      "detectedAt": "2026-05-04T10:40:59+07:00"
+    },
+    {
+      "id": "repo-dirty-wiro4x4",
+      "severity": "warning",
+      "category": "repo-dirty",
+      "project": "Wiro4x4",
+      "title": "Wiro4x4: 17 uncommitted changes",
+      "detail": "Branch main · last commit: \"fix(lint): resolve remaining floating promise warnings (#7)\"",
+      "detectedAt": "2026-05-04T09:07:10+07:00"
     },
     {
       "id": "creds-missing",
@@ -295,23 +306,23 @@
       "project": "Oracle OS",
       "title": "5 credential(s) not configured",
       "detail": "VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_PROJECT_NAME, VERCEL_TEAM_ID, GITHUB_TOKEN",
-      "detectedAt": "2026-05-03T11:01:08.537Z"
+      "detectedAt": "2026-05-05T10:38:31.845Z"
     }
   ],
   "recommendations": [
     {
-      "project": "Wiro4x4",
-      "priority": "high",
-      "reason": "CI failure on main",
-      "risk": "high",
-      "suggestedAction": "Investigate the failing CI workflow — check test, build, and lint steps for errors."
-    },
-    {
       "project": "Moshe",
       "priority": "medium",
-      "reason": "Moshe: 15 uncommitted changes",
+      "reason": "Moshe: 32 uncommitted changes",
       "risk": "medium",
       "suggestedAction": "Review staged changes in Moshe and commit or stash to keep the branch clean."
+    },
+    {
+      "project": "Wiro4x4",
+      "priority": "medium",
+      "reason": "Wiro4x4: 17 uncommitted changes",
+      "risk": "medium",
+      "suggestedAction": "Review staged changes in Wiro4x4 and commit or stash to keep the branch clean."
     },
     {
       "project": "Oracle OS",
@@ -325,17 +336,13 @@
     "repo": "Mekjunkong/Wiro4x4",
     "workflowName": "CI",
     "status": "completed",
-    "conclusion": "failure",
+    "conclusion": "success",
     "branch": "main",
     "event": "push",
-    "updatedAt": "2026-05-03T02:10:47Z",
-    "url": "https://github.com/Mekjunkong/Wiro4x4/actions/runs/25267399520",
-    "failureCategory": "test",
-    "jobDetails": {
-      "jobName": "ci",
-      "failedStep": "Run tests",
-      "failureCategory": "test"
-    }
+    "updatedAt": "2026-05-04T02:18:03Z",
+    "url": "https://github.com/Mekjunkong/Wiro4x4/actions/runs/25297587201",
+    "failureCategory": null,
+    "jobDetails": null
   },
   "deployTimeline": [
     {
@@ -343,16 +350,36 @@
       "project": "Moshe",
       "event": "commit",
       "state": "uncommitted-changes",
-      "timestamp": "2026-05-03T18:00:30+07:00",
-      "note": "feat(galaxy): add Oracle Phase 2A intelligence"
+      "timestamp": "2026-05-04T10:40:59+07:00",
+      "sourceRepo": "Moshe",
+      "sourceCommitSha": "1cf815675c9fa382efd692a85404328fb76426e5",
+      "syncState": "behind",
+      "note": "chore(gitignore): Add rules for origin symlinks and data/ directory"
     },
     {
       "provider": "git",
       "project": "Wiro4x4",
       "event": "commit",
-      "state": "clean",
-      "timestamp": "2026-05-03T09:08:43+07:00",
-      "note": "fix: resolve Wiro CI lint errors"
+      "state": "uncommitted-changes",
+      "timestamp": "2026-05-04T09:07:10+07:00",
+      "sourceRepo": "Wiro4x4",
+      "sourceCommitSha": "f4068dc84fa3724c1ba34a6449ec82b9132ec4be",
+      "syncState": "behind",
+      "note": "fix(lint): resolve remaining floating promise warnings (#7)"
+    },
+    {
+      "provider": "vercel",
+      "project": "galaxy",
+      "event": "deploy",
+      "state": "READY",
+      "url": "https://galaxy-d3g8sflz8-pasuthun-junkongs-projects.vercel.app",
+      "timestamp": "2026-05-03T11:01:17.303Z",
+      "deployedCommitSha": "338477a999be509755a96d4dd8eb2c8797f268a2",
+      "deployedCommitMessage": "feat(galaxy): add Oracle Phase 2A intelligence",
+      "sourceRepo": "Moshe",
+      "sourceCommitSha": "1cf815675c9fa382efd692a85404328fb76426e5",
+      "syncState": "behind",
+      "note": "read via Vercel CLI auth; no token value exposed"
     },
     {
       "provider": "vercel",
@@ -361,6 +388,11 @@
       "state": "READY",
       "url": "https://galaxy-894ee2bf3-pasuthun-junkongs-projects.vercel.app",
       "timestamp": "2026-05-03T00:31:09.199Z",
+      "deployedCommitSha": "a8f3216e121088df91a8ad006604ee614e1f50f2",
+      "deployedCommitMessage": "feat(galaxy): Oracle OS Level 3 dashboard with real data",
+      "sourceRepo": "Moshe",
+      "sourceCommitSha": "1cf815675c9fa382efd692a85404328fb76426e5",
+      "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
     {
@@ -370,15 +402,11 @@
       "state": "READY",
       "url": "https://galaxy-1rm73gk9s-pasuthun-junkongs-projects.vercel.app",
       "timestamp": "2026-05-02T23:50:23.862Z",
-      "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "vercel",
-      "project": "galaxy",
-      "event": "deploy",
-      "state": "READY",
-      "url": "https://galaxy-2n8v1pu15-pasuthun-junkongs-projects.vercel.app",
-      "timestamp": "2026-05-02T23:49:33.799Z",
+      "deployedCommitSha": "a8f3216e121088df91a8ad006604ee614e1f50f2",
+      "deployedCommitMessage": "feat(galaxy): Oracle OS Level 3 dashboard with real data",
+      "sourceRepo": "Moshe",
+      "sourceCommitSha": "1cf815675c9fa382efd692a85404328fb76426e5",
+      "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
     {
@@ -387,12 +415,55 @@
       "event": "commit",
       "state": "clean",
       "timestamp": "2026-05-02T22:57:45+07:00",
+      "sourceRepo": "Aum Hippie Young",
+      "sourceCommitSha": "2c20b3a53a422676f46c83654f9806a5fc2b8590",
+      "syncState": "in-sync",
       "note": "Improve homepage conversion and performance"
     }
   ],
+  "automation": {
+    "enabled": false,
+    "authConfigured": false,
+    "sessionConfigured": false,
+    "endpoint": "/api/oracle/actions",
+    "sessionEndpoint": "/api/oracle/session",
+    "authHeader": "HttpOnly signed session cookie",
+    "authMethod": "preview-only",
+    "auditPath": "/tmp/oracle-action-audit.jsonl",
+    "executionMode": "preview-only",
+    "sessionTtlMinutes": 480,
+    "note": "Preview trigger is wired to the action API path. Set ORACLE_SESSION_SECRET to arm Mike-only session-gated execution.",
+    "actions": [
+      {
+        "id": "refresh-oracle-snapshot",
+        "title": "Refresh Oracle snapshot",
+        "description": "Regenerate the read-only Oracle data bundle and re-evaluate sensors.",
+        "transport": "local-script",
+        "risk": "low",
+        "requiresConfirmation": true
+      },
+      {
+        "id": "dispatch-wiro-ci",
+        "title": "Dispatch Wiro CI",
+        "description": "Trigger the allowlisted GitHub workflow that verifies Wiro4x4 health.",
+        "transport": "github-api",
+        "risk": "medium",
+        "requiresConfirmation": true
+      },
+      {
+        "id": "vercel-redeploy",
+        "title": "Request Vercel redeploy",
+        "description": "Ask Vercel to redeploy the Oracle dashboard after a confirmed change.",
+        "transport": "vercel-api",
+        "risk": "medium",
+        "requiresConfirmation": true
+      }
+    ]
+  },
   "nextActions": [
-    "Set ORACLE_DASHBOARD_URL=https://www.mikewebstudio.com for public dashboard uptime checks.",
-    "Fix Wiro4x4 CI — investigate failing workflow steps.",
-    "Add analytics/booking sensors next for Wiro4x4 business visibility."
+    "Set ORACLE_SESSION_SECRET to arm the Mike-only signed session gate.",
+    "The Oracle now turns audit trail events into learnings before refreshing live data.",
+    "Keep the browser read-only until a valid session cookie unlocks execute mode.",
+    "Add execution handlers for GitHub and Vercel only after the audit trail is proven."
   ]
 }

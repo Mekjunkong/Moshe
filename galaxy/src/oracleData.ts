@@ -37,6 +37,7 @@ export interface OracleRepoStatus {
   path: string
   branch: string
   commit: string
+  commitFull: string
   commitSubject: string
   dirty: boolean
   changedFiles: number
@@ -75,6 +76,10 @@ export interface OracleDeploymentStatus {
   state: string
   url?: string
   createdAt?: string
+  gitCommitSha?: string
+  gitCommitMessage?: string
+  gitCommitRef?: string
+  gitDirty?: boolean
   note?: string
 }
 
@@ -137,7 +142,45 @@ export interface OracleDeployEvent {
   state: string
   url?: string
   timestamp: string
+  deployedCommitSha?: string
+  deployedCommitMessage?: string
+  sourceRepo?: string
+  sourceCommitSha?: string
+  syncState?: 'in-sync' | 'behind' | 'ahead' | 'unknown'
   note?: string
+}
+
+export interface OracleAutomationAction {
+  id: string
+  title: string
+  description: string
+  transport: 'preview-only' | 'github-api' | 'vercel-api' | 'local-script'
+  risk: 'low' | 'medium' | 'high'
+  requiresConfirmation: boolean
+}
+
+export interface OracleAutomationPolicy {
+  enabled: boolean
+  authConfigured: boolean
+  sessionConfigured: boolean
+  endpoint: string
+  sessionEndpoint: string
+  authHeader: string
+  authMethod: 'preview-only' | 'signed-session-cookie'
+  auditPath: string
+  executionMode: 'preview-only' | 'server-enabled'
+  sessionTtlMinutes: number
+  note?: string
+  actions: OracleAutomationAction[]
+}
+
+export interface OracleAutomationAuditEntry {
+  id: string
+  requestedAt: string
+  actor: string
+  actionId: string
+  outcome: 'allowed' | 'denied' | 'preview'
+  detail: string
 }
 
 // ── Root data contract ──────────────────────────────────────────────────────
@@ -169,6 +212,7 @@ export interface OracleData {
   recommendations?: OracleRecommendation[]
   wiroCi?: OracleWiroCi | null
   deployTimeline?: OracleDeployEvent[]
+  automation?: OracleAutomationPolicy | null
   nextActions: string[]
 }
 
@@ -223,6 +267,45 @@ export const ORACLE_FALLBACK_DATA: OracleData = {
   ],
   wiroCi: null,
   deployTimeline: [],
+  automation: {
+    enabled: false,
+    authConfigured: false,
+    sessionConfigured: false,
+    endpoint: '/api/oracle/actions',
+    sessionEndpoint: '/api/oracle/session',
+    authHeader: 'HttpOnly signed session cookie',
+    authMethod: 'preview-only',
+    auditPath: '/tmp/oracle-action-audit.jsonl',
+    executionMode: 'preview-only',
+    sessionTtlMinutes: 480,
+    note: 'Preview trigger is wired to the action API path. Set ORACLE_SESSION_SECRET to arm Mike-only session-gated execution.',
+    actions: [
+      {
+        id: 'refresh-oracle-snapshot',
+        title: 'Refresh Oracle snapshot',
+        description: 'Regenerate the read-only Oracle data bundle and re-evaluate sensors.',
+        transport: 'local-script',
+        risk: 'low',
+        requiresConfirmation: true,
+      },
+      {
+        id: 'dispatch-wiro-ci',
+        title: 'Dispatch Wiro CI',
+        description: 'Trigger the allowlisted GitHub workflow that verifies Wiro4x4 health.',
+        transport: 'github-api',
+        risk: 'medium',
+        requiresConfirmation: true,
+      },
+      {
+        id: 'vercel-redeploy',
+        title: 'Request Vercel redeploy',
+        description: 'Ask Vercel to redeploy the Oracle dashboard after a confirmed change.',
+        transport: 'vercel-api',
+        risk: 'medium',
+        requiresConfirmation: true,
+      },
+    ],
+  },
   nextActions: [
     'Run node scripts/generateOracleData.mjs',
     'Configure fresh env tokens only if Mike wants cloud deploy status',

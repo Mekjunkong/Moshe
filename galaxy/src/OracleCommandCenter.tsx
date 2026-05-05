@@ -7,12 +7,58 @@ interface Props {
   data: import('./types').GalaxyData
 }
 
-function useOracleLiveData(): OracleData {
+interface OracleActionManifestItem {
+  id: string
+  title: string
+  description: string
+  transport: string
+  risk: string
+  requiresConfirmation: boolean
+}
+
+interface OracleActionPreviewResponse {
+  ok: boolean
+  requestId?: string
+  decision?: 'preview' | 'executed'
+  message?: string
+  error?: string
+  nextStep?: string
+  source?: 'live-api' | 'local-fallback'
+  action?: OracleActionManifestItem
+  policy?: OracleData['automation']
+  session?: {
+    actor: string
+    expiresAt: string
+  }
+}
+
+interface OracleSessionResponse {
+  ok: boolean
+  requestId?: string
+  configured: boolean
+  authenticated: boolean
+  actor?: string | null
+  expiresAt?: string | null
+  message?: string
+  error?: string
+  policy?: OracleData['automation']
+}
+
+interface OracleSessionState {
+  status: 'loading' | 'ready' | 'authenticated' | 'error'
+  message: string
+  detail: string
+  configured: boolean
+  actor: string | null
+  expiresAt: string | null
+}
+
+function useOracleLiveData(refreshNonce = 0): OracleData {
   const [d, setD] = useState<OracleData>(ORACLE_FALLBACK_DATA)
 
   useEffect(() => {
     const controller = new AbortController()
-    fetch(`/oracleLive.json?ts=${Date.now()}`, { signal: controller.signal })
+    fetch(`/oracleLive.json?ts=${Date.now()}&refresh=${refreshNonce}`, { signal: controller.signal })
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json() as Promise<OracleData>
@@ -24,7 +70,7 @@ function useOracleLiveData(): OracleData {
         }
       })
     return () => controller.abort()
-  }, [])
+  }, [refreshNonce])
 
   return d
 }
@@ -47,15 +93,270 @@ function isHttpUrl(url?: string) {
 function timelineBadgeClass(state: string) {
   const s = state.toLowerCase()
   if (s === 'ready' || s === 'clean') return 'active'
-  if (s === 'uncommitted-changes' || s === 'building') return 'scheduled'
+  if (s === 'uncommitted-changes' || s === 'building' || s === 'ahead') return 'scheduled'
   if (s === 'error' || s === 'failed') return 'failed'
   return 'env-missing'
 }
 
-export default function OracleCommandCenter({ data }: Props) {
-  const oracle = useOracleLiveData()
-  const [tab, setTab] = useState<'intel' | 'overview' | 'sites' | 'repos' | 'sensors' | 'learnings'>('intel')
+function syncBadgeClass(syncState?: string) {
+  if (syncState === 'in-sync') return 'active'
+  if (syncState === 'behind' || syncState === 'ahead') return 'scheduled'
+  return 'env-missing'
+}
 
+const tabs = [
+  { id: 'intel', label: 'Intel', alert: true },
+  { id: 'overview', label: 'Overview' },
+  { id: 'sites', label: 'Sites' },
+  { id: 'repos', label: 'Repos' },
+  { id: 'sensors', label: 'Sensors' },
+  { id: 'learnings', label: 'Learnings' },
+] as const
+
+export default function OracleCommandCenter({ data }: Props) {
+  const [oracleRefreshNonce, setOracleRefreshNonce] = useState(0)
+  const oracle = useOracleLiveData(oracleRefreshNonce)
+  const [tab, setTab] = useState<'intel' | 'overview' | 'sites' | 'repos' | 'sensors' | 'learnings'>('intel')
+  const [previewReason, setPreviewReason] = useState('Refresh the Oracle snapshot before any future action.')
+  const [previewState, setPreviewState] = useState<{
+    status: 'idle' | 'loading' | 'ready' | 'error'
+    result: OracleActionPreviewResponse | null
+    detail: string
+  }>({
+    status: 'idle',
+    result: null,
+    detail: '',
+  })
+  const [sessionPassphrase, setSessionPassphrase] = useState('')
+  const [sessionState, setSessionState] = useState<OracleSessionState>({
+    status: 'loading',
+    message: 'Checking session gate…',
+    detail: 'The browser is checking whether a Mike-only signed cookie is already present.',
+    configured: false,
+    actor: null,
+    expiresAt: null,
+  })
+  const feedbackLoopNote =
+    oracle.nextActions.find((item) => item.toLowerCase().includes('audit trail events into learnings'))
+    ?? 'Audit trail events are being converted into reusable learnings.'
+
+  useEffect(() => {
+    const controller = new AbortController()
+    fetch('/api/oracle/session', {
+      method: 'GET',
+      credentials: 'include',
+      signal: controller.signal,
+    })
+      .then((response) => response.json() as Promise<OracleSessionResponse>)
+      .then((payload) => {
+        if (!payload.ok) throw new Error(payload.message ?? payload.error ?? 'Session check failed.')
+        const authenticated = Boolean(payload.authenticated)
+        setSessionState({
+          status: authenticated ? 'authenticated' : 'ready',
+          message: authenticated ? 'Signed session cookie unlocked.' : 'Session gate is closed.',
+          detail: authenticated
+            ? 'Execute mode is available to the currently signed-in Mike-only browser session.'
+            : payload.configured
+              ? 'Enter the Mike-only passphrase to mint a signed session cookie.'
+              : 'Set ORACLE_SESSION_SECRET on the server to enable execute mode.',
+          configured: payload.configured,
+          actor: payload.actor ?? null,
+          expiresAt: payload.expiresAt ?? null,
+        })
+      })
+      .catch((error: Error) => {
+        setSessionState({
+          status: 'error',
+          message: 'Session gate unavailable.',
+          detail: error.message,
+          configured: false,
+          actor: null,
+          expiresAt: null,
+        })
+      })
+    return () => controller.abort()
+  }, [])
+
+  const unlockSession = async () => {
+    setSessionState((current) => ({
+      ...current,
+      status: 'loading',
+      message: 'Unlocking session…',
+      detail: 'Sending the passphrase to the server to mint an httpOnly signed cookie.',
+    }))
+
+    try {
+      const response = await fetch('/api/oracle/session', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ passphrase: sessionPassphrase }),
+      })
+      const payload = (await response.json().catch(() => null)) as OracleSessionResponse | null
+      if (!response.ok || !payload?.ok) {
+        throw new Error(payload?.message ?? payload?.error ?? `HTTP ${response.status}`)
+      }
+
+      setSessionPassphrase('')
+      setSessionState({
+        status: 'authenticated',
+        message: payload.message ?? 'Session unlocked.',
+        detail: 'Mike-only execute mode is now available in this browser session.',
+        configured: payload.configured,
+        actor: payload.actor ?? 'Mike',
+        expiresAt: payload.expiresAt ?? null,
+      })
+    } catch (error) {
+      setSessionState((current) => ({
+        ...current,
+        status: 'error',
+        message: 'Failed to unlock session.',
+        detail: error instanceof Error ? error.message : 'Unknown session error.',
+      }))
+    }
+  }
+
+  const lockSession = async () => {
+    try {
+      const response = await fetch('/api/oracle/session', {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      const payload = (await response.json().catch(() => null)) as OracleSessionResponse | null
+      if (!response.ok || !payload?.ok) {
+        throw new Error(payload?.message ?? payload?.error ?? `HTTP ${response.status}`)
+      }
+
+      setSessionPassphrase('')
+      setSessionState({
+        status: 'ready',
+        message: payload.message ?? 'Session gate is closed.',
+        detail: 'Browser execution is locked until the passphrase is re-entered.',
+        configured: sessionState.configured,
+        actor: null,
+        expiresAt: null,
+      })
+    } catch (error) {
+      setSessionState((current) => ({
+        ...current,
+        status: 'error',
+        message: 'Failed to lock session.',
+        detail: error instanceof Error ? error.message : 'Unknown session error.',
+      }))
+    }
+  }
+
+  const runSnapshotPreview = async () => {
+    const actionId = 'refresh-oracle-snapshot'
+    const action = oracle.automation?.actions.find((item) => item.id === actionId) ?? null
+    setPreviewState({ status: 'loading', result: null, detail: 'Sending preview request…' })
+
+    try {
+      const response = await fetch(oracle.automation?.endpoint ?? '/api/oracle/actions', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionId,
+          mode: 'preview',
+          confirm: true,
+          reason: previewReason,
+        }),
+      })
+
+      const payload = (await response.json().catch(() => null)) as OracleActionPreviewResponse | null
+      if (!response.ok || !payload) {
+        throw new Error(payload?.message ?? payload?.error ?? `HTTP ${response.status}`)
+      }
+
+      setPreviewState({
+        status: 'ready',
+        result: { ...payload, source: 'live-api' },
+        detail: payload.message ?? 'Preview accepted from the live action API.',
+      })
+      return
+    } catch (error) {
+      const fallback: OracleActionPreviewResponse = {
+        ok: true,
+        requestId: `local-preview-${Date.now()}`,
+        decision: 'preview',
+        message: 'Local preview generated from the dashboard manifest because the API endpoint was not reachable in this environment.',
+        nextStep: 'Deploy the action API to a serverless environment to use the live preview endpoint.',
+        source: 'local-fallback',
+        action: action ?? undefined,
+        policy: oracle.automation,
+      }
+
+      setPreviewState({
+        status: 'error',
+        result: fallback,
+        detail: error instanceof Error ? error.message : 'Preview request failed.',
+      })
+    }
+  }
+
+  const runSnapshotExecute = async () => {
+    const actionId = 'refresh-oracle-snapshot'
+    const action = oracle.automation?.actions.find((item) => item.id === actionId) ?? null
+    if (sessionState.status !== 'authenticated') {
+      setPreviewState({
+        status: 'error',
+        result: {
+          ok: false,
+          error: 'unauthorized',
+          message: 'Unlock the Mike-only session gate before executing Oracle actions.',
+          action: action ?? undefined,
+          policy: oracle.automation,
+        },
+        detail: 'Execute mode is locked until a valid signed session cookie is present.',
+      })
+      return
+    }
+
+    setPreviewState({ status: 'loading', result: null, detail: 'Sending execute request…' })
+
+    try {
+      const response = await fetch(oracle.automation?.endpoint ?? '/api/oracle/actions', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionId,
+          mode: 'execute',
+          confirm: true,
+          reason: previewReason,
+        }),
+      })
+
+      const payload = (await response.json().catch(() => null)) as OracleActionPreviewResponse | null
+      if (!response.ok || !payload) {
+        throw new Error(payload?.message ?? payload?.error ?? `HTTP ${response.status}`)
+      }
+
+      setPreviewState({
+        status: 'ready',
+        result: { ...payload, source: 'live-api' },
+        detail: payload.message ?? 'Oracle action executed.',
+      })
+      setOracleRefreshNonce((n) => n + 1)
+      return
+    } catch (error) {
+      setPreviewState({
+        status: 'error',
+        result: {
+          ok: false,
+          error: 'execution_failed',
+          message: error instanceof Error ? error.message : 'Execute request failed.',
+          action: action ?? undefined,
+          policy: oracle.automation,
+          session: sessionState.actor && sessionState.expiresAt ? { actor: sessionState.actor, expiresAt: sessionState.expiresAt } : undefined,
+        },
+        detail: error instanceof Error ? error.message : 'Execute request failed.',
+      })
+    }
+  }
+
+  const previewAction = previewState.result?.action ?? oracle.automation?.actions[0] ?? null
   const projectNodes = data.documents.filter((d) => d.clusterId === 'projects').length
   const memoryNodes = data.documents.filter((d) => d.clusterId === 'memory').length
   const skillNodes = data.documents.filter((d) => d.clusterId === 'skills').length
@@ -81,7 +382,7 @@ export default function OracleCommandCenter({ data }: Props) {
         </div>
       </div>
 
-      <div className="oracle-metrics">
+      <dl className="oracle-metrics" aria-label="Oracle status summary">
         {[
           { label: 'Brain', value: data.documents.length },
           { label: 'Sites OK', value: `${onlineSites}/${oracle.websites.length || 0}` },
@@ -89,31 +390,35 @@ export default function OracleCommandCenter({ data }: Props) {
           { label: 'GitHub', value: `${githubOk}/${oracle.github.length || 0}` },
           { label: 'Alerts', value: criticalIncidents, alert: criticalIncidents > 0 },
         ].map((m) => (
-          <div key={m.label} className={'alert' in m && m.alert ? 'oracle-metric-alert' : ''}>
-            <strong>{'alert' in m && m.alert ? `⚠ ${m.value}` : m.value}</strong>
-            <span>{m.label}</span>
+          <div key={m.label} className={`oracle-metric${'alert' in m && m.alert ? ' oracle-metric-alert' : ''}`}>
+            <dt>{m.label}</dt>
+            <dd>{'alert' in m && m.alert ? `⚠ ${m.value}` : m.value}</dd>
           </div>
         ))}
-      </div>
+      </dl>
 
-      <div className="oracle-tabs" role="tablist">
-        {(['intel', 'overview', 'sites', 'repos', 'sensors', 'learnings'] as const).map((t) => (
+      <div className="oracle-tabs" role="tablist" aria-label="Oracle sections">
+        {tabs.map((t) => (
           <button
-            key={t}
+            key={t.id}
+            type="button"
             role="tab"
-            aria-selected={tab === t}
-            className={`oracle-tab${tab === t ? ' active' : ''}${t === 'intel' && criticalIncidents > 0 ? ' has-alert' : ''}`}
-            onClick={() => setTab(t)}
+            id={`oracle-tab-${t.id}`}
+            aria-controls={`oracle-panel-${t.id}`}
+            aria-selected={tab === t.id}
+            tabIndex={tab === t.id ? 0 : -1}
+            className={`oracle-tab${tab === t.id ? ' active' : ''}${t.id === 'intel' && criticalIncidents > 0 ? ' has-alert' : ''}`}
+            onClick={() => setTab(t.id)}
           >
-            {t === 'intel' ? 'Intel' : t.charAt(0).toUpperCase() + t.slice(1)}
-            {t === 'intel' && criticalIncidents > 0 && <span className="oracle-tab-dot" aria-hidden="true" />}
+            {t.label}
+            {t.id === 'intel' && criticalIncidents > 0 && <span className="oracle-tab-dot" aria-hidden="true" />}
           </button>
         ))}
       </div>
 
       {/* ── Intel tab ── */}
       {tab === 'intel' && (
-        <div className="oracle-section oracle-scroll">
+        <section id="oracle-panel-intel" role="tabpanel" aria-labelledby="oracle-tab-intel" className="oracle-section oracle-scroll">
 
           {/* Wiro CI */}
           <div className="oracle-section-head">
@@ -233,6 +538,31 @@ export default function OracleCommandCenter({ data }: Props) {
                       <span className={`cron-badge ${timelineBadgeClass(ev.state)}`}>{ev.state}</span>
                     </div>
                     <small className="oracle-muted">{ev.provider.toUpperCase()} · {ev.event} · {timeAgo(ev.timestamp)}</small>
+                    {ev.deployedCommitSha && (
+                      <div className="oracle-wiro-row">
+                        <span>Deployed commit</span>
+                        <code>{ev.deployedCommitSha.slice(0, 7)}</code>
+                      </div>
+                    )}
+                    {ev.sourceRepo && (
+                      <div className="oracle-wiro-row">
+                        <span>Source repo</span>
+                        <code>{ev.sourceRepo}</code>
+                      </div>
+                    )}
+                    {ev.sourceCommitSha && (
+                      <div className="oracle-wiro-row">
+                        <span>Current commit</span>
+                        <code>{ev.sourceCommitSha.slice(0, 7)}</code>
+                      </div>
+                    )}
+                    {ev.syncState && (
+                      <div className="oracle-wiro-row">
+                        <span>Freshness</span>
+                        <code className={syncBadgeClass(ev.syncState)}>{ev.syncState}</code>
+                      </div>
+                    )}
+                    {ev.deployedCommitMessage && <p className="oracle-timeline-note">{ev.deployedCommitMessage}</p>}
                     {ev.note && <p className="oracle-timeline-note">{ev.note}</p>}
                     {ev.url && isHttpUrl(ev.url) && (
                       <a href={ev.url} target="_blank" rel="noopener noreferrer" className="oracle-link">{ev.url}</a>
@@ -242,12 +572,12 @@ export default function OracleCommandCenter({ data }: Props) {
               ))}
             </div>
           )}
-        </div>
+        </section>
       )}
 
       {/* ── Overview tab ── */}
       {tab === 'overview' && (
-        <div className="oracle-section oracle-scroll">
+        <section id="oracle-panel-overview" role="tabpanel" aria-labelledby="oracle-tab-overview" className="oracle-section oracle-scroll">
           <div className="oracle-section-head">
             <p>SYSTEM PHASE</p>
             <span>{oracle.born}</span>
@@ -256,6 +586,190 @@ export default function OracleCommandCenter({ data }: Props) {
             <strong>{oracle.level3Phase}</strong>
             <small>Safe mode: no redeploy/restart/write actions exposed in browser.</small>
           </div>
+
+          <div className="oracle-live-card compact oracle-feedback-card">
+            <span>Feedback loop: <strong>active</strong></span>
+            <span>Audit learnings: <strong>{oracle.recentLearnings.length}</strong></span>
+            <span>Memory write: <strong>ψ/memory/learnings/oracle-action-feedback.md</strong></span>
+            <small>{feedbackLoopNote}</small>
+          </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>ACTION LAYER</p>
+            <span>{oracle.automation?.executionMode ?? 'preview-only'}</span>
+          </div>
+          {oracle.automation ? (
+            <article className={`oracle-status-card ${oracle.automation.enabled ? 'ok' : 'warn'}`}>
+              <div className="oracle-status-head">
+                <strong>Future buttons</strong>
+                <span>{oracle.automation.enabled ? 'SESSION GATED' : 'PREVIEW ONLY'}</span>
+              </div>
+              <div className="oracle-wiro-row">
+                <span>Endpoint</span>
+                <code>{oracle.automation.endpoint}</code>
+              </div>
+              <div className="oracle-wiro-row">
+                <span>Session gate</span>
+                <code>{oracle.automation.sessionConfigured ? 'signed cookie' : 'missing'}</code>
+              </div>
+              <div className="oracle-wiro-row">
+                <span>Session endpoint</span>
+                <code>{oracle.automation.sessionEndpoint}</code>
+              </div>
+              <div className="oracle-wiro-row">
+                <span>Audit</span>
+                <code>{oracle.automation.auditPath}</code>
+              </div>
+              <div className="oracle-policy-badges">
+                <span className={`oracle-risk-badge ${oracle.automation.enabled ? 'high' : 'low'}`}>
+                  {oracle.automation.executionMode.toUpperCase()}
+                </span>
+                <span className="oracle-risk-badge medium">Mike-only</span>
+                <span className="oracle-risk-badge low">Allowlisted</span>
+                <span className="oracle-risk-badge low">Audit logged</span>
+              </div>
+              <div className="oracle-action-boundary">
+                <div className="oracle-boundary-card">
+                  <strong>Safety rail</strong>
+                  <ul>
+                    <li>Server-side execution only</li>
+                    <li>Explicit confirmation for every mutation</li>
+                    <li>Allowlisted targets and actions</li>
+                    <li>Write audit trail before side effects</li>
+                  </ul>
+                </div>
+                <div className="oracle-boundary-card">
+                  <strong>Preview mode</strong>
+                  <p>{oracle.automation.note}</p>
+                  <small>Preview trigger is live; execute mode waits for a signed Mike-only session cookie.</small>
+                </div>
+              </div>
+              <div className="oracle-preview-panel">
+                <div className="oracle-preview-head">
+                  <div>
+                    <strong>Action preview trigger</strong>
+                    <p>Wired to the Oracle action API in preview mode first.</p>
+                  </div>
+                  <span className={`oracle-risk-badge ${previewState.status === 'error' ? 'medium' : 'low'}`}>
+                    {previewState.status === 'idle' ? 'READY' : previewState.status.toUpperCase()}
+                  </span>
+                </div>
+                <label className="oracle-preview-field">
+                  <span>Preview reason</span>
+                  <textarea
+                    value={previewReason}
+                    onChange={(e) => setPreviewReason(e.target.value)}
+                    rows={3}
+                    placeholder="Why do we want to preview the Oracle snapshot?"
+                  />
+                </label>
+                <div className="oracle-preview-actions">
+                  <button
+                    type="button"
+                    className="oracle-preview-button"
+                    onClick={runSnapshotPreview}
+                    disabled={previewState.status === 'loading'}
+                  >
+                    {previewState.status === 'loading' ? 'Sending preview…' : 'Preview refresh-oracle-snapshot'}
+                  </button>
+                  <small>Preview-only calls do not mutate the dashboard. Execution stays server-side.</small>
+                </div>
+                <div className="oracle-preview-result">
+                  <div className="oracle-preview-result-head">
+                    <strong>{previewAction?.title ?? 'Refresh Oracle snapshot'}</strong>
+                    <div className="oracle-preview-result-badges">
+                      <span>{previewState.result?.decision ?? '—'}</span>
+                      <span className={`oracle-risk-badge ${previewState.result?.source === 'live-api' ? 'low' : 'medium'}`}>
+                        {previewState.result?.source === 'live-api'
+                          ? 'LIVE API'
+                          : previewState.result?.source === 'local-fallback'
+                            ? 'LOCAL FALLBACK'
+                            : 'NO SOURCE'}
+                      </span>
+                    </div>
+                  </div>
+                  <p>{previewState.result?.message ?? 'No preview has been sent yet.'}</p>
+                  {previewState.detail && <small>{previewState.detail}</small>}
+                  {previewState.result?.nextStep && <small>{previewState.result.nextStep}</small>}
+                  {previewState.result?.requestId && <code>{previewState.result.requestId}</code>}
+                </div>
+                <div className="oracle-execute-lane">
+                  <div className="oracle-boundary-card oracle-execute-card">
+                    <strong>Execute lane</strong>
+                    <p>
+                      Real execution only opens after a Mike-only signed session cookie is minted by the server.
+                    </p>
+                    {oracle.automation.sessionConfigured ? (
+                      <>
+                        <label className="oracle-session-field">
+                          <span>Session passphrase</span>
+                          <input
+                            type="password"
+                            value={sessionPassphrase}
+                            onChange={(e) => setSessionPassphrase(e.target.value)}
+                            placeholder="Enter Mike-only passphrase"
+                          />
+                        </label>
+                        <div className="oracle-session-actions">
+                          <button
+                            type="button"
+                            className="oracle-preview-button"
+                            onClick={unlockSession}
+                            disabled={sessionState.status === 'loading' || !sessionPassphrase.trim()}
+                          >
+                            {sessionState.status === 'loading' ? 'Unlocking…' : sessionState.status === 'authenticated' ? 'Refresh session' : 'Unlock session'}
+                          </button>
+                          <button
+                            type="button"
+                            className="oracle-session-secondary"
+                            onClick={lockSession}
+                            disabled={sessionState.status !== 'authenticated'}
+                          >
+                            Lock session
+                          </button>
+                        </div>
+                        <small>{sessionState.message}</small>
+                        <small>{sessionState.detail}</small>
+                        {sessionState.actor && <small>Signed in as {sessionState.actor}</small>}
+                        {sessionState.expiresAt && <small>Expires at {new Date(sessionState.expiresAt).toLocaleString()}</small>}
+                      </>
+                    ) : (
+                      <small>Set ORACLE_SESSION_SECRET on the server to enable the Mike-only session gate.</small>
+                    )}
+                    <button
+                      type="button"
+                      className="oracle-preview-button"
+                      onClick={runSnapshotExecute}
+                      disabled={sessionState.status !== 'authenticated'}
+                    >
+                      Execute refresh-oracle-snapshot
+                    </button>
+                    <small>
+                      Browser execution is disabled until a signed session cookie exists. The API still keeps a full audit trail.
+                    </small>
+                  </div>
+                </div>
+              </div>
+              <div className="oracle-action-grid">
+                {oracle.automation.actions.map((action) => (
+                  <article className="oracle-action-card" key={action.id}>
+                    <div className="oracle-action-head">
+                      <strong>{action.title}</strong>
+                      <span className={`oracle-risk-badge ${action.risk}`}>{action.risk.toUpperCase()}</span>
+                    </div>
+                    <p>{action.description}</p>
+                    <small>
+                      {action.transport} · {action.requiresConfirmation ? 'confirmation required' : 'no confirmation'}
+                    </small>
+                  </article>
+                ))}
+              </div>
+            </article>
+          ) : (
+            <div className="oracle-cron-card">
+              <small className="oracle-muted">Phase 3 automation summary not available yet.</small>
+            </div>
+          )}
 
           <div className="oracle-section-head" style={{ marginTop: 16 }}>
             <p>DEPLOYMENTS</p>
@@ -268,6 +782,12 @@ export default function OracleCommandCenter({ data }: Props) {
                 <span className={`cron-badge ${d.state.toLowerCase()}`}>{d.state}</span>
               </div>
               {d.url && <a href={d.url} target="_blank" rel="noopener noreferrer" className="oracle-link">{d.url}</a>}
+              {(d.gitCommitSha || d.gitCommitMessage) && (
+                <>
+                  <small>Commit {d.gitCommitSha ? d.gitCommitSha.slice(0, 7) : '—'} · {d.gitCommitRef ?? 'no ref'}{d.gitDirty ? ' · dirty' : ''}</small>
+                  {d.gitCommitMessage && <small>{d.gitCommitMessage}</small>}
+                </>
+              )}
               <small>{d.createdAt ? timeAgo(d.createdAt) : d.note ?? 'read-only snapshot'}</small>
             </div>
           ))}
@@ -295,12 +815,12 @@ export default function OracleCommandCenter({ data }: Props) {
               <li key={s}>{s}</li>
             ))}
           </ol>
-        </div>
+        </section>
       )}
 
       {/* ── Sites tab ── */}
       {tab === 'sites' && (
-        <div className="oracle-section oracle-scroll">
+        <section id="oracle-panel-sites" role="tabpanel" aria-labelledby="oracle-tab-sites" className="oracle-section oracle-scroll">
           <div className="oracle-section-head">
             <p>WEBSITE MONITOR</p>
             <span>{onlineSites}/{oracle.websites.length} online</span>
@@ -346,12 +866,12 @@ export default function OracleCommandCenter({ data }: Props) {
               </article>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
       {/* ── Repos tab ── */}
       {tab === 'repos' && (
-        <div className="oracle-section oracle-scroll">
+        <section id="oracle-panel-repos" role="tabpanel" aria-labelledby="oracle-tab-repos" className="oracle-section oracle-scroll">
           <div className="oracle-section-head">
             <p>GIT REPOS</p>
             <span>{dirtyRepos} dirty</span>
@@ -390,12 +910,12 @@ export default function OracleCommandCenter({ data }: Props) {
               <small>{cred.purpose}</small>
             </div>
           ))}
-        </div>
+        </section>
       )}
 
       {/* ── Sensors tab ── */}
       {tab === 'sensors' && (
-        <div className="oracle-section oracle-scroll">
+        <section id="oracle-panel-sensors" role="tabpanel" aria-labelledby="oracle-tab-sensors" className="oracle-section oracle-scroll">
           <div className="oracle-section-head">
             <p>GITHUB LIVE SENSORS</p>
             <span>{githubOk}/{oracle.github.length} API OK</span>
@@ -446,12 +966,12 @@ export default function OracleCommandCenter({ data }: Props) {
               <small>{cred.purpose}</small>
             </div>
           ))}
-        </div>
+        </section>
       )}
 
       {/* ── Learnings tab ── */}
       {tab === 'learnings' && (
-        <div className="oracle-section oracle-scroll">
+        <section id="oracle-panel-learnings" role="tabpanel" aria-labelledby="oracle-tab-learnings" className="oracle-section oracle-scroll">
           <div className="oracle-section-head">
             <p>BRAIN COUNTS</p>
             <span>{projectNodes} projects · {skillNodes} skills · {runtimeNodes} runtime</span>
@@ -460,6 +980,14 @@ export default function OracleCommandCenter({ data }: Props) {
             <span>ψ learnings: <strong>{oracle.stats.learnings}</strong></span>
             <span>retrospectives: <strong>{oracle.stats.retrospectives}</strong></span>
             <span>active: <strong>{oracle.stats.activeProjects}</strong></span>
+          </div>
+
+          <div className="oracle-live-card oracle-feedback-card">
+            <strong>Oracle self-improvement loop</strong>
+            <small>
+              Live audit entries are distilled into recent learnings, then folded back into the regenerated Oracle snapshot.
+            </small>
+            <small>{feedbackLoopNote}</small>
           </div>
 
           <div className="oracle-section-head" style={{ marginTop: 16 }}>
@@ -480,13 +1008,15 @@ export default function OracleCommandCenter({ data }: Props) {
             <p>RETROSPECTIVES</p>
             <span>{oracle.retrospectivesCount} total</span>
           </div>
-          {oracle.retrospectivesRecent.map((r) => (
-            <div className="oracle-retro-item" key={r}>
-              <span>•</span>
-              <small>{r}</small>
-            </div>
-          ))}
-        </div>
+          <ul className="oracle-retro-list">
+            {oracle.retrospectivesRecent.map((r) => (
+              <li className="oracle-retro-item" key={r}>
+                <span>•</span>
+                <small>{r}</small>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
     </aside>
   )

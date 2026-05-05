@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
-import { KnowledgeMap } from 'knowledge-map-3d'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import type {
   MapDocument as KmMapDocument,
   ClusterMeta as KmClusterMeta,
@@ -10,6 +9,10 @@ import { CLUSTER_COLORS } from './clusters'
 import GalaxyChrome from './GalaxyChrome'
 import NodeDetailPanel from './NodeDetailPanel'
 import OracleCommandCenter from './OracleCommandCenter'
+
+const KnowledgeMap = lazy(() =>
+  import('knowledge-map-3d').then((mod) => ({ default: mod.KnowledgeMap })),
+)
 
 // ---------------------------------------------------------------------------
 // Adapters — bridge our galaxy-data.json schema to knowledge-map-3d types
@@ -187,21 +190,40 @@ export default function App() {
 
       {data && (
         <>
-          <KnowledgeMap
-            documents={kmDocs}
-            clusters={kmClusters}
-            nebulae={kmNebulae}
-            typeColors={CLUSTER_COLORS}
-            embedded
-            onDocumentClick={(kmDoc) => {
-              const local = data.documents.find(d => d.id === kmDoc.id) ?? null
-              setSelected(local)
-            }}
-            onClusterClick={(cluster) =>
-              setActive((prev) => (prev === cluster.id ? null : cluster.id))
+          <Suspense
+            fallback={
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'grid',
+                  placeItems: 'center',
+                  color: '#cbd5e1',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  letterSpacing: 1,
+                  background: 'radial-gradient(circle at center, rgba(34,211,238,0.05), transparent 55%)',
+                }}
+              >
+                Loading cosmic map…
+              </div>
             }
-            highlightIds={highlightIds}
-          />
+          >
+            <KnowledgeMap
+              documents={kmDocs}
+              clusters={kmClusters}
+              nebulae={kmNebulae}
+              typeColors={CLUSTER_COLORS}
+              embedded
+              onDocumentClick={(kmDoc) => {
+                const local = data.documents.find(d => d.id === kmDoc.id) ?? null
+                setSelected(local)
+              }}
+              onClusterClick={(cluster) =>
+                setActive((prev) => (prev === cluster.id ? null : cluster.id))
+              }
+              highlightIds={highlightIds}
+            />
+          </Suspense>
           {selectedNode && (
             <NodeDetailPanel node={selectedNode} onClose={() => setSelected(null)} />
           )}

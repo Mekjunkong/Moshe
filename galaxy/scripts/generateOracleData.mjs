@@ -5,9 +5,10 @@
  * No secrets are written. Env vars are reduced to configured/not-configured booleans.
  * Phase 2A additions: incidents, recommendations, wiroCi, deployTimeline.
  */
-import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, readdirSync, statSync, mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { execFileSync } from 'child_process';
+import { deriveOracleLearnings, readOracleAuditEntries } from './oracleLearning.mjs';
 
 const ROOT = join(import.meta.dirname, '..');
 const MOSHE_ROOT = join(ROOT, '..');
@@ -176,6 +177,7 @@ function repoStatus(name, path) {
     path,
     branch: safeExec('git', ['branch', '--show-current'], path),
     commit: safeExec('git', ['rev-parse', '--short', 'HEAD'], path),
+    commitFull: safeExec('git', ['rev-parse', 'HEAD'], path),
     commitSubject: safeExec('git', ['log', '-1', '--pretty=%s'], path),
     dirty: changed.length > 0,
     changedFiles: changed.length,
@@ -187,6 +189,52 @@ function repoStatus(name, path) {
 
 function envStatus(name, purpose) {
   return { name, configured: Boolean(process.env[name]), purpose };
+}
+
+function oracleAutomationPolicy() {
+  const sessionConfigured = Boolean(process.env.ORACLE_SESSION_SECRET);
+  const auditPath = process.env.ORACLE_ACTION_AUDIT_PATH || '/tmp/oracle-action-audit.jsonl';
+  return {
+    enabled: sessionConfigured,
+    authConfigured: sessionConfigured,
+    sessionConfigured,
+    endpoint: '/api/oracle/actions',
+    sessionEndpoint: '/api/oracle/session',
+    authHeader: 'HttpOnly signed session cookie',
+    authMethod: sessionConfigured ? 'signed-session-cookie' : 'preview-only',
+    auditPath,
+    executionMode: sessionConfigured ? 'server-enabled' : 'preview-only',
+    sessionTtlMinutes: 480,
+    note: sessionConfigured
+      ? 'Oracle execute mode is gated by a Mike-only signed session cookie with audit logging.'
+      : 'Preview trigger is wired to the action API path. Set ORACLE_SESSION_SECRET to arm Mike-only session-gated execution.',
+    actions: [
+      {
+        id: 'refresh-oracle-snapshot',
+        title: 'Refresh Oracle snapshot',
+        description: 'Regenerate the read-only Oracle data bundle and re-evaluate sensors.',
+        transport: 'local-script',
+        risk: 'low',
+        requiresConfirmation: true,
+      },
+      {
+        id: 'dispatch-wiro-ci',
+        title: 'Dispatch Wiro CI',
+        description: 'Trigger the allowlisted GitHub workflow that verifies Wiro4x4 health.',
+        transport: 'github-api',
+        risk: 'medium',
+        requiresConfirmation: true,
+      },
+      {
+        id: 'vercel-redeploy',
+        title: 'Request Vercel redeploy',
+        description: 'Ask Vercel to redeploy the Oracle dashboard after a confirmed change.',
+        transport: 'vercel-api',
+        risk: 'medium',
+        requiresConfirmation: true,
+      },
+    ],
+  };
 }
 
 function vercelProjectScope() {
@@ -214,6 +262,10 @@ async function vercelDeployments() {
       state: d.state || 'unknown',
       url: d.url ? `https://${d.url}` : undefined,
       createdAt: d.createdAt ? new Date(d.createdAt).toISOString() : undefined,
+      gitCommitSha: d.meta?.gitCommitSha,
+      gitCommitMessage: d.meta?.gitCommitMessage,
+      gitCommitRef: d.meta?.gitCommitRef,
+      gitDirty: d.meta?.gitDirty === '1' || d.meta?.gitDirty === 1 || d.meta?.gitDirty === true,
       note: 'read via Vercel CLI auth; no token value exposed',
     }));
     if (cliDeployments.length) return cliDeployments;
@@ -242,6 +294,10 @@ async function vercelDeployments() {
       state: d.state || 'unknown',
       url: d.url ? `https://${d.url}` : undefined,
       createdAt: d.createdAt ? new Date(d.createdAt).toISOString() : undefined,
+      gitCommitSha: d.meta?.gitCommitSha,
+      gitCommitMessage: d.meta?.gitCommitMessage,
+      gitCommitRef: d.meta?.gitCommitRef,
+      gitDirty: d.meta?.gitDirty === '1' || d.meta?.gitDirty === 1 || d.meta?.gitDirty === true,
     }));
     return deployments.length ? deployments : [{ provider: 'vercel', project: projectId, state: 'empty', note: 'No deployments returned' }];
   } catch (err) {
@@ -571,6 +627,26 @@ function deriveDeployTimeline(deployments, repos) {
 
   for (const d of deployments) {
     if (d.createdAt) {
+      const sourceRepo = d.project === 'galaxy'
+        ? repos.find((r) => r.name === 'Moshe')
+        : repos.find((r) => r.name.toLowerCase() === String(d.project).toLowerCase());
+      const deployedCommitSha = d.gitCommitSha || undefined;
+      const sourceCommitSha = sourceRepo?.commitFull || sourceRepo?.commit;
+      let syncState = 'unknown';
+      if (sourceCommitSha && deployedCommitSha) {
+        if (
+          sourceCommitSha === deployedCommitSha ||
+          sourceCommitSha.startsWith(deployedCommitSha.slice(0, 7)) ||
+          deployedCommitSha.startsWith(sourceCommitSha.slice(0, 7))
+        ) {
+          syncState = 'in-sync';
+        } else if (sourceRepo?.lastCommitAt && d.createdAt) {
+          syncState = new Date(sourceRepo.lastCommitAt).getTime() > new Date(d.createdAt).getTime()
+            ? 'behind'
+            : 'ahead';
+        }
+      }
+
       events.push({
         provider: d.provider,
         project: d.project,
@@ -578,6 +654,11 @@ function deriveDeployTimeline(deployments, repos) {
         state: d.state || 'unknown',
         url: isGoodUrl(d.url) ? d.url : undefined,
         timestamp: d.createdAt,
+        deployedCommitSha,
+        deployedCommitMessage: d.gitCommitMessage,
+        sourceRepo: sourceRepo?.name,
+        sourceCommitSha,
+        syncState,
         note: d.note,
       });
     }
@@ -591,6 +672,9 @@ function deriveDeployTimeline(deployments, repos) {
         event: 'commit',
         state: r.dirty ? 'uncommitted-changes' : 'clean',
         timestamp: r.lastCommitAt,
+        sourceRepo: r.name,
+        sourceCommitSha: r.commitFull || r.commit,
+        syncState: r.dirty ? 'behind' : 'in-sync',
         note: r.commitSubject ? String(r.commitSubject).slice(0, 80) : undefined,
       });
     }
@@ -638,6 +722,15 @@ const credentialsConfig = [
 ];
 
 const generatedAt = new Date().toISOString();
+const automation = oracleAutomationPolicy();
+const auditEntries = readOracleAuditEntries(automation.auditPath, 50);
+const auditLearnings = deriveOracleLearnings(auditEntries, learnings, 5);
+const recentLearnings = [...auditLearnings, ...learnings].slice(0, 5);
+const learningFeedPath = join(PSI, 'memory/learnings/oracle-action-feedback.md');
+if (auditLearnings.length) {
+  mkdirSync(join(PSI, 'memory/learnings'), { recursive: true });
+  writeFileSync(learningFeedPath, `---\ntitle: Oracle action feedback loop\nupdated: ${generatedAt}\n---\n\n# Oracle action feedback loop\n\nThe Oracle now turns session and action audit events into reusable learnings.\n\n${auditLearnings.map((item) => `- **${item.date}** — ${item.title}: ${item.summary}`).join('\n')}\n`);
+}
 const incidents = deriveIncidents(websites, repos, github, credentialsConfig, generatedAt);
 const recommendations = deriveRecommendations(incidents, repos);
 const wiroCi = deriveWiroCi(github);
@@ -646,7 +739,7 @@ const deployTimeline = deriveDeployTimeline(deployments, repos);
 const data = {
   generated: generatedAt,
   born: '2026-04-18',
-  level3Phase: 'Phase 2A: Better Read-only Intelligence — incidents, CI status, recommendations, deploy timeline',
+  level3Phase: 'Phase 3B: Feedback loop — audit-derived learnings, auth, allowlist, audit log, preview mode',
   stats: {
     learnings: learnings.length,
     retrospectives: retrospectives.length,
@@ -655,7 +748,7 @@ const data = {
     writingDocs: writing.length,
     labExperiments: lab.length,
   },
-  recentLearnings: learnings.slice(0, 5),
+  recentLearnings: recentLearnings.slice(0, 5),
   retrospectivesCount: retrospectives.length,
   retrospectivesRecent: retrospectives.slice(0, 5).map((r) => `${r.date} — ${r.title}`),
   activeCrons: cronJobs(),
@@ -664,7 +757,7 @@ const data = {
       name: 'Moshe Oracle OS',
       url: process.env.ORACLE_DASHBOARD_URL || '',
       status: 'Building',
-      note: 'Phase 2A active: incidents, CI status, recommendations, deploy timeline.',
+      note: 'Phase 3A active: server-side action API foundation, auth, allowlist, audit log.',
       accent: 'orange',
     },
     {
@@ -697,10 +790,12 @@ const data = {
   recommendations,
   wiroCi,
   deployTimeline,
+  automation,
   nextActions: [
-    'Set ORACLE_DASHBOARD_URL=https://www.mikewebstudio.com for public dashboard uptime checks.',
-    'Fix Wiro4x4 CI — investigate failing workflow steps.',
-    'Add analytics/booking sensors next for Wiro4x4 business visibility.',
+    'Set ORACLE_SESSION_SECRET to arm the Mike-only signed session gate.',
+    'The Oracle now turns audit trail events into learnings before refreshing live data.',
+    'Keep the browser read-only until a valid session cookie unlocks execute mode.',
+    'Add execution handlers for GitHub and Vercel only after the audit trail is proven.',
   ],
 };
 
