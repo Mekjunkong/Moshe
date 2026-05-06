@@ -341,6 +341,76 @@ export interface OraclePhase5BLayer {
   phase5CRequirements: string[]
 }
 
+
+export interface OracleExecutorRun {
+  id: string
+  queueItemId: string
+  actionId: string
+  state: 'started' | 'completed' | 'failed' | 'skipped'
+  actor: string
+  startedAt: string
+  completedAt?: string
+  durationMs?: number
+  exitCode?: number
+  summary: string
+  rollbackNote: string
+}
+
+export interface OracleSafePromotionCandidate {
+  id: string
+  queueItemId: string
+  status: 'eligible' | 'blocked' | 'watch'
+  cadence: string
+  reason: string
+  requiredEvidence: string[]
+}
+
+export interface OracleTelegramApprovalPayload {
+  id: string
+  approvalInboxId: string
+  message: string
+  actions: ('approve' | 'reject' | 'defer')[]
+  expiresAt?: string
+}
+
+export interface OracleLiveSmokeCheck {
+  label: string
+  status: 'pass' | 'watch' | 'fail'
+  detail: string
+}
+
+export interface OraclePhase5CLayer {
+  updatedAt: string
+  phase: 'phase_5c'
+  summary: string
+  feedbackButtons: {
+    enabled: boolean
+    endpoint: string
+    ratings: string[]
+    status: 'wired' | 'locked' | 'preview'
+  }
+  executorRuns: {
+    endpoint: string
+    configured: boolean
+    pathLabel: string
+    runs: OracleExecutorRun[]
+    counts: {
+      started: number
+      completed: number
+      failed: number
+      skipped: number
+    }
+  }
+  promotionCandidates: OracleSafePromotionCandidate[]
+  telegramApprovalPayloads: OracleTelegramApprovalPayload[]
+  liveSmokeReadiness: {
+    status: 'pass' | 'watch' | 'fail'
+    checks: OracleLiveSmokeCheck[]
+    nextStep: string
+  }
+  topPhaseRequirements: string[]
+}
+
 export interface OracleTodayLearning {
   title: string
   source: string
@@ -465,6 +535,7 @@ export interface OracleData {
   terminal?: OracleTerminalPolicy
   phase5A?: OraclePhase5ALayer
   phase5B?: OraclePhase5BLayer
+  phase5C?: OraclePhase5CLayer
   nextActions: string[]
 }
 
@@ -637,6 +708,23 @@ export const ORACLE_FALLBACK_DATA: OracleData = {
     businessValueScores: [],
     guardrails: [],
     phase5CRequirements: [],
+  },
+  phase5C: {
+    updatedAt: new Date(0).toISOString(),
+    phase: 'phase_5c',
+    summary: 'Waiting for Phase 5C autonomous run-state loop.',
+    feedbackButtons: { enabled: false, endpoint: '/api/oracle/feedback', ratings: [], status: 'preview' },
+    executorRuns: {
+      endpoint: '/api/oracle/executor',
+      configured: false,
+      pathLabel: 'not configured',
+      runs: [],
+      counts: { started: 0, completed: 0, failed: 0, skipped: 0 },
+    },
+    promotionCandidates: [],
+    telegramApprovalPayloads: [],
+    liveSmokeReadiness: { status: 'watch', checks: [], nextStep: 'Generate a fresh Oracle snapshot.' },
+    topPhaseRequirements: [],
   },
   nextActions: [
     'Run node scripts/generateOracleData.mjs',

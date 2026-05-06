@@ -70,6 +70,39 @@ interface OracleTerminalResponse {
   recipes?: { label: string; command: string; cwd: string }[]
 }
 
+
+interface OracleFeedbackResponse {
+  ok: boolean
+  requestId?: string
+  message?: string
+  error?: string
+  entry?: {
+    id: string
+    signalId: string
+    rating: string
+    note: string
+    source: string
+    actor: string
+    createdAt: string
+  }
+}
+
+interface OracleExecutorResponse {
+  ok: boolean
+  requestId?: string
+  decision?: string
+  error?: string
+  message?: string
+  run?: {
+    id: string
+    queueItemId: string
+    actionId: string
+    state: string
+    summary: string
+    rollbackNote: string
+  }
+}
+
 interface OracleSessionState {
   status: 'loading' | 'ready' | 'authenticated' | 'error'
   message: string
@@ -226,7 +259,26 @@ export default function OracleCommandCenter({ data }: Props) {
     guardrails: [],
     phase5CRequirements: [],
   }
-  const phase5Badge = (value: string) => value === 'clean' || value === 'in_sync' || value === 'complete' || value === 'ready' || value === 'promote' ? 'low' : value === 'blocked' || value === 'approval_required' || value === 'missing' || value === 'suppress' ? 'high' : 'medium'
+  const phase5C = oracle.phase5C ?? {
+    updatedAt: oracle.generated,
+    phase: 'phase_5c' as const,
+    summary: 'Phase 5C autonomous run-state loop is waiting for a live snapshot.',
+    feedbackButtons: { enabled: false, endpoint: '/api/oracle/feedback', ratings: [], status: 'preview' as const },
+    executorRuns: {
+      endpoint: '/api/oracle/executor',
+      configured: false,
+      pathLabel: 'not configured',
+      runs: [],
+      counts: { started: 0, completed: 0, failed: 0, skipped: 0 },
+    },
+    promotionCandidates: [],
+    telegramApprovalPayloads: [],
+    liveSmokeReadiness: { status: 'watch' as const, checks: [], nextStep: 'Generate a fresh Oracle snapshot.' },
+    topPhaseRequirements: [],
+  }
+  const [feedbackState, setFeedbackState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
+  const [executorState, setExecutorState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
+  const phase5Badge = (value: string) => value === 'clean' || value === 'in_sync' || value === 'complete' || value === 'ready' || value === 'promote' || value === 'eligible' || value === 'completed' || value === 'pass' || value === 'wired' ? 'low' : value === 'blocked' || value === 'approval_required' || value === 'missing' || value === 'suppress' || value === 'failed' || value === 'fail' ? 'high' : 'medium'
 
   useEffect(() => {
     const controller = new AbortController()
@@ -482,6 +534,42 @@ export default function OracleCommandCenter({ data }: Props) {
   const runSnapshotPreview = () => runOracleAction('refresh-oracle-snapshot', 'preview')
   const runSnapshotExecute = () => runOracleAction('refresh-oracle-snapshot', 'execute')
 
+  const submitSignalFeedback = async (signalId: string, rating: string) => {
+    setFeedbackState({ status: 'loading', message: `Recording ${rating}…` })
+    try {
+      const response = await fetch(phase5C.feedbackButtons.endpoint, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ signalId, rating, source: 'dashboard', note: `Dashboard quick feedback: ${rating}` }),
+      })
+      const payload = await response.json() as OracleFeedbackResponse
+      if (!response.ok || !payload.ok) throw new Error(payload.message ?? payload.error ?? 'Feedback failed.')
+      setFeedbackState({ status: 'ready', message: payload.message ?? 'Feedback recorded.' })
+      setOracleRefreshNonce((value) => value + 1)
+    } catch (error) {
+      setFeedbackState({ status: 'error', message: error instanceof Error ? error.message : 'Feedback failed.' })
+    }
+  }
+
+  const runSafeExecutorQueue = async (queueItemId: string) => {
+    setExecutorState({ status: 'loading', message: `Running ${queueItemId}…` })
+    try {
+      const response = await fetch(phase5C.executorRuns.endpoint, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ queueItemId, confirm: true }),
+      })
+      const payload = await response.json() as OracleExecutorResponse
+      if (!response.ok || !payload.ok) throw new Error(payload.run?.summary ?? payload.message ?? payload.error ?? 'Executor failed.')
+      setExecutorState({ status: 'ready', message: payload.run?.summary ?? 'Safe executor run completed.' })
+      setOracleRefreshNonce((value) => value + 1)
+    } catch (error) {
+      setExecutorState({ status: 'error', message: error instanceof Error ? error.message : 'Executor failed.' })
+    }
+  }
+
   const previewAction = previewState.result?.action ?? oracle.automation?.actions[0] ?? null
   const projectNodes = data.documents.filter((d) => d.clusterId === 'projects').length
   const memoryNodes = data.documents.filter((d) => d.clusterId === 'memory').length
@@ -492,13 +580,15 @@ export default function OracleCommandCenter({ data }: Props) {
   const configuredCreds = oracle.credentials.filter((c) => c.configured).length
   const githubOk = oracle.github.filter((g) => g.apiStatus === 'ok').length
   const criticalIncidents = (oracle.incidents ?? []).filter((i) => i.severity === 'critical').length
-  const oracleModeLabel = oracle.phase5B
-    ? 'PHASE 5B · FEEDBACK + EXECUTOR LOOP'
-    : oracle.phase5A
-      ? 'PHASE 5A · CLOSED-LOOP SENSORS'
-      : oracle.automation?.sessionConfigured
-        ? 'PHASE 3B · SESSION-GATED ACTIONS'
-        : 'PHASE 2A · READ ONLY'
+  const oracleModeLabel = oracle.phase5C
+    ? 'PHASE 5C · RUN-STATE AUTONOMY LOOP'
+    : oracle.phase5B
+      ? 'PHASE 5B · FEEDBACK + EXECUTOR LOOP'
+      : oracle.phase5A
+        ? 'PHASE 5A · CLOSED-LOOP SENSORS'
+        : oracle.automation?.sessionConfigured
+          ? 'PHASE 3B · SESSION-GATED ACTIONS'
+          : 'PHASE 2A · READ ONLY'
   const wiroSite = oracle.websites.find((site) => site.name.toLowerCase().includes('wiro'))
   const wiroGithub = oracle.github.find((repo) => repo.repo.toLowerCase().includes('wiro'))
   const highPriorityRecommendations = (oracle.recommendations ?? []).slice(0, 5)
@@ -1496,6 +1586,11 @@ export default function OracleCommandCenter({ data }: Props) {
                   <strong>{signal.source}</strong>
                   <p>{signal.valueSignal}</p>
                   <small>{signal.businessArea} · {signal.actionability} · {signal.mikeFeedback}</small>
+                  <div className="oracle-preview-actions">
+                    {phase5C.feedbackButtons.ratings.slice(0, 3).map((rating) => (
+                      <button type="button" className="oracle-mini-button" key={`${signal.id}-${rating}`} disabled={sessionState.status !== 'authenticated' || feedbackState.status === 'loading'} onClick={() => submitSignalFeedback(signal.id, rating)}>{rating}</button>
+                    ))}
+                  </div>
                 </div>
               ))}
             </article>
@@ -1610,6 +1705,78 @@ export default function OracleCommandCenter({ data }: Props) {
               {phase5B.guardrails.map((item) => <span key={item}>5B guardrail: {item}</span>)}
             </div>
           )}
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>PHASE 5C RUN-STATE LOOP</p>
+            <span>{phase5C.phase}</span>
+          </div>
+          <div className="oracle-intelligence-grid">
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Feedback buttons</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5C.feedbackButtons.status)}`}>{phase5C.feedbackButtons.status}</span>
+              </div>
+              <p>{feedbackState.message || 'Dashboard signal ratings now post to the persistent feedback ledger when Mike session is unlocked.'}</p>
+              <small>{phase5C.feedbackButtons.endpoint} · {phase5C.feedbackButtons.ratings.join(' / ')}</small>
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Executor run states</strong>
+                <span>{phase5C.executorRuns.runs.length} runs</span>
+              </div>
+              <p>{executorState.message || `${phase5C.executorRuns.counts.completed} completed · ${phase5C.executorRuns.counts.failed} failed · ${phase5C.executorRuns.counts.started} started`}</p>
+              {phase5B.safeExecutorQueue.slice(0, 2).map((item) => (
+                <div className="oracle-intel-line" key={`run-${item.id}`}>
+                  <strong>{item.title}</strong>
+                  <p>{item.nextStep}</p>
+                  <button type="button" className="oracle-action-button" disabled={sessionState.status !== 'authenticated' || executorState.status === 'loading' || item.status !== 'ready'} onClick={() => runSafeExecutorQueue(item.id)}>Run safe_now</button>
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card money">
+              <div className="oracle-status-head">
+                <strong>Promotion gates</strong>
+                <span>{phase5C.promotionCandidates.length} candidates</span>
+              </div>
+              {phase5C.promotionCandidates.slice(0, 3).map((item) => (
+                <div className="oracle-intel-line" key={item.id}>
+                  <strong>{item.queueItemId}</strong>
+                  <p>{item.reason}</p>
+                  <small>{item.status} · {item.cadence}</small>
+                </div>
+              ))}
+            </article>
+          </div>
+          <div className="oracle-intelligence-grid" style={{ marginTop: 12 }}>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Telegram approval payloads</strong>
+                <span>{phase5C.telegramApprovalPayloads.length} drafts</span>
+              </div>
+              {phase5C.telegramApprovalPayloads.slice(0, 2).map((item) => (
+                <div className="oracle-intel-line" key={item.id}>
+                  <strong>{item.approvalInboxId}</strong>
+                  <p>{item.message}</p>
+                  <small>{item.actions.join(' / ')} · expires {item.expiresAt ?? 'unknown'}</small>
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Live smoke readiness</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5C.liveSmokeReadiness.status)}`}>{phase5C.liveSmokeReadiness.status}</span>
+              </div>
+              <p>{phase5C.liveSmokeReadiness.nextStep}</p>
+              {phase5C.liveSmokeReadiness.checks.map((check) => <small key={check.label}>{check.label}: {check.status} · {check.detail}</small>)}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Top-phase gates</strong>
+                <span>{phase5C.topPhaseRequirements.length} left</span>
+              </div>
+              {phase5C.topPhaseRequirements.map((item) => <small key={item}>• {item}</small>)}
+            </article>
+          </div>
 
           <div className="oracle-section-head" style={{ marginTop: 16 }}>
             <p>IMPROVEMENT BACKLOG</p>

@@ -4,6 +4,7 @@ import oracleActionsHandler from './actions.js'
 import oracleSessionHandler from './session.js'
 import oracleTerminalHandler from './terminal.js'
 import oracleFeedbackHandler from './feedback.js'
+import oracleExecutorHandler from './executor.js'
 import { createSessionToken, SESSION_COOKIE_NAME, verifySessionToken } from './auth.js'
 
 function createReq({ method = 'POST', headers = {}, body = {} } = {}) {
@@ -40,6 +41,7 @@ const ORIGINAL_ENV = {
   ORACLE_SESSION_SECRET: process.env.ORACLE_SESSION_SECRET,
   ORACLE_ACTION_AUDIT_PATH: process.env.ORACLE_ACTION_AUDIT_PATH,
   ORACLE_FEEDBACK_LEDGER_PATH: process.env.ORACLE_FEEDBACK_LEDGER_PATH,
+  ORACLE_EXECUTOR_LEDGER_PATH: process.env.ORACLE_EXECUTOR_LEDGER_PATH,
   ORACLE_WIRO_CI_DISPATCHER: process.env.ORACLE_WIRO_CI_DISPATCHER,
   ORACLE_TERMINAL_ENABLED: process.env.ORACLE_TERMINAL_ENABLED,
 }
@@ -48,6 +50,7 @@ beforeEach(() => {
   process.env.ORACLE_SESSION_SECRET = 'test-session-secret'
   process.env.ORACLE_ACTION_AUDIT_PATH = '/tmp/oracle-action-audit-test.jsonl'
   process.env.ORACLE_FEEDBACK_LEDGER_PATH = `/tmp/oracle-feedback-ledger-test-${process.pid}.jsonl`
+  process.env.ORACLE_EXECUTOR_LEDGER_PATH = `/tmp/oracle-executor-runs-test-${process.pid}.jsonl`
   process.env.ORACLE_WIRO_CI_DISPATCHER = 'true'
   process.env.ORACLE_TERMINAL_ENABLED = 'true'
 })
@@ -56,6 +59,7 @@ afterEach(() => {
   process.env.ORACLE_SESSION_SECRET = ORIGINAL_ENV.ORACLE_SESSION_SECRET
   process.env.ORACLE_ACTION_AUDIT_PATH = ORIGINAL_ENV.ORACLE_ACTION_AUDIT_PATH
   process.env.ORACLE_FEEDBACK_LEDGER_PATH = ORIGINAL_ENV.ORACLE_FEEDBACK_LEDGER_PATH
+  process.env.ORACLE_EXECUTOR_LEDGER_PATH = ORIGINAL_ENV.ORACLE_EXECUTOR_LEDGER_PATH
   process.env.ORACLE_WIRO_CI_DISPATCHER = ORIGINAL_ENV.ORACLE_WIRO_CI_DISPATCHER
   process.env.ORACLE_TERMINAL_ENABLED = ORIGINAL_ENV.ORACLE_TERMINAL_ENABLED
 })
@@ -263,6 +267,43 @@ describe('oracle feedback ledger gate', () => {
     const listPayload = readJson(listRes)
     assert.equal(listPayload.entries[0].signalId, 'rec-oracle-1')
     assert.equal(listPayload.counts.useful, 1)
+  })
+})
+
+
+describe('oracle safe executor gate', () => {
+  test('GET returns executor policy and persisted runs', async () => {
+    const res = createRes()
+    await oracleExecutorHandler(createReq({ method: 'GET' }), res)
+    const payload = readJson(res)
+    assert.equal(res.statusCode, 200)
+    assert.equal(payload.ok, true)
+    assert.equal(payload.policy.endpoint, '/api/oracle/executor')
+    assert.ok(Array.isArray(payload.policy.queue))
+    assert.ok(Array.isArray(payload.runs))
+  })
+
+  test('executor rejects without a signed session', async () => {
+    const res = createRes()
+    await oracleExecutorHandler(createReq({ body: { queueItemId: 'queue-refresh-oracle-snapshot', confirm: true } }), res)
+    const payload = readJson(res)
+    assert.equal(res.statusCode, 401)
+    assert.equal(payload.error, 'unauthorized')
+  })
+
+  test('executor requires explicit confirmation for safe_now queue items', async () => {
+    const token = createSessionToken('test-session-secret', 'Mike', 60_000)
+    const res = createRes()
+    await oracleExecutorHandler(
+      createReq({
+        headers: { cookie: `${SESSION_COOKIE_NAME}=${token}` },
+        body: { queueItemId: 'queue-refresh-oracle-snapshot' },
+      }),
+      res,
+    )
+    const payload = readJson(res)
+    assert.equal(res.statusCode, 428)
+    assert.equal(payload.error, 'confirmation_required')
   })
 })
 

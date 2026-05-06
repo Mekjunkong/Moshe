@@ -1448,6 +1448,162 @@ function derivePhase5B({ generatedAt, phase5A, repos, deployTimeline, operationa
   };
 }
 
+
+
+function executorLedgerPath() {
+  return process.env.ORACLE_EXECUTOR_LEDGER_PATH || '/tmp/oracle-executor-runs.jsonl';
+}
+
+function readExecutorRuns(path = executorLedgerPath(), limit = 50) {
+  if (!existsSync(path)) return [];
+  try {
+    return readFileSync(path, 'utf8')
+      .split('\n')
+      .filter(Boolean)
+      .slice(-limit)
+      .reverse()
+      .map((line, index) => {
+        try {
+          const parsed = JSON.parse(line);
+          return {
+            id: String(parsed.id || `executor-${index}`),
+            queueItemId: String(parsed.queueItemId || 'unknown'),
+            actionId: String(parsed.actionId || 'unknown'),
+            state: ['started', 'completed', 'failed', 'skipped'].includes(parsed.state) ? parsed.state : 'failed',
+            actor: String(parsed.actor || 'Mike'),
+            startedAt: String(parsed.startedAt || parsed.at || new Date(0).toISOString()),
+            completedAt: parsed.completedAt ? String(parsed.completedAt) : undefined,
+            durationMs: Number.isFinite(parsed.durationMs) ? parsed.durationMs : undefined,
+            exitCode: Number.isFinite(parsed.exitCode) ? parsed.exitCode : undefined,
+            summary: String(parsed.summary || '').slice(0, 500),
+            rollbackNote: String(parsed.rollbackNote || '').slice(0, 500),
+          };
+        } catch {
+          return {
+            id: `executor-${index}`,
+            queueItemId: 'parse-error',
+            actionId: 'parse-error',
+            state: 'failed',
+            actor: 'unknown',
+            startedAt: new Date(0).toISOString(),
+            summary: 'An executor ledger line could not be parsed.',
+            rollbackNote: 'Ignore malformed run record and inspect raw ledger.',
+          };
+        }
+      });
+  } catch {
+    return [];
+  }
+}
+
+function executorRunCounts(runs) {
+  return {
+    started: runs.filter((run) => run.state === 'started').length,
+    completed: runs.filter((run) => run.state === 'completed').length,
+    failed: runs.filter((run) => run.state === 'failed').length,
+    skipped: runs.filter((run) => run.state === 'skipped').length,
+  };
+}
+
+function derivePromotionCandidates({ phase5B, phase5A }) {
+  const bestAreas = new Set(phase5B.businessValueScores.filter((score) => score.verdict === 'promote').map((score) => score.area));
+  const repoClean = phase5A.repoHygiene.verdict === 'clean';
+  const deployOk = ['in_sync', 'review_before_ship'].includes(phase5A.deploymentFreshnessGap.verdict);
+  return phase5B.safeExecutorQueue.map((item) => {
+    const evidence = phase5B.evidenceChains.find((chain) => chain.id === item.evidenceChainId);
+    const evidenceReady = evidence?.status === 'complete';
+    const valueReady = bestAreas.has(item.businessArea) || item.businessArea === 'oracle_os';
+    const eligible = item.status === 'ready' && evidenceReady && valueReady && repoClean && deployOk;
+    return {
+      id: `promote-${item.id}`,
+      queueItemId: item.id,
+      status: eligible ? 'eligible' : item.status === 'blocked' || !repoClean ? 'blocked' : 'watch',
+      cadence: item.businessArea === 'oracle_os' ? 'every 6h max, only if snapshot older than 60m' : 'manual until more useful feedback exists',
+      reason: eligible
+        ? 'Safe_now item has evidence, value signal, clean repo state, and bounded cadence.'
+        : `Waiting on ${[
+            item.status === 'ready' ? null : 'ready queue status',
+            evidenceReady ? null : 'complete evidence',
+            valueReady ? null : 'business value promotion',
+            repoClean ? null : 'clean repo hygiene',
+          ].filter(Boolean).join(', ')}.`,
+      requiredEvidence: [
+        evidenceReady ? 'evidence complete' : 'complete evidence chain',
+        repoClean ? 'repo clean' : 'repo hygiene clean',
+        valueReady ? 'value promoted' : 'business value promoted',
+      ],
+    };
+  });
+}
+
+function deriveTelegramApprovalPayloads({ phase5B }) {
+  return phase5B.approvalInbox.slice(0, 5).map((item) => ({
+    id: `telegram-${item.id}`,
+    approvalInboxId: item.id,
+    message: `Approval needed: ${item.title}\nRisk: ${item.risk}\nAction: ${item.requestedAction}\nTrigger: ${item.approvalTrigger}`.slice(0, 900),
+    actions: ['approve', 'reject', 'defer'],
+    expiresAt: item.expiresAt,
+  }));
+}
+
+function deriveLiveSmokeReadiness({ websites, phase5B, phase5A, generatedAt }) {
+  const oracleSite = websites.find((site) => site.name === 'Moshe Oracle Dashboard');
+  const feedbackReady = phase5B.feedbackPersistence.endpoint === '/api/oracle/feedback';
+  const executorReady = phase5B.safeExecutorQueue.length > 0;
+  const snapshotFresh = phase5A.deploymentFreshnessGap.snapshotAgeMinutes <= 60;
+  const checks = [
+    { label: 'Oracle website reachable', status: oracleSite?.ok ? 'pass' : 'fail', detail: oracleSite?.ok ? `${oracleSite.responseMs || 'unknown'}ms` : 'Oracle dashboard URL is not reachable.' },
+    { label: 'Feedback endpoint wired', status: feedbackReady ? 'pass' : 'fail', detail: feedbackReady ? '/api/oracle/feedback is in snapshot.' : 'Feedback endpoint missing.' },
+    { label: 'Executor endpoint planned', status: executorReady ? 'pass' : 'watch', detail: executorReady ? `${phase5B.safeExecutorQueue.length} safe queue item(s).` : 'No safe queue items.' },
+    { label: 'Snapshot freshness', status: snapshotFresh ? 'pass' : 'watch', detail: `${phase5A.deploymentFreshnessGap.snapshotAgeMinutes}m old at ${generatedAt}.` },
+    { label: 'Repo hygiene blocks blind execution', status: phase5A.repoHygiene.verdict === 'blocked' ? 'watch' : 'pass', detail: phase5A.repoHygiene.summary },
+  ];
+  const fail = checks.filter((check) => check.status === 'fail').length;
+  const watch = checks.filter((check) => check.status === 'watch').length;
+  return {
+    status: fail ? 'fail' : watch ? 'watch' : 'pass',
+    checks,
+    nextStep: fail
+      ? 'Fix failing live smoke checks before deploy.'
+      : watch
+        ? 'Resolve watch items before calling the loop top-phase autonomous.'
+        : 'Live smoke readiness is green for a guarded Phase 5C deploy.',
+  };
+}
+
+function derivePhase5C({ generatedAt, phase5A, phase5B, websites }) {
+  const runs = readExecutorRuns(executorLedgerPath(), 50);
+  const promotionCandidates = derivePromotionCandidates({ phase5B, phase5A });
+  return {
+    updatedAt: generatedAt,
+    phase: 'phase_5c',
+    summary: 'Phase 5C active: dashboard feedback buttons, persistent safe executor run states, promotion gates, Telegram approval payloads, and live smoke readiness are wired.',
+    feedbackButtons: {
+      enabled: true,
+      endpoint: '/api/oracle/feedback',
+      ratings: ['useful', 'noisy', 'missing-context', 'action-taken', 'ignored'],
+      status: process.env.ORACLE_SESSION_SECRET ? 'wired' : 'locked',
+    },
+    executorRuns: {
+      endpoint: '/api/oracle/executor',
+      configured: Boolean(process.env.ORACLE_SESSION_SECRET),
+      pathLabel: executorLedgerPath().replace(/^.*\//, ''),
+      runs: runs.slice(0, 12),
+      counts: executorRunCounts(runs),
+    },
+    promotionCandidates,
+    telegramApprovalPayloads: deriveTelegramApprovalPayloads({ phase5B }),
+    liveSmokeReadiness: deriveLiveSmokeReadiness({ websites, phase5B, phase5A, generatedAt }),
+    topPhaseRequirements: [
+      'Clean repo hygiene so safe_now queue can move from blocked to ready.',
+      'Collect real Mike feedback ratings from dashboard/Telegram for at least 10 signals.',
+      'Run safe executor successfully several times and verify completed/failed states persist.',
+      'Wire Telegram approval callbacks to update approval inbox state, not just payload drafts.',
+      'Deploy a prebuilt local snapshot and smoke live /oracleLive.json plus API gates.',
+    ],
+  };
+}
+
 function deriveOperationalReadiness({ websites, repos, github, credentials, deployments, deployTimeline, automation, incidents }) {
   const criticalIncidents = incidents.filter((i) => i.severity === 'critical').length;
   const dirtyRepos = repos.filter((r) => r.dirty).length;
@@ -1615,11 +1771,17 @@ const phase5B = derivePhase5B({
   intelligenceLayer,
   automation,
 });
+const phase5C = derivePhase5C({
+  generatedAt,
+  phase5A,
+  phase5B,
+  websites,
+});
 
 const data = {
   generated: generatedAt,
   born: '2026-04-18',
-  level3Phase: 'Phase 5B: Feedback persistence, evidence chains, safe executor queue, approval inbox, and value scoring',
+  level3Phase: 'Phase 5C: Dashboard feedback buttons, executor run states, promotion gates, Telegram approval payloads, and live smoke readiness',
   stats: {
     learnings: learnings.length,
     retrospectives: retrospectives.length,
@@ -1637,7 +1799,7 @@ const data = {
       name: 'Moshe Oracle OS',
       url: process.env.ORACLE_DASHBOARD_URL || '',
       status: 'Building',
-      note: 'Phase 5B active: persistent feedback, evidence chains, safe executor queue, approval inbox, and business-value scoring now shape autonomy.',
+      note: 'Phase 5C active: dashboard feedback buttons, persistent executor run states, promotion gates, Telegram approval payloads, and live smoke readiness shape bounded autonomy.',
       accent: 'orange',
     },
     {
@@ -1676,6 +1838,7 @@ const data = {
   terminal,
   phase5A,
   phase5B,
+  phase5C,
   nextActions: [
     'Set ORACLE_SESSION_SECRET to arm the Mike-only signed session gate.',
     'The Oracle now turns audit trail events into learnings before refreshing live data.',
@@ -1684,12 +1847,13 @@ const data = {
     'Use the Intelligence Layer panels to turn learnings into money radar and approval-ready actions.',
     'Use Phase 5A feedback/repo/deploy sensors before recommending safe executor actions.',
     'Use Phase 5B feedback persistence, evidence chains, approval inbox, and value scoring before promoting autonomous safe_now work.',
+    'Use Phase 5C run states and promotion gates before scheduling any safe_now autonomous execution.',
     'Enable ORACLE_TERMINAL_ENABLED=true only on Mike local/admin runtime before using the Terminal tab.',
   ],
 };
 
 writeFileSync(OUT, `${JSON.stringify(data, null, 2)}\n`);
-console.log(`✅ Oracle live data written to ${OUT} [Phase 2A]`);
+console.log(`✅ Oracle live data written to ${OUT} [Phase 5C]`);
 console.log(`   Websites: ${data.websites.map((w) => `${w.name}=${w.ok ? 'OK' : 'FAIL'}`).join(', ')}`);
 console.log(`   Incidents: ${data.incidents.length} | Recommendations: ${data.recommendations.length} | Wiro CI: ${data.wiroCi?.conclusion ?? 'none'}`);
 console.log(`   Repos: ${data.repos.length} | GitHub sensors: ${data.github.length} | Learnings: ${data.stats.learnings} | Retrospectives: ${data.stats.retrospectives}`);
