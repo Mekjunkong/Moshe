@@ -605,6 +605,50 @@ export interface OraclePhase5FLayer {
   }
 }
 
+
+
+export interface OracleBoundedSafeCronControl {
+  id: string
+  label: string
+  status: 'pass' | 'watch' | 'fail'
+  rule: string
+  evidence: string
+}
+
+export interface OracleSafeCronPilotPlan {
+  id: string
+  status: 'draft_only' | 'ready' | 'blocked'
+  schedule: string
+  actionId: string
+  maxRuns: number
+  toolBudget: string
+  allowedScope: string[]
+  forbiddenScope: string[]
+  delivery: 'origin' | 'local'
+  rollback: string
+}
+
+export interface OraclePhase5GLayer {
+  updatedAt: string
+  phase: 'phase_5g'
+  summary: string
+  safeCronPilot: OracleSafeCronPilotPlan
+  preflightControls: OracleBoundedSafeCronControl[]
+  evidence: {
+    safeExecutorPilotCompleted: boolean
+    reportQualityGatesPassing: number
+    reportQualityGatesTotal: number
+    cronQualityStatus: 'pass' | 'watch' | 'fail'
+    sourceBlockers: string[]
+  }
+  topPhaseGate: {
+    status: 'blocked' | 'watch' | 'ready'
+    blockers: string[]
+    watchItems: string[]
+    nextStep: string
+  }
+}
+
 export interface OracleTodayLearning {
   title: string
   source: string
@@ -733,6 +777,7 @@ export interface OracleData {
   phase5D?: OraclePhase5DLayer
   phase5E?: OraclePhase5ELayer
   phase5F?: OraclePhase5FLayer
+  phase5G?: OraclePhase5GLayer
   nextActions: string[]
 }
 
@@ -958,6 +1003,15 @@ export const ORACLE_FALLBACK_DATA: OracleData = {
     reportQualityGates: [],
     safePilotEvidence: { actionId: 'queue-refresh-oracle-snapshot', status: 'missing', evidence: 'No live snapshot generated yet.', nextStep: 'Generate a fresh Oracle snapshot.' },
     cronQualityCompliance: { status: 'watch', checkedJobs: 0, notes: [] },
+    topPhaseGate: { status: 'blocked', blockers: ['Generate a fresh Oracle snapshot.'], watchItems: [], nextStep: 'Run npm run build.' },
+  },
+  phase5G: {
+    updatedAt: new Date(0).toISOString(),
+    phase: 'phase_5g',
+    summary: 'Waiting for Phase 5G bounded safe cron pilot.',
+    safeCronPilot: { id: 'bounded-safe-now-refresh-pilot', status: 'draft_only', schedule: 'manual only', actionId: 'queue-refresh-oracle-snapshot', maxRuns: 0, toolBudget: 'none', allowedScope: [], forbiddenScope: [], delivery: 'local', rollback: 'Do not schedule until snapshot is generated.' },
+    preflightControls: [],
+    evidence: { safeExecutorPilotCompleted: false, reportQualityGatesPassing: 0, reportQualityGatesTotal: 0, cronQualityStatus: 'watch', sourceBlockers: [] },
     topPhaseGate: { status: 'blocked', blockers: ['Generate a fresh Oracle snapshot.'], watchItems: [], nextStep: 'Run npm run build.' },
   },
   nextActions: [

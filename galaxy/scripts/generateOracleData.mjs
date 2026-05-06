@@ -2133,6 +2133,103 @@ function derivePhase5F({ generatedAt, activeCrons, phase5B, phase5C, phase5D, ph
   };
 }
 
+
+function derivePhase5G({ generatedAt, phase5D, phase5F }) {
+  const reportTotal = phase5F.reportQualityGates.length;
+  const reportPassing = phase5F.reportQualityGates.filter((gate) => gate.status === 'pass').length;
+  const safeExecutorCompleted = phase5F.safePilotEvidence.status === 'completed';
+  const sourceBlockers = [
+    ...phase5D.topPhaseReadiness.blockers,
+    ...phase5F.topPhaseGate.blockers,
+  ];
+  const controls = [
+    {
+      id: 'safe-executor-evidence',
+      label: 'Safe executor pilot completed',
+      status: safeExecutorCompleted ? 'pass' : 'watch',
+      rule: 'At least one signed-session safe_now executor run must complete before recurring safe_now scheduling.',
+      evidence: phase5F.safePilotEvidence.evidence,
+    },
+    {
+      id: 'report-quality-gates',
+      label: 'Report quality gates passing',
+      status: reportTotal > 0 && reportPassing === reportTotal ? 'pass' : 'fail',
+      rule: 'All proactive report quality gates must pass before recurring automation.',
+      evidence: `${reportPassing}/${reportTotal} report quality gates pass.`,
+    },
+    {
+      id: 'cron-quality-compliance',
+      label: 'Cron quality compliance',
+      status: phase5F.cronQualityCompliance.status,
+      rule: 'Cron prompts must include no-approval-framing and Wiro-first quality rules.',
+      evidence: phase5F.cronQualityCompliance.notes.join(' · ') || 'No cron quality notes.',
+    },
+    {
+      id: 'source-safety',
+      label: 'No source-risk blockers',
+      status: sourceBlockers.length ? 'fail' : 'pass',
+      rule: 'Recurring safe_now automation cannot start while source-risk blockers exist.',
+      evidence: sourceBlockers.join(' · ') || 'No source-risk blockers from Phase 5D/5F.',
+    },
+    {
+      id: 'bounded-run-budget',
+      label: 'Bounded run budget',
+      status: 'pass',
+      rule: 'Pilot must be finite: max 3 runs, safe_now only, local/internal delivery, no recursive cron creation.',
+      evidence: 'Pilot plan maxRuns=3, allowed action queue-refresh-oracle-snapshot only.',
+    },
+  ];
+  const blockers = controls.filter((control) => control.status === 'fail').map((control) => `${control.label}: ${control.evidence}`);
+  const watchItems = controls.filter((control) => control.status === 'watch').map((control) => `${control.label}: ${control.evidence}`);
+  const status = blockers.length ? 'blocked' : watchItems.length ? 'watch' : 'ready';
+  return {
+    updatedAt: generatedAt,
+    phase: 'phase_5g',
+    summary: 'Phase 5G active: Oracle can draft one bounded safe_now cron pilot only when safe executor evidence, report-quality gates, cron-quality rules, and source-safety controls pass.',
+    safeCronPilot: {
+      id: 'bounded-safe-now-refresh-pilot',
+      status: status === 'ready' ? 'ready' : blockers.length ? 'blocked' : 'draft_only',
+      schedule: 'every 6h for 3 runs after Mike enables the pilot',
+      actionId: 'queue-refresh-oracle-snapshot',
+      maxRuns: 3,
+      toolBudget: 'terminal/file only; no browser/customer/contact/deploy tools; no recursive cron creation',
+      allowedScope: [
+        'refresh Oracle snapshot',
+        'read local Oracle state',
+        'write executor run evidence',
+        'deliver concise status only when something changes',
+      ],
+      forbiddenScope: [
+        'commit/push/deploy',
+        'customer or public messages',
+        'delete/cleanup',
+        'spend money',
+        'create another cron job',
+      ],
+      delivery: 'origin',
+      rollback: 'Pause/remove pilot cron and ignore/discard generated snapshot diff if quality gates regress.',
+    },
+    preflightControls: controls,
+    evidence: {
+      safeExecutorPilotCompleted: safeExecutorCompleted,
+      reportQualityGatesPassing: reportPassing,
+      reportQualityGatesTotal: reportTotal,
+      cronQualityStatus: phase5F.cronQualityCompliance.status,
+      sourceBlockers,
+    },
+    topPhaseGate: {
+      status,
+      blockers,
+      watchItems,
+      nextStep: blockers.length
+        ? 'Fix failed preflight controls before scheduling any bounded safe_now pilot.'
+        : status === 'watch'
+          ? 'Resolve watch controls, then Mike can enable one 3-run safe_now pilot.'
+          : 'Ready for Mike to enable one bounded 3-run safe_now cron pilot.',
+    },
+  };
+}
+
 function deriveOperationalReadiness({ websites, repos, github, credentials, deployments, deployTimeline, automation, incidents }) {
   const criticalIncidents = incidents.filter((i) => i.severity === 'critical').length;
   const dirtyRepos = repos.filter((r) => r.dirty).length;
@@ -2327,11 +2424,16 @@ const phase5F = derivePhase5F({
   phase5D,
   phase5E,
 });
+const phase5G = derivePhase5G({
+  generatedAt,
+  phase5D,
+  phase5F,
+});
 
 const data = {
   generated: generatedAt,
   born: '2026-04-18',
-  level3Phase: 'Phase 5F: Learning action memory, report quality gates, and safe pilot evidence',
+  level3Phase: 'Phase 5G: Bounded safe_now cron pilot controls and preflight gates',
   stats: {
     learnings: learnings.length,
     retrospectives: retrospectives.length,
@@ -2349,7 +2451,7 @@ const data = {
       name: 'Moshe Oracle OS',
       url: process.env.ORACLE_DASHBOARD_URL || '',
       status: 'Building',
-      note: 'Phase 5F active: feedback and quality rules are converted into action memory before bounded automation.',
+      note: 'Phase 5G active: bounded safe_now cron pilot is drafted behind preflight controls.',
       accent: 'orange',
     },
     {
@@ -2392,6 +2494,7 @@ const data = {
   phase5D,
   phase5E,
   phase5F,
+  phase5G,
   nextActions: [
     'Set ORACLE_SESSION_SECRET to arm the Mike-only signed session gate.',
     'The Oracle now turns audit trail events into learnings before refreshing live data.',
@@ -2405,11 +2508,12 @@ const data = {
     'Enable ORACLE_TERMINAL_ENABLED=true only on Mike local/admin runtime before using the Terminal tab.',
     'Use Phase 5E taste filters: proactive reports must be Wiro-first and framed as watch/test/ignore.',
     'Use Phase 5F learning action memory before creating any recurring safe_now cron pilot.',
+    'Use Phase 5G preflight controls before enabling a bounded safe_now cron pilot.',
   ],
 };
 
 writeFileSync(OUT, `${JSON.stringify(data, null, 2)}\n`);
-console.log(`✅ Oracle live data written to ${OUT} [Phase 5F]`);
+console.log(`✅ Oracle live data written to ${OUT} [Phase 5G]`);
 console.log(`   Websites: ${data.websites.map((w) => `${w.name}=${w.ok ? 'OK' : 'FAIL'}`).join(', ')}`);
 console.log(`   Incidents: ${data.incidents.length} | Recommendations: ${data.recommendations.length} | Wiro CI: ${data.wiroCi?.conclusion ?? 'none'}`);
 console.log(`   Repos: ${data.repos.length} | GitHub sensors: ${data.github.length} | Learnings: ${data.stats.learnings} | Retrospectives: ${data.stats.retrospectives}`);

@@ -330,6 +330,15 @@ export default function OracleCommandCenter({ data }: Props) {
     cronQualityCompliance: { status: 'watch' as const, checkedJobs: 0, notes: [] },
     topPhaseGate: { status: 'blocked' as const, blockers: ['Generate a fresh Oracle snapshot.'], watchItems: [], nextStep: 'Run npm run build.' },
   }
+  const phase5G = oracle.phase5G ?? {
+    updatedAt: oracle.generated,
+    phase: 'phase_5g' as const,
+    summary: 'Phase 5G bounded safe cron pilot is waiting for a live snapshot.',
+    safeCronPilot: { id: 'bounded-safe-now-refresh-pilot', status: 'draft_only' as const, schedule: 'manual only', actionId: 'queue-refresh-oracle-snapshot', maxRuns: 0, toolBudget: 'none', allowedScope: [], forbiddenScope: [], delivery: 'local' as const, rollback: 'Generate a fresh Oracle snapshot.' },
+    preflightControls: [],
+    evidence: { safeExecutorPilotCompleted: false, reportQualityGatesPassing: 0, reportQualityGatesTotal: 0, cronQualityStatus: 'watch' as const, sourceBlockers: [] },
+    topPhaseGate: { status: 'blocked' as const, blockers: ['Generate a fresh Oracle snapshot.'], watchItems: [], nextStep: 'Run npm run build.' },
+  }
   const [feedbackState, setFeedbackState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
   const [executorState, setExecutorState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
   const [approvalState, setApprovalState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
@@ -654,8 +663,10 @@ export default function OracleCommandCenter({ data }: Props) {
   const configuredCreds = oracle.credentials.filter((c) => c.configured).length
   const githubOk = oracle.github.filter((g) => g.apiStatus === 'ok').length
   const criticalIncidents = (oracle.incidents ?? []).filter((i) => i.severity === 'critical').length
-  const oracleModeLabel = oracle.phase5F
-    ? 'PHASE 5F · LEARNING ACTION MEMORY'
+  const oracleModeLabel = oracle.phase5G
+    ? 'PHASE 5G · BOUNDED SAFE CRON'
+    : oracle.phase5F
+      ? 'PHASE 5F · LEARNING ACTION MEMORY'
     : oracle.phase5E
       ? 'PHASE 5E · QUALITY INTELLIGENCE'
     : oracle.phase5D
@@ -1927,6 +1938,57 @@ export default function OracleCommandCenter({ data }: Props) {
               <p>{phase5D.topPhaseReadiness.nextStep}</p>
               {phase5D.topPhaseReadiness.blockers.map((blocker) => <small key={blocker}>BLOCKER · {blocker}</small>)}
               {phase5D.topPhaseReadiness.watchItems.map((item) => <small key={item}>WATCH · {item}</small>)}
+            </article>
+          </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>PHASE 5G BOUNDED SAFE CRON</p>
+            <span>{phase5G.topPhaseGate.status}</span>
+          </div>
+          <div className="oracle-intelligence-grid">
+            <article className="oracle-intel-card money">
+              <div className="oracle-status-head">
+                <strong>Safe_now pilot plan</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5G.safeCronPilot.status)}`}>{phase5G.safeCronPilot.status}</span>
+              </div>
+              <p>{phase5G.safeCronPilot.schedule}</p>
+              <small>Action: {phase5G.safeCronPilot.actionId} · max {phase5G.safeCronPilot.maxRuns} runs</small>
+              <small>Budget: {phase5G.safeCronPilot.toolBudget}</small>
+              <small>Rollback: {phase5G.safeCronPilot.rollback}</small>
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Preflight controls</strong>
+                <span>{phase5G.preflightControls.filter((control) => control.status === 'pass').length}/{phase5G.preflightControls.length} pass</span>
+              </div>
+              {phase5G.preflightControls.map((control) => (
+                <div className="oracle-intel-line" key={control.id}>
+                  <strong>{control.label}</strong>
+                  <p>{control.rule}</p>
+                  <small>{control.status}: {control.evidence}</small>
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Top-phase gate</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5G.topPhaseGate.status)}`}>{phase5G.topPhaseGate.status}</span>
+              </div>
+              <p>{phase5G.topPhaseGate.nextStep}</p>
+              <small>Safe pilot completed: {phase5G.evidence.safeExecutorPilotCompleted ? 'yes' : 'no'}</small>
+              <small>Quality gates: {phase5G.evidence.reportQualityGatesPassing}/{phase5G.evidence.reportQualityGatesTotal}</small>
+              {phase5G.topPhaseGate.blockers.map((item) => <small key={item}>Blocker: {item}</small>)}
+              {phase5G.topPhaseGate.watchItems.map((item) => <small key={item}>Watch: {item}</small>)}
+            </article>
+          </div>
+          <div className="oracle-intelligence-grid" style={{ marginTop: 12 }}>
+            <article className="oracle-intel-card">
+              <strong>Allowed scope</strong>
+              {phase5G.safeCronPilot.allowedScope.map((item) => <small key={item}>✓ {item}</small>)}
+            </article>
+            <article className="oracle-intel-card">
+              <strong>Forbidden scope</strong>
+              {phase5G.safeCronPilot.forbiddenScope.map((item) => <small key={item}>✕ {item}</small>)}
             </article>
           </div>
 
