@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-06T03:11:12.249Z",
+  "generated": "2026-05-06T03:13:01.934Z",
   "born": "2026-04-18",
   "level3Phase": "Phase 3B: Feedback loop — audit-derived learnings, auth, allowlist, audit log, preview mode",
   "stats": {
@@ -36,7 +36,7 @@
       "title": "Oracle action feedback loop",
       "file": "oracle-action-feedback.md",
       "date": "2026-05-06",
-      "summary": "updated: 2026-05-06T03:08:21.861Z  Oracle action feedback loop The Oracle now turns session and action audit events into reusable learnings."
+      "summary": "updated: 2026-05-06T03:11:39.559Z  Oracle action feedback loop The Oracle now turns session and action audit events into reusable learnings."
     }
   ],
   "retrospectivesCount": 16,
@@ -115,7 +115,7 @@
       "ok": true,
       "status": 200,
       "responseMs": null,
-      "checkedAt": "2026-05-06T03:11:01.915Z",
+      "checkedAt": "2026-05-06T03:12:52.381Z",
       "note": "local build target; set ORACLE_DASHBOARD_URL after deploy for public uptime checks"
     },
     {
@@ -123,8 +123,8 @@
       "url": "https://aum-hippie-young.vercel.app/",
       "ok": true,
       "status": 200,
-      "responseMs": 183,
-      "checkedAt": "2026-05-06T03:11:02.098Z",
+      "responseMs": 182,
+      "checkedAt": "2026-05-06T03:12:52.563Z",
       "note": "reachable"
     },
     {
@@ -132,8 +132,8 @@
       "url": "https://www.wiro4x4indochina.com/",
       "ok": true,
       "status": 200,
-      "responseMs": 172,
-      "checkedAt": "2026-05-06T03:11:02.108Z",
+      "responseMs": 175,
+      "checkedAt": "2026-05-06T03:12:52.577Z",
       "note": "reachable"
     }
   ],
@@ -142,12 +142,12 @@
       "name": "Moshe",
       "path": "/Users/pasuthunjunkong/workspace/Moshe",
       "branch": "main",
-      "commit": "1754a6d",
-      "commitFull": "1754a6dbaefbf69d1d51802ddc75f161278babb2",
-      "commitSubject": "oracle: guard deployment freshness lag",
+      "commit": "aa46db6",
+      "commitFull": "aa46db6997ea0eb0c8c97027e015db70680fc7e0",
+      "commitSubject": "oracle: add operational readiness panel",
       "dirty": true,
-      "changedFiles": 32,
-      "lastCommitAt": "2026-05-06T09:13:54+07:00",
+      "changedFiles": 28,
+      "lastCommitAt": "2026-05-06T10:11:19+07:00",
       "github": "Mekjunkong/Moshe",
       "remoteHost": "github.com"
     },
@@ -183,6 +183,18 @@
       "provider": "vercel",
       "project": "galaxy",
       "state": "READY",
+      "url": "https://galaxy-o94gvfjom-pasuthun-junkongs-projects.vercel.app",
+      "createdAt": "2026-05-06T03:11:45.814Z",
+      "gitCommitSha": "aa46db6997ea0eb0c8c97027e015db70680fc7e0",
+      "gitCommitMessage": "oracle: add operational readiness panel",
+      "gitCommitRef": "main",
+      "gitDirty": true,
+      "note": "read via Vercel CLI auth; no token value exposed"
+    },
+    {
+      "provider": "vercel",
+      "project": "galaxy",
+      "state": "READY",
       "url": "https://galaxy-5lr0v7fvx-pasuthun-junkongs-projects.vercel.app",
       "createdAt": "2026-05-06T02:14:20.253Z",
       "gitCommitSha": "1754a6dbaefbf69d1d51802ddc75f161278babb2",
@@ -202,18 +214,6 @@
       "gitCommitRef": "main",
       "gitDirty": true,
       "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "vercel",
-      "project": "galaxy",
-      "state": "READY",
-      "url": "https://galaxy-54mcakgz8-pasuthun-junkongs-projects.vercel.app",
-      "createdAt": "2026-05-06T01:54:30.131Z",
-      "gitCommitSha": "e0cde1d922072ec69db53f4c20b6c4ec5db041b8",
-      "gitCommitMessage": "oracle: add autonomous improvement loop",
-      "gitCommitRef": "main",
-      "gitDirty": true,
-      "note": "read via Vercel CLI auth; no token value exposed"
     }
   ],
   "github": [
@@ -224,7 +224,7 @@
       "apiStatus": "ok",
       "private": false,
       "defaultBranch": "main",
-      "pushedAt": "2026-05-06T02:13:56Z",
+      "pushedAt": "2026-05-06T03:11:21Z",
       "openIssues": 0,
       "openPullRequests": 0,
       "latestWorkflow": null,
@@ -298,9 +298,9 @@
       "severity": "warning",
       "category": "repo-dirty",
       "project": "Moshe",
-      "title": "Moshe: 32 uncommitted changes",
-      "detail": "Branch main · last commit: \"oracle: guard deployment freshness lag\"",
-      "detectedAt": "2026-05-06T09:13:54+07:00"
+      "title": "Moshe: 28 uncommitted changes",
+      "detail": "Branch main · last commit: \"oracle: add operational readiness panel\"",
+      "detectedAt": "2026-05-06T10:11:19+07:00"
     },
     {
       "id": "repo-dirty-wiro4x4",
@@ -318,14 +318,14 @@
       "project": "Oracle OS",
       "title": "5 credential(s) not configured",
       "detail": "VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_PROJECT_NAME, VERCEL_TEAM_ID, GITHUB_TOKEN",
-      "detectedAt": "2026-05-06T03:11:12.249Z"
+      "detectedAt": "2026-05-06T03:13:01.934Z"
     }
   ],
   "recommendations": [
     {
       "project": "Moshe",
       "priority": "medium",
-      "reason": "Moshe: 32 uncommitted changes",
+      "reason": "Moshe: 28 uncommitted changes",
       "risk": "medium",
       "suggestedAction": "Review staged changes in Moshe and commit or stash to keep the branch clean."
     },
@@ -362,12 +362,12 @@
       "project": "galaxy",
       "event": "deploy",
       "state": "READY",
-      "url": "https://galaxy-5lr0v7fvx-pasuthun-junkongs-projects.vercel.app",
-      "timestamp": "2026-05-06T02:14:20.253Z",
-      "deployedCommitSha": "1754a6dbaefbf69d1d51802ddc75f161278babb2",
-      "deployedCommitMessage": "oracle: guard deployment freshness lag",
+      "url": "https://galaxy-o94gvfjom-pasuthun-junkongs-projects.vercel.app",
+      "timestamp": "2026-05-06T03:11:45.814Z",
+      "deployedCommitSha": "aa46db6997ea0eb0c8c97027e015db70680fc7e0",
+      "deployedCommitMessage": "oracle: add operational readiness panel",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "1754a6dbaefbf69d1d51802ddc75f161278babb2",
+      "sourceCommitSha": "aa46db6997ea0eb0c8c97027e015db70680fc7e0",
       "syncState": "in-sync",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
@@ -376,11 +376,25 @@
       "project": "Moshe",
       "event": "commit",
       "state": "uncommitted-changes",
-      "timestamp": "2026-05-06T09:13:54+07:00",
+      "timestamp": "2026-05-06T10:11:19+07:00",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "1754a6dbaefbf69d1d51802ddc75f161278babb2",
+      "sourceCommitSha": "aa46db6997ea0eb0c8c97027e015db70680fc7e0",
       "syncState": "behind",
-      "note": "oracle: guard deployment freshness lag"
+      "note": "oracle: add operational readiness panel"
+    },
+    {
+      "provider": "vercel",
+      "project": "galaxy",
+      "event": "deploy",
+      "state": "READY",
+      "url": "https://galaxy-5lr0v7fvx-pasuthun-junkongs-projects.vercel.app",
+      "timestamp": "2026-05-06T02:14:20.253Z",
+      "deployedCommitSha": "1754a6dbaefbf69d1d51802ddc75f161278babb2",
+      "deployedCommitMessage": "oracle: guard deployment freshness lag",
+      "sourceRepo": "Moshe",
+      "sourceCommitSha": "aa46db6997ea0eb0c8c97027e015db70680fc7e0",
+      "syncState": "behind",
+      "note": "read via Vercel CLI auth; no token value exposed"
     },
     {
       "provider": "vercel",
@@ -392,21 +406,7 @@
       "deployedCommitSha": "9f5e056e9e0994c6cf3f156f24ae028d52f28558",
       "deployedCommitMessage": "oracle: surface deployment freshness",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "1754a6dbaefbf69d1d51802ddc75f161278babb2",
-      "syncState": "behind",
-      "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "vercel",
-      "project": "galaxy",
-      "event": "deploy",
-      "state": "READY",
-      "url": "https://galaxy-54mcakgz8-pasuthun-junkongs-projects.vercel.app",
-      "timestamp": "2026-05-06T01:54:30.131Z",
-      "deployedCommitSha": "e0cde1d922072ec69db53f4c20b6c4ec5db041b8",
-      "deployedCommitMessage": "oracle: add autonomous improvement loop",
-      "sourceRepo": "Moshe",
-      "sourceCommitSha": "1754a6dbaefbf69d1d51802ddc75f161278babb2",
+      "sourceCommitSha": "aa46db6997ea0eb0c8c97027e015db70680fc7e0",
       "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
