@@ -1,10 +1,10 @@
 {
-  "generated": "2026-05-06T01:42:27.071Z",
+  "generated": "2026-05-06T01:52:52.141Z",
   "born": "2026-04-18",
   "level3Phase": "Phase 3B: Feedback loop — audit-derived learnings, auth, allowlist, audit log, preview mode",
   "stats": {
     "learnings": 10,
-    "retrospectives": 13,
+    "retrospectives": 14,
     "activeProjects": 2,
     "inboxItems": 1,
     "writingDocs": 0,
@@ -30,7 +30,7 @@
       "title": "Oracle action feedback loop",
       "file": "oracle-action-feedback.md",
       "date": "2026-05-06",
-      "summary": "updated: 2026-05-06T00:15:10.706Z  Oracle action feedback loop The Oracle now turns session and action audit events into reusable learnings."
+      "summary": "updated: 2026-05-06T01:44:30.973Z  Oracle action feedback loop The Oracle now turns session and action audit events into reusable learnings."
     },
     {
       "title": "Oracle Action Layer + Wiro Visibility Split",
@@ -39,13 +39,13 @@
       "summary": "Date: 2026-05-05  Learning Keep Oracle action-layer design separate from Wiro visibility work. Oracle should show future buttons as a preview-only con…"
     }
   ],
-  "retrospectivesCount": 13,
+  "retrospectivesCount": 14,
   "retrospectivesRecent": [
+    "2026-05-06 — Oracle Option A + C — Wiro Business Mode and Telegram Reports",
     "2026-05-06 — Oracle Phase 1 + Phase 2 Command Center",
     "2026-05-05 — Oracle Action Layer + Wiro Visibility — 2026-05-05",
     "2026-05-05 — Oracle Phase 2A Smoke Check — 2026-05-05",
-    "2026-05-05 — Retrospective — Oracle Phase 3A Action API Foundation",
-    "2026-05-05 — Oracle Overnight Stabilization — 2026-05-06"
+    "2026-05-05 — Retrospective — Oracle Phase 3A Action API Foundation"
   ],
   "activeCrons": [
     {
@@ -115,7 +115,7 @@
       "ok": true,
       "status": 200,
       "responseMs": null,
-      "checkedAt": "2026-05-06T01:42:16.788Z",
+      "checkedAt": "2026-05-06T01:52:40.857Z",
       "note": "local build target; set ORACLE_DASHBOARD_URL after deploy for public uptime checks"
     },
     {
@@ -123,8 +123,8 @@
       "url": "https://aum-hippie-young.vercel.app/",
       "ok": true,
       "status": 200,
-      "responseMs": 242,
-      "checkedAt": "2026-05-06T01:42:17.030Z",
+      "responseMs": 206,
+      "checkedAt": "2026-05-06T01:52:41.063Z",
       "note": "reachable"
     },
     {
@@ -132,8 +132,8 @@
       "url": "https://www.wiro4x4indochina.com/",
       "ok": true,
       "status": 200,
-      "responseMs": 204,
-      "checkedAt": "2026-05-06T01:42:17.035Z",
+      "responseMs": 198,
+      "checkedAt": "2026-05-06T01:52:41.077Z",
       "note": "reachable"
     }
   ],
@@ -142,12 +142,12 @@
       "name": "Moshe",
       "path": "/Users/pasuthunjunkong/workspace/Moshe",
       "branch": "main",
-      "commit": "97a2be8",
-      "commitFull": "97a2be8415c321f8cbc582cff3a6859f9878d4f5",
-      "commitSubject": "oracle: refresh command center snapshot",
+      "commit": "a98bee8",
+      "commitFull": "a98bee89891340b3ef8eebf13bff087a38856fe0",
+      "commitSubject": "oracle: add wiro business mode and reports",
       "dirty": true,
-      "changedFiles": 26,
-      "lastCommitAt": "2026-05-06T07:14:42+07:00",
+      "changedFiles": 27,
+      "lastCommitAt": "2026-05-06T08:44:10+07:00",
       "github": "Mekjunkong/Moshe",
       "remoteHost": "github.com"
     },
@@ -183,6 +183,18 @@
       "provider": "vercel",
       "project": "galaxy",
       "state": "READY",
+      "url": "https://galaxy-grzx39emn-pasuthun-junkongs-projects.vercel.app",
+      "createdAt": "2026-05-06T01:44:38.115Z",
+      "gitCommitSha": "a98bee89891340b3ef8eebf13bff087a38856fe0",
+      "gitCommitMessage": "oracle: add wiro business mode and reports",
+      "gitCommitRef": "main",
+      "gitDirty": true,
+      "note": "read via Vercel CLI auth; no token value exposed"
+    },
+    {
+      "provider": "vercel",
+      "project": "galaxy",
+      "state": "READY",
       "url": "https://galaxy-g6mt691sv-pasuthun-junkongs-projects.vercel.app",
       "createdAt": "2026-05-06T00:15:16.737Z",
       "gitCommitSha": "97a2be8415c321f8cbc582cff3a6859f9878d4f5",
@@ -202,18 +214,6 @@
       "gitCommitRef": "main",
       "gitDirty": true,
       "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "vercel",
-      "project": "galaxy",
-      "state": "READY",
-      "url": "https://galaxy-jq0xvyubb-pasuthun-junkongs-projects.vercel.app",
-      "createdAt": "2026-05-05T23:25:11.667Z",
-      "gitCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
-      "gitCommitMessage": "oracle: sync live session-gated status",
-      "gitCommitRef": "main",
-      "gitDirty": true,
-      "note": "read via Vercel CLI auth; no token value exposed"
     }
   ],
   "github": [
@@ -224,7 +224,7 @@
       "apiStatus": "ok",
       "private": false,
       "defaultBranch": "main",
-      "pushedAt": "2026-05-06T00:14:44Z",
+      "pushedAt": "2026-05-06T01:44:12Z",
       "openIssues": 0,
       "openPullRequests": 0,
       "latestWorkflow": null,
@@ -298,9 +298,9 @@
       "severity": "warning",
       "category": "repo-dirty",
       "project": "Moshe",
-      "title": "Moshe: 26 uncommitted changes",
-      "detail": "Branch main · last commit: \"oracle: refresh command center snapshot\"",
-      "detectedAt": "2026-05-06T07:14:42+07:00"
+      "title": "Moshe: 27 uncommitted changes",
+      "detail": "Branch main · last commit: \"oracle: add wiro business mode and reports\"",
+      "detectedAt": "2026-05-06T08:44:10+07:00"
     },
     {
       "id": "repo-dirty-wiro4x4",
@@ -318,14 +318,14 @@
       "project": "Oracle OS",
       "title": "5 credential(s) not configured",
       "detail": "VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_PROJECT_NAME, VERCEL_TEAM_ID, GITHUB_TOKEN",
-      "detectedAt": "2026-05-06T01:42:27.071Z"
+      "detectedAt": "2026-05-06T01:52:52.141Z"
     }
   ],
   "recommendations": [
     {
       "project": "Moshe",
       "priority": "medium",
-      "reason": "Moshe: 26 uncommitted changes",
+      "reason": "Moshe: 27 uncommitted changes",
       "risk": "medium",
       "suggestedAction": "Review staged changes in Moshe and commit or stash to keep the branch clean."
     },
@@ -362,12 +362,12 @@
       "project": "galaxy",
       "event": "deploy",
       "state": "READY",
-      "url": "https://galaxy-g6mt691sv-pasuthun-junkongs-projects.vercel.app",
-      "timestamp": "2026-05-06T00:15:16.737Z",
-      "deployedCommitSha": "97a2be8415c321f8cbc582cff3a6859f9878d4f5",
-      "deployedCommitMessage": "oracle: refresh command center snapshot",
+      "url": "https://galaxy-grzx39emn-pasuthun-junkongs-projects.vercel.app",
+      "timestamp": "2026-05-06T01:44:38.115Z",
+      "deployedCommitSha": "a98bee89891340b3ef8eebf13bff087a38856fe0",
+      "deployedCommitMessage": "oracle: add wiro business mode and reports",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "97a2be8415c321f8cbc582cff3a6859f9878d4f5",
+      "sourceCommitSha": "a98bee89891340b3ef8eebf13bff087a38856fe0",
       "syncState": "in-sync",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
@@ -376,11 +376,25 @@
       "project": "Moshe",
       "event": "commit",
       "state": "uncommitted-changes",
-      "timestamp": "2026-05-06T07:14:42+07:00",
+      "timestamp": "2026-05-06T08:44:10+07:00",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "97a2be8415c321f8cbc582cff3a6859f9878d4f5",
+      "sourceCommitSha": "a98bee89891340b3ef8eebf13bff087a38856fe0",
       "syncState": "behind",
-      "note": "oracle: refresh command center snapshot"
+      "note": "oracle: add wiro business mode and reports"
+    },
+    {
+      "provider": "vercel",
+      "project": "galaxy",
+      "event": "deploy",
+      "state": "READY",
+      "url": "https://galaxy-g6mt691sv-pasuthun-junkongs-projects.vercel.app",
+      "timestamp": "2026-05-06T00:15:16.737Z",
+      "deployedCommitSha": "97a2be8415c321f8cbc582cff3a6859f9878d4f5",
+      "deployedCommitMessage": "oracle: refresh command center snapshot",
+      "sourceRepo": "Moshe",
+      "sourceCommitSha": "a98bee89891340b3ef8eebf13bff087a38856fe0",
+      "syncState": "behind",
+      "note": "read via Vercel CLI auth; no token value exposed"
     },
     {
       "provider": "vercel",
@@ -392,21 +406,7 @@
       "deployedCommitSha": "99531515d0bfdd9da6cfa6067272bde2a874cc19",
       "deployedCommitMessage": "oracle: build daily command center actions",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "97a2be8415c321f8cbc582cff3a6859f9878d4f5",
-      "syncState": "behind",
-      "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "vercel",
-      "project": "galaxy",
-      "event": "deploy",
-      "state": "READY",
-      "url": "https://galaxy-jq0xvyubb-pasuthun-junkongs-projects.vercel.app",
-      "timestamp": "2026-05-05T23:25:11.667Z",
-      "deployedCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
-      "deployedCommitMessage": "oracle: sync live session-gated status",
-      "sourceRepo": "Moshe",
-      "sourceCommitSha": "97a2be8415c321f8cbc582cff3a6859f9878d4f5",
+      "sourceCommitSha": "a98bee89891340b3ef8eebf13bff087a38856fe0",
       "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },

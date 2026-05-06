@@ -119,6 +119,7 @@ const tabs = [
   { id: 'intel', label: 'Intel', alert: true },
   { id: 'overview', label: 'Overview' },
   { id: 'wiro', label: 'Wiro' },
+  { id: 'improve', label: 'Improve' },
   { id: 'sites', label: 'Sites' },
   { id: 'repos', label: 'Repos' },
   { id: 'sensors', label: 'Sensors' },
@@ -128,7 +129,7 @@ const tabs = [
 export default function OracleCommandCenter({ data }: Props) {
   const [oracleRefreshNonce, setOracleRefreshNonce] = useState(0)
   const oracle = useOracleLiveData(oracleRefreshNonce)
-  const [tab, setTab] = useState<'today' | 'intel' | 'overview' | 'wiro' | 'sites' | 'repos' | 'sensors' | 'learnings'>('today')
+  const [tab, setTab] = useState<'today' | 'intel' | 'overview' | 'wiro' | 'improve' | 'sites' | 'repos' | 'sensors' | 'learnings'>('today')
   const [previewReason, setPreviewReason] = useState('Refresh the Oracle snapshot before any future action.')
   const [previewState, setPreviewState] = useState<{
     status: 'idle' | 'loading' | 'ready' | 'error'
@@ -426,6 +427,23 @@ export default function OracleCommandCenter({ data }: Props) {
     { label: 'WhatsApp CTA', status: 'ready', detail: 'Keep WhatsApp as the primary conversion route.' },
     { label: 'Kosher positioning', status: 'active', detail: 'Highlight Hebrew-speaking guide support, kosher meals, and Shabbat-friendly planning.' },
     { label: 'Inquiry processing', status: 'scheduled', detail: 'Daily lead check cron monitors Wiro inquiries and returns action lists.' },
+  ]
+  const autonomyRules = [
+    { label: 'Safe autonomy', status: 'active', detail: 'Moshe can improve dashboard UI, reports, docs, read-only checks, and debug flows without waiting.' },
+    { label: 'Guardrails', status: 'locked', detail: 'Secrets, destructive changes, customer-facing sends, and risky writes still require explicit gates.' },
+    { label: 'Evidence first', status: 'required', detail: 'Every shipped improvement needs build/test/browser/live verification before it counts as done.' },
+  ]
+  const improvementBacklog = [
+    { title: 'Report feedback score', owner: 'Oracle', value: 'Next', detail: 'Track whether morning and evening reports are useful, noisy, or missing context.' },
+    { title: 'Wiro lead source bridge', owner: 'Wiro', value: 'High', detail: 'Convert Obsidian inquiry counts into a dashboard signal without exposing customer details.' },
+    { title: 'Deployment freshness card', owner: 'DevOps', value: 'High', detail: 'Show live commit versus repo HEAD with a simple in-sync or stale verdict.' },
+    { title: 'Autonomous weekly cleanup', owner: 'Moshe', value: 'Medium', detail: 'Surface stale notes, dirty repos, and missing retrospectives as one weekly maintenance list.' },
+  ]
+  const activeLoops = [
+    { name: 'Morning Oracle Brief', cadence: '08:00 daily', signal: 'top actions, Wiro, warnings' },
+    { name: 'Evening Wiro Business Pulse', cadence: '18:00 daily', signal: 'sales readiness, leads, marketing move' },
+    { name: 'Daily Oracle Self-Learning Scan', cadence: '07:00 daily', signal: 'memory/project learning' },
+    { name: 'Weekly Oracle Report', cadence: 'Monday 09:00', signal: 'strategic review' },
   ]
 
   return (
@@ -1069,6 +1087,67 @@ export default function OracleCommandCenter({ data }: Props) {
             )}
             <button type="button" className="oracle-preview-button" onClick={() => runOracleAction('dispatch-wiro-ci', 'preview')}>Preview Wiro CI dispatch</button>
             <button type="button" className="oracle-preview-button" onClick={() => runOracleAction('dispatch-wiro-ci', 'execute')} disabled={sessionState.status !== 'authenticated'}>Execute Wiro CI dispatch</button>
+          </div>
+        </section>
+      )}
+
+      {/* ── Improve tab ── */}
+      {tab === 'improve' && (
+        <section id="oracle-panel-improve" role="tabpanel" aria-labelledby="oracle-tab-improve" className="oracle-section oracle-scroll">
+          <div className="oracle-improve-hero">
+            <div>
+              <p>AUTONOMOUS ORACLE LOOP</p>
+              <h2>Self-improvement mode</h2>
+              <small>Safe improvements ship without waiting. Risky actions stay behind guardrails.</small>
+            </div>
+            <span className="oracle-risk-badge low">ACTIVE</span>
+          </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>OPERATING RULES</p>
+            <span>{autonomyRules.length} boundaries</span>
+          </div>
+          <div className="oracle-improve-rule-list">
+            {autonomyRules.map((rule) => (
+              <article className="oracle-improve-rule" key={rule.label}>
+                <div className="oracle-status-head">
+                  <strong>{rule.label}</strong>
+                  <span>{rule.status.toUpperCase()}</span>
+                </div>
+                <p>{rule.detail}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>IMPROVEMENT BACKLOG</p>
+            <span>prioritized by Moshe</span>
+          </div>
+          <div className="oracle-improve-backlog">
+            {improvementBacklog.map((item) => (
+              <article className="oracle-improve-card" key={item.title}>
+                <div>
+                  <strong>{item.title}</strong>
+                  <small>{item.owner}</small>
+                </div>
+                <span className={`oracle-risk-badge ${item.value === 'High' ? 'medium' : 'low'}`}>{item.value}</span>
+                <p>{item.detail}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>ACTIVE LOOPS</p>
+            <span>Telegram + dashboard</span>
+          </div>
+          <div className="oracle-improve-loop-list">
+            {activeLoops.map((loop) => (
+              <article className="oracle-improve-loop" key={loop.name}>
+                <strong>{loop.name}</strong>
+                <span>{loop.cadence}</span>
+                <p>{loop.signal}</p>
+              </article>
+            ))}
           </div>
         </section>
       )}

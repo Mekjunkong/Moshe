@@ -1543,3 +1543,116 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+.oracle-improve-hero {
+  border: 1px solid rgba(168, 85, 247, 0.24);
+  border-radius: 22px;
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+  background:
+    radial-gradient(circle at top left, rgba(168, 85, 247, 0.22), transparent 38%),
+    radial-gradient(circle at bottom right, rgba(34, 211, 238, 0.14), transparent 34%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(46, 16, 101, 0.64));
+}
+
+.oracle-improve-hero p {
+  margin: 0;
+  color: #c4b5fd;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.oracle-improve-hero h2 {
+  margin: 5px 0;
+  color: #f5f3ff;
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+}
+
+.oracle-improve-hero small,
+.oracle-improve-rule p,
+.oracle-improve-card p,
+.oracle-improve-loop p {
+  color: rgba(237, 233, 254, 0.76);
+}
+
+.oracle-improve-rule-list,
+.oracle-improve-backlog,
+.oracle-improve-loop-list {
+  display: grid;
+  gap: 10px;
+}
+
+.oracle-improve-rule,
+.oracle-improve-card,
+.oracle-improve-loop {
+  border: 1px solid rgba(168, 85, 247, 0.16);
+  border-radius: 16px;
+  padding: 13px;
+  background:
+    linear-gradient(180deg, rgba(17, 24, 39, 0.88), rgba(15, 23, 42, 0.72)),
+    radial-gradient(circle at 12% 18%, rgba(34, 211, 238, 0.08), transparent 36%);
+}
+
+.oracle-improve-rule p,
+.oracle-improve-card p,
+.oracle-improve-loop p {
+  margin: 8px 0 0;
+  line-height: 1.45;
+}
+
+.oracle-improve-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 12px;
+  align-items: start;
+}
+
+.oracle-improve-card strong,
+.oracle-improve-loop strong,
+.oracle-improve-rule strong {
+  color: #faf5ff;
+}
+
+.oracle-improve-card small {
+  display: block;
+  margin-top: 3px;
+  color: rgba(196, 181, 253, 0.85);
+}
+
+.oracle-improve-card p {
+  grid-column: 1 / -1;
+}
+
+.oracle-improve-loop {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 10px;
+}
+
+.oracle-improve-loop span {
+  color: rgba(34, 211, 238, 0.9);
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+.oracle-improve-loop p {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 720px) {
+  .oracle-improve-hero {
+    flex-direction: column;
+  }
+
+  .oracle-improve-card,
+  .oracle-improve-loop {
+    grid-template-columns: 1fr;
+  }
+}
