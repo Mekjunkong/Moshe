@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-06T11:03:07.316Z",
+  "generated": "2026-05-06T11:22:40.676Z",
   "born": "2026-04-18",
   "level3Phase": "Phase 5D: Approval callbacks, cron promotion drafts, repo hygiene classification, and deploy smoke gates",
   "stats": {
@@ -15,11 +15,6 @@
       "title": "Learning: session gate unlocks execution",
       "date": "2026-05-06",
       "summary": "Mike-only signed session cookie issued."
-    },
-    {
-      "title": "Learning: Wiro CI dispatch works",
-      "date": "2026-05-05",
-      "summary": "Wiro CI dispatch queued for Mekjunkong/Wiro4x4."
     },
     {
       "title": "Hermes Cron Tool-Call Ceiling RuntimeError",
@@ -38,6 +33,12 @@
       "file": "2026-05-06-oracle-intelligence-terminal-layer.md",
       "date": "2026-05-06",
       "summary": "What changed - Added Oracle Intelligence Layer v1 to Galaxy dashboard:   - Today’s Learnings"
+    },
+    {
+      "title": "Oracle Phase 4 Autonomy Router — 2026-05-06",
+      "file": "2026-05-06-oracle-phase-4-autonomy-router.md",
+      "date": "2026-05-06",
+      "summary": "Learning Mike wants Oracle to move from self-learning into a safe autonomous operating layer. Phase 4 is not unrestricted execution; it is explicit ro…"
     }
   ],
   "retrospectivesCount": 17,
@@ -116,7 +117,7 @@
       "ok": true,
       "status": 200,
       "responseMs": null,
-      "checkedAt": "2026-05-06T11:02:56.726Z",
+      "checkedAt": "2026-05-06T11:22:30.379Z",
       "note": "local build target; set ORACLE_DASHBOARD_URL after deploy for public uptime checks"
     },
     {
@@ -124,8 +125,8 @@
       "url": "https://aum-hippie-young.vercel.app/",
       "ok": true,
       "status": 200,
-      "responseMs": 184,
-      "checkedAt": "2026-05-06T11:02:56.910Z",
+      "responseMs": 186,
+      "checkedAt": "2026-05-06T11:22:30.565Z",
       "note": "reachable"
     },
     {
@@ -133,8 +134,8 @@
       "url": "https://www.wiro4x4indochina.com/",
       "ok": true,
       "status": 200,
-      "responseMs": 183,
-      "checkedAt": "2026-05-06T11:02:56.930Z",
+      "responseMs": 208,
+      "checkedAt": "2026-05-06T11:22:30.608Z",
       "note": "reachable"
     }
   ],
@@ -143,15 +144,15 @@
       "name": "Moshe",
       "path": "/Users/pasuthunjunkong/workspace/Moshe",
       "branch": "oracle-phase-5d-approval-cron-gates",
-      "commit": "ef70499",
-      "commitFull": "ef70499715b9c2721be099d21f645fe24db46e0f",
-      "commitSubject": "feat: add Oracle phase 5C run-state loop",
+      "commit": "3e5fdb1",
+      "commitFull": "3e5fdb1b6948f2103c76e0c61ce46b2509c01292",
+      "commitSubject": "feat: add Oracle phase 5D approval gates",
       "dirty": true,
-      "changedFiles": 52,
-      "modifiedFiles": 6,
-      "untrackedFiles": 46,
+      "changedFiles": 48,
+      "modifiedFiles": 4,
+      "untrackedFiles": 44,
       "protectedTouched": false,
-      "lastCommitAt": "2026-05-06T17:37:24+07:00",
+      "lastCommitAt": "2026-05-06T18:05:00+07:00",
       "github": "Mekjunkong/Moshe",
       "remoteHost": "github.com"
     },
@@ -234,7 +235,7 @@
       "apiStatus": "ok",
       "private": false,
       "defaultBranch": "main",
-      "pushedAt": "2026-05-06T10:37:25Z",
+      "pushedAt": "2026-05-06T11:05:01Z",
       "openIssues": 0,
       "openPullRequests": 0,
       "latestWorkflow": null,
@@ -308,9 +309,9 @@
       "severity": "warning",
       "category": "repo-dirty",
       "project": "Moshe",
-      "title": "Moshe: 52 uncommitted changes",
-      "detail": "Branch oracle-phase-5d-approval-cron-gates · last commit: \"feat: add Oracle phase 5C run-state loop\"",
-      "detectedAt": "2026-05-06T17:37:24+07:00"
+      "title": "Moshe: 48 uncommitted changes",
+      "detail": "Branch oracle-phase-5d-approval-cron-gates · last commit: \"feat: add Oracle phase 5D approval gates\"",
+      "detectedAt": "2026-05-06T18:05:00+07:00"
     },
     {
       "id": "creds-missing",
@@ -319,14 +320,14 @@
       "project": "Oracle OS",
       "title": "5 credential(s) not configured",
       "detail": "VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_PROJECT_NAME, VERCEL_TEAM_ID, GITHUB_TOKEN",
-      "detectedAt": "2026-05-06T11:03:07.316Z"
+      "detectedAt": "2026-05-06T11:22:40.676Z"
     }
   ],
   "recommendations": [
     {
       "project": "Moshe",
       "priority": "medium",
-      "reason": "Moshe: 52 uncommitted changes",
+      "reason": "Moshe: 48 uncommitted changes",
       "risk": "medium",
       "suggestedAction": "Review staged changes in Moshe and commit or stash to keep the branch clean."
     },
@@ -356,11 +357,11 @@
       "project": "Moshe",
       "event": "commit",
       "state": "uncommitted-changes",
-      "timestamp": "2026-05-06T17:37:24+07:00",
+      "timestamp": "2026-05-06T18:05:00+07:00",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "ef70499715b9c2721be099d21f645fe24db46e0f",
+      "sourceCommitSha": "3e5fdb1b6948f2103c76e0c61ce46b2509c01292",
       "syncState": "behind",
-      "note": "feat: add Oracle phase 5C run-state loop"
+      "note": "feat: add Oracle phase 5D approval gates"
     },
     {
       "provider": "git",
@@ -383,7 +384,7 @@
       "deployedCommitSha": "27cd254c574d5cdc389155fe93a9dd16bfcae81a",
       "deployedCommitMessage": "oracle: add autonomy router lanes",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "ef70499715b9c2721be099d21f645fe24db46e0f",
+      "sourceCommitSha": "3e5fdb1b6948f2103c76e0c61ce46b2509c01292",
       "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
@@ -397,7 +398,7 @@
       "deployedCommitSha": "06f96325f2305145359192ea6fc0b201a4cabb1b",
       "deployedCommitMessage": "oracle: keep intelligence radar populated in production",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "ef70499715b9c2721be099d21f645fe24db46e0f",
+      "sourceCommitSha": "3e5fdb1b6948f2103c76e0c61ce46b2509c01292",
       "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
@@ -411,7 +412,7 @@
       "deployedCommitSha": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
       "deployedCommitMessage": "oracle: log readiness deployment",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "ef70499715b9c2721be099d21f645fe24db46e0f",
+      "sourceCommitSha": "3e5fdb1b6948f2103c76e0c61ce46b2509c01292",
       "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
@@ -528,7 +529,7 @@
     ]
   },
   "intelligenceLayer": {
-    "updatedAt": "2026-05-06T11:03:07.577Z",
+    "updatedAt": "2026-05-06T11:22:40.940Z",
     "summary": "Oracle is learning from ψ and opportunity artifacts. Top money radar: AI Inquiry and Quote Copilot for Tour Operators (95/100).",
     "todayLearnings": [
       {
@@ -673,7 +674,7 @@
       }
     ],
     "autonomyRouter": {
-      "updatedAt": "2026-05-06T11:03:07.577Z",
+      "updatedAt": "2026-05-06T11:22:40.940Z",
       "phase": "phase_4",
       "summary": "Phase 4 is active: Oracle classifies every recommendation before action and keeps execution behind safe/draft/approval lanes.",
       "lanes": [
@@ -841,59 +842,59 @@
     "note": "Terminal panel is visible but execution is disabled until ORACLE_TERMINAL_ENABLED=true is set on a trusted runtime."
   },
   "phase5A": {
-    "updatedAt": "2026-05-06T11:03:07.316Z",
+    "updatedAt": "2026-05-06T11:22:40.676Z",
     "phase": "phase_5a",
     "summary": "Phase 5A active: Oracle now has closed-loop signal quality, repo hygiene, and deployment freshness sensors before safe execution.",
     "feedbackLedger": {
-      "updatedAt": "2026-05-06T11:03:07.316Z",
+      "updatedAt": "2026-05-06T11:22:40.676Z",
       "summary": "12 signals tracked; 1 high-actionability; 1 need approval.",
       "signals": [
         {
+          "id": "audit-faaa3e36-0922-4796-aa28-ec2f5858c1da",
+          "source": "audit:oracle-session",
+          "businessArea": "oracle_os",
+          "actionability": "low",
+          "freshness": "fresh",
+          "riskLevel": "low",
+          "approvalRequired": false,
+          "mikeFeedback": "unrated",
+          "valueSignal": "Mike-only signed session cookie issued."
+        },
+        {
+          "id": "audit-b95bab6c-7452-4c45-b5f3-db23bf65dd2a",
+          "source": "audit:oracle-session",
+          "businessArea": "oracle_os",
+          "actionability": "low",
+          "freshness": "fresh",
+          "riskLevel": "low",
+          "approvalRequired": false,
+          "mikeFeedback": "unrated",
+          "valueSignal": "Mike-only signed session cookie issued."
+        },
+        {
+          "id": "audit-80bac1dd-937f-4fb5-bc68-f7b002002029",
+          "source": "audit:oracle-session",
+          "businessArea": "oracle_os",
+          "actionability": "low",
+          "freshness": "fresh",
+          "riskLevel": "low",
+          "approvalRequired": false,
+          "mikeFeedback": "unrated",
+          "valueSignal": "Mike-only signed session cookie issued."
+        },
+        {
+          "id": "audit-6a9509d7-a1d8-4073-b755-320cdd706b22",
+          "source": "audit:oracle-session",
+          "businessArea": "oracle_os",
+          "actionability": "low",
+          "freshness": "fresh",
+          "riskLevel": "low",
+          "approvalRequired": false,
+          "mikeFeedback": "unrated",
+          "valueSignal": "Mike-only signed session cookie issued."
+        },
+        {
           "id": "audit-9caf87e2-dae0-45f0-9462-e2be13815c6a",
-          "source": "audit:oracle-session",
-          "businessArea": "oracle_os",
-          "actionability": "low",
-          "freshness": "fresh",
-          "riskLevel": "low",
-          "approvalRequired": false,
-          "mikeFeedback": "unrated",
-          "valueSignal": "Mike-only signed session cookie issued."
-        },
-        {
-          "id": "audit-aa558dca-437d-4cf6-b462-4249bae42e02",
-          "source": "audit:oracle-session",
-          "businessArea": "oracle_os",
-          "actionability": "low",
-          "freshness": "fresh",
-          "riskLevel": "low",
-          "approvalRequired": false,
-          "mikeFeedback": "unrated",
-          "valueSignal": "Mike-only signed session cookie issued."
-        },
-        {
-          "id": "audit-fba5f17e-6c0a-4c4e-a876-c8c0ed99d813",
-          "source": "audit:oracle-session",
-          "businessArea": "oracle_os",
-          "actionability": "low",
-          "freshness": "fresh",
-          "riskLevel": "low",
-          "approvalRequired": false,
-          "mikeFeedback": "unrated",
-          "valueSignal": "Mike-only signed session cookie issued."
-        },
-        {
-          "id": "audit-3c09fe6f-800c-4335-a3d6-fd1baa55dd17",
-          "source": "audit:oracle-session",
-          "businessArea": "oracle_os",
-          "actionability": "low",
-          "freshness": "fresh",
-          "riskLevel": "low",
-          "approvalRequired": false,
-          "mikeFeedback": "unrated",
-          "valueSignal": "Mike-only signed session cookie issued."
-        },
-        {
-          "id": "audit-e6b8cf76-c77d-4556-b961-c37bf115cd08",
           "source": "audit:oracle-session",
           "businessArea": "oracle_os",
           "actionability": "low",
@@ -991,15 +992,15 @@
       "nextLearningStep": "Capture Mike feedback as useful/noisy/missing-context, then prioritize future reports by value signal."
     },
     "repoHygiene": {
-      "updatedAt": "2026-05-06T11:03:07.316Z",
+      "updatedAt": "2026-05-06T11:22:40.676Z",
       "verdict": "blocked",
       "summary": "1 repo(s) blocked by protected/large dirty state.",
       "items": [
         {
           "repo": "Moshe",
           "branch": "oracle-phase-5d-approval-cron-gates",
-          "changedFiles": 52,
-          "untrackedFiles": 46,
+          "changedFiles": 48,
+          "untrackedFiles": 44,
           "protectedTouched": false,
           "verdict": "blocked",
           "recommendation": "Do not recommend ship/deploy until protected or large dirty state is reviewed."
@@ -1025,12 +1026,12 @@
       ]
     },
     "deploymentFreshnessGap": {
-      "updatedAt": "2026-05-06T11:03:07.316Z",
+      "updatedAt": "2026-05-06T11:22:40.676Z",
       "verdict": "review_before_ship",
-      "summary": "galaxy: live 27cd254 vs local ef70499 · behind",
+      "summary": "galaxy: live 27cd254 vs local 3e5fdb1 · behind",
       "liveProject": "galaxy",
       "liveCommit": "27cd254c574d",
-      "localCommit": "ef70499715b9",
+      "localCommit": "3e5fdb1b6948",
       "snapshotAgeMinutes": 0,
       "worktreeDirty": true,
       "dirtyRepoCount": 2,
@@ -1045,7 +1046,7 @@
     ]
   },
   "phase5B": {
-    "updatedAt": "2026-05-06T11:03:07.316Z",
+    "updatedAt": "2026-05-06T11:22:40.676Z",
     "phase": "phase_5b",
     "summary": "Phase 5B active: feedback now has a signed-session persistence endpoint, evidence chains, safe executor queue, approval inbox states, and value/noise scoring.",
     "feedbackPersistence": {
@@ -1069,8 +1070,8 @@
         "status": "complete",
         "summary": "Evidence for regenerating the local Oracle snapshot without external side effects.",
         "proofs": [
-          "snapshot generated 2026-05-06T11:03:07.316Z",
-          "Moshe repo HEAD ef70499",
+          "snapshot generated 2026-05-06T11:22:40.676Z",
+          "Moshe repo HEAD 3e5fdb1",
           "readiness watch (64)"
         ],
         "missing": [],
@@ -1141,7 +1142,7 @@
         "risk": "medium",
         "requestedAction": "Prepare options and evidence for Mike, but do not contact prospects.",
         "approvalTrigger": "Mike approval required before execution.",
-        "expiresAt": "2026-05-07T11:03:07.316Z"
+        "expiresAt": "2026-05-07T11:22:40.676Z"
       },
       {
         "id": "approval-approval-outreach-send",
@@ -1150,7 +1151,7 @@
         "risk": "medium",
         "requestedAction": "Keep outreach as a draft and wait for explicit Mike approval.",
         "approvalTrigger": "Mike approval required before execution.",
-        "expiresAt": "2026-05-07T11:03:07.316Z"
+        "expiresAt": "2026-05-07T11:22:40.676Z"
       },
       {
         "id": "approval-approval-publish-landing",
@@ -1159,7 +1160,7 @@
         "risk": "medium",
         "requestedAction": "Prepare review checklist for Mike.",
         "approvalTrigger": "Mike approval required before execution.",
-        "expiresAt": "2026-05-07T11:03:07.316Z"
+        "expiresAt": "2026-05-07T11:22:40.676Z"
       },
       {
         "id": "approval-action-dispatch-wiro-ci",
@@ -1169,7 +1170,7 @@
         "requestedAction": "Preview the workflow request and wait for Mike approval before dispatch.",
         "approvalTrigger": "Creates an external GitHub event and consumes CI minutes.",
         "evidenceChainId": "wiro-ci-evidence",
-        "expiresAt": "2026-05-07T11:03:07.316Z"
+        "expiresAt": "2026-05-07T11:22:40.676Z"
       },
       {
         "id": "approval-action-vercel-redeploy",
@@ -1179,7 +1180,7 @@
         "requestedAction": "Prepare deployment evidence and wait for Mike approval.",
         "approvalTrigger": "Changes live production surface and must be tied to verified commits/artifacts.",
         "evidenceChainId": "oracle-deploy-evidence",
-        "expiresAt": "2026-05-07T11:03:07.316Z"
+        "expiresAt": "2026-05-07T11:22:40.676Z"
       }
     ],
     "businessValueScores": [
@@ -1235,7 +1236,7 @@
     ]
   },
   "phase5C": {
-    "updatedAt": "2026-05-06T11:03:07.316Z",
+    "updatedAt": "2026-05-06T11:22:40.676Z",
     "phase": "phase_5c",
     "summary": "Phase 5C active: dashboard feedback buttons, persistent safe executor run states, promotion gates, Telegram approval payloads, and live smoke readiness are wired.",
     "feedbackButtons": {
@@ -1298,7 +1299,7 @@
           "reject",
           "defer"
         ],
-        "expiresAt": "2026-05-07T11:03:07.316Z"
+        "expiresAt": "2026-05-07T11:22:40.676Z"
       },
       {
         "id": "telegram-approval-approval-outreach-send",
@@ -1309,7 +1310,7 @@
           "reject",
           "defer"
         ],
-        "expiresAt": "2026-05-07T11:03:07.316Z"
+        "expiresAt": "2026-05-07T11:22:40.676Z"
       },
       {
         "id": "telegram-approval-approval-publish-landing",
@@ -1320,7 +1321,7 @@
           "reject",
           "defer"
         ],
-        "expiresAt": "2026-05-07T11:03:07.316Z"
+        "expiresAt": "2026-05-07T11:22:40.676Z"
       },
       {
         "id": "telegram-approval-action-dispatch-wiro-ci",
@@ -1331,7 +1332,7 @@
           "reject",
           "defer"
         ],
-        "expiresAt": "2026-05-07T11:03:07.316Z"
+        "expiresAt": "2026-05-07T11:22:40.676Z"
       },
       {
         "id": "telegram-approval-action-vercel-redeploy",
@@ -1342,7 +1343,7 @@
           "reject",
           "defer"
         ],
-        "expiresAt": "2026-05-07T11:03:07.316Z"
+        "expiresAt": "2026-05-07T11:22:40.676Z"
       }
     ],
     "liveSmokeReadiness": {
@@ -1366,7 +1367,7 @@
         {
           "label": "Snapshot freshness",
           "status": "pass",
-          "detail": "0m old at 2026-05-06T11:03:07.316Z."
+          "detail": "0m old at 2026-05-06T11:22:40.676Z."
         },
         {
           "label": "Repo hygiene blocks blind execution",
@@ -1385,7 +1386,7 @@
     ]
   },
   "phase5D": {
-    "updatedAt": "2026-05-06T11:03:07.316Z",
+    "updatedAt": "2026-05-06T11:22:40.676Z",
     "phase": "phase_5d",
     "summary": "Phase 5D active: approval callback persistence, cron promotion drafts, repo hygiene classification, and deploy smoke gates are wired before top-phase automation.",
     "approvalCallbacks": {
@@ -1434,9 +1435,10 @@
       {
         "repo": "Moshe",
         "verdict": "mixed",
-        "trackedChanges": 6,
-        "scratchUntracked": 5,
-        "sourceUntracked": 41,
+        "trackedChanges": 4,
+        "scratchUntracked": 42,
+        "docUntracked": 2,
+        "sourceUntracked": 0,
         "note": "Source-affecting or mixed changes remain; keep deployment and cron promotion guarded."
       },
       {
@@ -1444,6 +1446,7 @@
         "verdict": "clean",
         "trackedChanges": 0,
         "scratchUntracked": 0,
+        "docUntracked": 0,
         "sourceUntracked": 0,
         "note": "No local changes detected."
       },
@@ -1452,8 +1455,9 @@
         "verdict": "scratch_only",
         "trackedChanges": 0,
         "scratchUntracked": 1,
+        "docUntracked": 0,
         "sourceUntracked": 0,
-        "note": "Only known scratch/local-memory paths are untracked; safe to ignore for source deploy decisions after review."
+        "note": "Only known scratch/local-memory paths are untracked; safe to ignore for source deploy decisions."
       }
     ],
     "deploySmokeGates": [
@@ -1473,21 +1477,24 @@
       },
       {
         "id": "smoke-approval-api",
-        "status": "fail",
+        "status": "watch",
         "command": "curl -fsS https://mikewebstudio.com/api/oracle/approval",
-        "expected": "200 JSON policy for approval callbacks.",
-        "lastObserved": "session secret missing in build context"
+        "expected": "200 JSON policy for approval/decision callbacks; POST remains session-gated.",
+        "lastObserved": "build context missing session secret; GET can still be smoked after deploy, POST stays locked"
       }
     ],
     "topPhaseReadiness": {
       "status": "blocked",
       "blockers": [
-        "Source-affecting repo hygiene still needs review.",
-        "No successful persisted safe executor run yet.",
-        "No persisted approval callback decisions yet.",
-        "Deploy smoke gate has failing prerequisite."
+        "Source-affecting repo hygiene still needs review."
       ],
-      "nextStep": "Resolve blockers before scheduling autonomous safe_now cron or claiming top-phase."
+      "watchItems": [
+        "No successful persisted safe executor run yet.",
+        "No persisted approval/decision callback entries yet.",
+        "Production deploy smoke checks are pending.",
+        "Deployment freshness still needs review before claiming live top-phase."
+      ],
+      "nextStep": "Resolve source-risk blockers before scheduling autonomous safe_now cron or claiming top-phase."
     }
   },
   "nextActions": [

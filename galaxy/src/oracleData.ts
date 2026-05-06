@@ -434,9 +434,10 @@ export interface OracleCronPromotionPlan {
 
 export interface OracleRepoHygieneClassification {
   repo: string
-  verdict: 'source_change' | 'scratch_only' | 'mixed' | 'clean'
+  verdict: 'source_change' | 'scratch_only' | 'docs_only' | 'mixed' | 'clean'
   trackedChanges: number
   scratchUntracked: number
+  docUntracked: number
   sourceUntracked: number
   note: string
 }
@@ -471,6 +472,7 @@ export interface OraclePhase5DLayer {
   topPhaseReadiness: {
     status: 'blocked' | 'watch' | 'ready'
     blockers: string[]
+    watchItems: string[]
     nextStep: string
   }
 }
@@ -805,7 +807,7 @@ export const ORACLE_FALLBACK_DATA: OracleData = {
     cronPromotionPlans: [],
     repoHygieneClassifications: [],
     deploySmokeGates: [],
-    topPhaseReadiness: { status: 'blocked', blockers: ['Generate a fresh Oracle snapshot.'], nextStep: 'Run npm run build.' },
+    topPhaseReadiness: { status: 'blocked', blockers: ['Generate a fresh Oracle snapshot.'], watchItems: [], nextStep: 'Run npm run build.' },
   },
   nextActions: [
     'Run node scripts/generateOracleData.mjs',

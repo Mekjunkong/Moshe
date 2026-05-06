@@ -1657,7 +1657,17 @@ function approvalDecisionCounts(decisions) {
 }
 
 function classifyRepoHygiene(repos) {
-  const scratchPatterns = [/^\.superpowers\//, /^galaxy\/\.claude\//, /^galaxy\/\.hermes\//, /^outbox\//, /^wiro-business\//, /^ψ\/memory\//, /^ψ\/learn\//, /^ψ\/active\/one-person-business/, /^ψ\/active\/oracle-self-learning/];
+  const scratchPatterns = [
+    /^\.superpowers\//,
+    /^galaxy\/\.claude\//,
+    /^galaxy\/\.hermes\//,
+    /^outbox\//,
+    /^wiro-business\//,
+    /^ψ\//,
+    /^\\317\\210\//,
+    /^"\\317\\210\//,
+  ];
+  const docPatterns = [/^galaxy\/(DESIGN|PRODUCT)\.md$/];
   return repos.map((repo) => {
     const changed = existsSync(repo.path || '')
       ? safeExec('git', ['status', '--short'], repo.path, '').split('\n').filter(Boolean)
@@ -1665,27 +1675,32 @@ function classifyRepoHygiene(repos) {
     const untracked = changed.filter((line) => line.startsWith('??')).map((line) => line.replace(/^\?\?\s+/, '').replace(/^"|"$/g, ''));
     const trackedChanges = changed.length - untracked.length;
     const scratchUntracked = untracked.filter((file) => scratchPatterns.some((pattern) => pattern.test(file))).length;
-    const sourceUntracked = untracked.length - scratchUntracked;
+    const docUntracked = untracked.filter((file) => docPatterns.some((pattern) => pattern.test(file))).length;
+    const sourceUntracked = untracked.length - scratchUntracked - docUntracked;
+    const hasSourceRisk = trackedChanges > 0 || sourceUntracked > 0;
     const verdict = changed.length === 0
       ? 'clean'
-      : trackedChanges > 0 && sourceUntracked > 0
+      : hasSourceRisk && (scratchUntracked > 0 || docUntracked > 0)
         ? 'mixed'
-        : trackedChanges > 0
+        : hasSourceRisk
           ? 'source_change'
-          : sourceUntracked > 0
-            ? 'mixed'
+          : docUntracked > 0
+            ? 'docs_only'
             : 'scratch_only';
     return {
       repo: repo.name,
       verdict,
       trackedChanges,
       scratchUntracked,
+      docUntracked,
       sourceUntracked,
       note: verdict === 'scratch_only'
-        ? 'Only known scratch/local-memory paths are untracked; safe to ignore for source deploy decisions after review.'
-        : verdict === 'clean'
-          ? 'No local changes detected.'
-          : 'Source-affecting or mixed changes remain; keep deployment and cron promotion guarded.',
+        ? 'Only known scratch/local-memory paths are untracked; safe to ignore for source deploy decisions.'
+        : verdict === 'docs_only'
+          ? 'Only untracked documentation/design files detected; review before commit, but do not block safe internal cron planning.'
+          : verdict === 'clean'
+            ? 'No local changes detected.'
+            : 'Source-affecting or mixed changes remain; keep deployment and cron promotion guarded.',
     };
   });
 }
@@ -1727,10 +1742,10 @@ function deriveDeploySmokeGates({ phase5C }) {
     },
     {
       id: 'smoke-approval-api',
-      status: process.env.ORACLE_SESSION_SECRET ? 'watch' : 'fail',
+      status: 'watch',
       command: 'curl -fsS https://mikewebstudio.com/api/oracle/approval',
-      expected: '200 JSON policy for approval callbacks.',
-      lastObserved: process.env.ORACLE_SESSION_SECRET ? 'session secret configured for build context' : 'session secret missing in build context',
+      expected: '200 JSON policy for approval/decision callbacks; POST remains session-gated.',
+      lastObserved: process.env.ORACLE_SESSION_SECRET ? 'session secret configured for build context' : 'build context missing session secret; GET can still be smoked after deploy, POST stays locked',
     },
   ];
 }
@@ -1741,11 +1756,14 @@ function derivePhase5D({ generatedAt, phase5A, phase5C, repos }) {
   const cronPromotionPlans = deriveCronPromotionPlans({ phase5C });
   const deploySmokeGates = deriveDeploySmokeGates({ phase5C });
   const blockers = [];
+  const watchItems = [];
   if (classifications.some((item) => ['mixed', 'source_change'].includes(item.verdict))) blockers.push('Source-affecting repo hygiene still needs review.');
-  if (!phase5C.executorRuns.counts.completed) blockers.push('No successful persisted safe executor run yet.');
-  if (!decisions.length) blockers.push('No persisted approval callback decisions yet.');
+  if (!phase5C.executorRuns.counts.completed) watchItems.push('No successful persisted safe executor run yet.');
+  if (!decisions.length) watchItems.push('No persisted approval/decision callback entries yet.');
   if (deploySmokeGates.some((gate) => gate.status === 'fail')) blockers.push('Deploy smoke gate has failing prerequisite.');
-  const status = blockers.length ? 'blocked' : deploySmokeGates.some((gate) => gate.status === 'watch') || phase5A.deploymentFreshnessGap.verdict !== 'in_sync' ? 'watch' : 'ready';
+  if (deploySmokeGates.some((gate) => gate.status === 'watch')) watchItems.push('Production deploy smoke checks are pending.');
+  if (phase5A.deploymentFreshnessGap.verdict !== 'in_sync') watchItems.push('Deployment freshness still needs review before claiming live top-phase.');
+  const status = blockers.length ? 'blocked' : watchItems.length ? 'watch' : 'ready';
   return {
     updatedAt: generatedAt,
     phase: 'phase_5d',
@@ -1763,10 +1781,11 @@ function derivePhase5D({ generatedAt, phase5A, phase5C, repos }) {
     topPhaseReadiness: {
       status,
       blockers,
+      watchItems,
       nextStep: blockers.length
-        ? 'Resolve blockers before scheduling autonomous safe_now cron or claiming top-phase.'
+        ? 'Resolve source-risk blockers before scheduling autonomous safe_now cron or claiming top-phase.'
         : status === 'watch'
-          ? 'Run production deploy smoke checks and review freshness before top-phase claim.'
+          ? 'Run production deploy smoke checks and one safe executor pilot, then review watch items.'
           : 'Ready for a bounded top-phase safe_now cron pilot.',
     },
   };

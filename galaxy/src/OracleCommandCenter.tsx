@@ -307,12 +307,12 @@ export default function OracleCommandCenter({ data }: Props) {
     cronPromotionPlans: [],
     repoHygieneClassifications: [],
     deploySmokeGates: [],
-    topPhaseReadiness: { status: 'blocked' as const, blockers: [], nextStep: 'Generate a fresh Oracle snapshot.' },
+    topPhaseReadiness: { status: 'blocked' as const, blockers: [], watchItems: [], nextStep: 'Generate a fresh Oracle snapshot.' },
   }
   const [feedbackState, setFeedbackState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
   const [executorState, setExecutorState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
   const [approvalState, setApprovalState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
-  const phase5Badge = (value: string) => value === 'clean' || value === 'in_sync' || value === 'complete' || value === 'ready' || value === 'promote' || value === 'eligible' || value === 'completed' || value === 'pass' || value === 'wired' || value === 'approved' || value === 'scratch_only' ? 'low' : value === 'blocked' || value === 'approval_required' || value === 'missing' || value === 'suppress' || value === 'failed' || value === 'fail' || value === 'rejected' || value === 'source_change' || value === 'mixed' ? 'high' : 'medium'
+  const phase5Badge = (value: string) => value === 'clean' || value === 'in_sync' || value === 'complete' || value === 'ready' || value === 'promote' || value === 'eligible' || value === 'completed' || value === 'pass' || value === 'wired' || value === 'approved' || value === 'scratch_only' || value === 'docs_only' ? 'low' : value === 'blocked' || value === 'approval_required' || value === 'missing' || value === 'suppress' || value === 'failed' || value === 'fail' || value === 'rejected' || value === 'source_change' || value === 'mixed' ? 'high' : 'medium'
 
   useEffect(() => {
     const controller = new AbortController()
@@ -1830,6 +1830,78 @@ export default function OracleCommandCenter({ data }: Props) {
                 <span>{phase5C.topPhaseRequirements.length} left</span>
               </div>
               {phase5C.topPhaseRequirements.map((item) => <small key={item}>• {item}</small>)}
+            </article>
+          </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>PHASE 5D READINESS FIX</p>
+            <span>{phase5D.topPhaseReadiness.status}</span>
+          </div>
+          <div className="oracle-intelligence-grid">
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Decision callbacks</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5D.topPhaseReadiness.status)}`}>{phase5D.topPhaseReadiness.status}</span>
+              </div>
+              <p>{approvalState.message || `${phase5D.approvalCallbacks.counts.approved} approved · ${phase5D.approvalCallbacks.counts.rejected} rejected · ${phase5D.approvalCallbacks.counts.deferred} deferred`}</p>
+              <small>{phase5D.approvalCallbacks.endpoint} · GET smokeable; POST stays Mike-session gated.</small>
+              {phase5B.approvalInbox.slice(0, 2).map((item) => (
+                <div className="oracle-preview-actions" key={`approval-${item.id}`}>
+                  {(['approved', 'rejected', 'deferred'] as const).map((decision) => (
+                    <button type="button" className="oracle-mini-button" key={`${item.id}-${decision}`} disabled={sessionState.status !== 'authenticated' || approvalState.status === 'loading'} onClick={() => submitApprovalDecision(item.id, decision)}>{decision}</button>
+                  ))}
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card money">
+              <div className="oracle-status-head">
+                <strong>Cron promotion drafts</strong>
+                <span>{phase5D.cronPromotionPlans.length} plans</span>
+              </div>
+              {phase5D.cronPromotionPlans.slice(0, 3).map((plan) => (
+                <div className="oracle-intel-line" key={plan.id}>
+                  <strong>{plan.queueItemId}</strong>
+                  <p>{plan.reason}</p>
+                  <small>{plan.status} · {plan.schedule}</small>
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Repo hygiene classification</strong>
+                <span>{phase5D.repoHygieneClassifications.length} repos</span>
+              </div>
+              {phase5D.repoHygieneClassifications.map((item) => (
+                <div className="oracle-intel-line" key={item.repo}>
+                  <strong>{item.repo}</strong>
+                  <p>{item.note}</p>
+                  <small>{item.verdict} · tracked {item.trackedChanges} · scratch {item.scratchUntracked} · docs {item.docUntracked ?? 0} · source {item.sourceUntracked}</small>
+                </div>
+              ))}
+            </article>
+          </div>
+          <div className="oracle-intelligence-grid" style={{ marginTop: 12 }}>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Deploy smoke gates</strong>
+                <span>{phase5D.deploySmokeGates.length} gates</span>
+              </div>
+              {phase5D.deploySmokeGates.map((gate) => (
+                <div className="oracle-intel-line" key={gate.id}>
+                  <strong>{gate.id}</strong>
+                  <p>{gate.expected}</p>
+                  <small>{gate.status} · {gate.command} · {gate.lastObserved}</small>
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Top-phase readiness</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5D.topPhaseReadiness.status)}`}>{phase5D.topPhaseReadiness.status}</span>
+              </div>
+              <p>{phase5D.topPhaseReadiness.nextStep}</p>
+              {phase5D.topPhaseReadiness.blockers.map((blocker) => <small key={blocker}>BLOCKER · {blocker}</small>)}
+              {phase5D.topPhaseReadiness.watchItems.map((item) => <small key={item}>WATCH · {item}</small>)}
             </article>
           </div>
 
