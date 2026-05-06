@@ -445,6 +445,22 @@ export default function OracleCommandCenter({ data }: Props) {
     { name: 'Daily Oracle Self-Learning Scan', cadence: '07:00 daily', signal: 'memory/project learning' },
     { name: 'Weekly Oracle Report', cadence: 'Monday 09:00', signal: 'strategic review' },
   ]
+  const latestDeploy = oracle.deployTimeline?.find((event) => event.project.toLowerCase().includes('galaxy') || event.project.toLowerCase().includes('oracle'))
+    ?? oracle.deployTimeline?.[0]
+    ?? null
+  const mosheRepo = oracle.repos.find((repo) => repo.name.toLowerCase().includes('moshe'))
+  const deployedShort = latestDeploy?.deployedCommitSha?.slice(0, 7) ?? oracle.deployments[0]?.gitCommitSha?.slice(0, 7) ?? 'unknown'
+  const repoShort = mosheRepo?.commit ?? 'unknown'
+  const deploySync = latestDeploy?.syncState ?? (deployedShort !== 'unknown' && repoShort !== 'unknown' && deployedShort === repoShort ? 'in-sync' : 'unknown')
+  const deploymentFreshness = {
+    label: deploySync === 'in-sync' ? 'LIVE MATCHES REPO' : deploySync === 'behind' ? 'LIVE BEHIND REPO' : deploySync === 'ahead' ? 'LIVE AHEAD OF REPO' : 'VERIFY LIVE COMMIT',
+    badge: deploySync === 'in-sync' ? 'low' : deploySync === 'unknown' ? 'medium' : 'high',
+    detail: latestDeploy?.note ?? 'Oracle compares Vercel deployment metadata with the current Moshe repo snapshot.',
+    deployed: deployedShort,
+    repo: repoShort,
+    message: latestDeploy?.deployedCommitMessage ?? oracle.deployments[0]?.gitCommitMessage ?? mosheRepo?.commitSubject ?? 'No deployment message available.',
+    updated: latestDeploy?.timestamp ?? oracle.deployments[0]?.createdAt ?? oracle.generated,
+  }
 
   return (
     <aside className="oracle-shell" aria-label="Oracle OS command center">
@@ -1118,6 +1134,29 @@ export default function OracleCommandCenter({ data }: Props) {
               </article>
             ))}
           </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>DEPLOYMENT FRESHNESS</p>
+            <span>{deploymentFreshness.label}</span>
+          </div>
+          <article className="oracle-deploy-freshness">
+            <div className="oracle-deploy-ring" aria-hidden="true">
+              <span>{deploymentFreshness.badge === 'low' ? '✓' : '!'}</span>
+            </div>
+            <div className="oracle-deploy-freshness-main">
+              <div className="oracle-status-head">
+                <strong>{deploymentFreshness.label}</strong>
+                <span className={`oracle-risk-badge ${deploymentFreshness.badge}`}>{deploySync.toUpperCase()}</span>
+              </div>
+              <p>{deploymentFreshness.detail}</p>
+              <div className="oracle-deploy-compare">
+                <code>live {deploymentFreshness.deployed}</code>
+                <span>↔</span>
+                <code>repo {deploymentFreshness.repo}</code>
+              </div>
+              <small>{deploymentFreshness.message} · updated {timeAgo(deploymentFreshness.updated)}</small>
+            </div>
+          </article>
 
           <div className="oracle-section-head" style={{ marginTop: 16 }}>
             <p>IMPROVEMENT BACKLOG</p>

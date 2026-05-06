@@ -1656,3 +1656,69 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+.oracle-deploy-freshness {
+  border: 1px solid rgba(34, 211, 238, 0.22);
+  border-radius: 20px;
+  padding: 15px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  background:
+    radial-gradient(circle at 14% 12%, rgba(34, 211, 238, 0.18), transparent 38%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(8, 47, 73, 0.62));
+}
+
+.oracle-deploy-ring {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.22), rgba(15, 23, 42, 0.92));
+  border: 1px solid rgba(34, 211, 238, 0.36);
+  box-shadow: 0 0 34px rgba(34, 211, 238, 0.18);
+}
+
+.oracle-deploy-ring span {
+  color: #a7f3d0;
+  font-weight: 900;
+  font-size: 1.35rem;
+}
+
+.oracle-deploy-freshness-main p {
+  margin: 8px 0;
+  color: rgba(224, 242, 254, 0.78);
+  line-height: 1.45;
+}
+
+.oracle-deploy-compare {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 9px 0;
+}
+
+.oracle-deploy-compare code {
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: #bae6fd;
+  background: rgba(2, 6, 23, 0.38);
+}
+
+.oracle-deploy-compare span {
+  color: rgba(125, 211, 252, 0.7);
+}
+
+.oracle-deploy-freshness-main small {
+  color: rgba(203, 213, 225, 0.62);
+}
+
+@media (max-width: 520px) {
+  .oracle-deploy-freshness {
+    grid-template-columns: 1fr;
+  }
+}
