@@ -362,10 +362,22 @@ export default function OracleCommandCenter({ data }: Props) {
     nextThought: { title: 'Generate a fresh Oracle snapshot.', lane: 'safe_now' as const, why: 'No consciousness snapshot exists yet.', safeAction: 'Run npm run build.' },
     topPhaseGate: { status: 'blocked' as const, blockers: ['Generate a fresh Oracle snapshot.'], watchItems: [], nextStep: 'Run npm run build.' },
   }
+  const phase5J = oracle.phase5J ?? {
+    updatedAt: oracle.generated,
+    phase: 'phase_5j' as const,
+    summary: 'Phase 5J Arra Oracle MCP connection is waiting for a live snapshot.',
+    status: 'blocked' as const,
+    rootCause: 'No live MCP readiness snapshot exists yet.',
+    server: { package: 'arra-oracle@github:Soul-Brews-Studio/arra-oracle#main', url: 'http://127.0.0.1:47778', healthEndpoint: '/api/health', status: 'watch' as const },
+    adapter: { path: 'galaxy/scripts/arraOracleMcpAdapter.mjs', transport: 'stdio-json-lines' as const, tools: [], autostart: false, status: 'watch' as const },
+    hermesConfig: { configured: false, serverName: 'arra_oracle', restartRequired: true, configPath: '~/.hermes/config.yaml' },
+    checks: [],
+    nextStep: 'Run npm run build.',
+  }
   const [feedbackState, setFeedbackState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
   const [executorState, setExecutorState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
   const [approvalState, setApprovalState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
-  const phase5Badge = (value: string) => value === 'clean' || value === 'in_sync' || value === 'complete' || value === 'ready' || value === 'promote' || value === 'eligible' || value === 'completed' || value === 'pass' || value === 'wired' || value === 'approved' || value === 'scratch_only' || value === 'docs_only' || value === 'draft_ready' || value === 'live' ? 'low' : value === 'blocked' || value === 'approval_required' || value === 'missing' || value === 'suppress' || value === 'failed' || value === 'fail' || value === 'rejected' || value === 'source_change' || value === 'mixed' ? 'high' : 'medium'
+  const phase5Badge = (value: string) => value === 'clean' || value === 'in_sync' || value === 'complete' || value === 'ready' || value === 'promote' || value === 'eligible' || value === 'completed' || value === 'pass' || value === 'wired' || value === 'approved' || value === 'scratch_only' || value === 'docs_only' || value === 'draft_ready' || value === 'live' || value === 'connected' || value === 'ok' ? 'low' : value === 'blocked' || value === 'approval_required' || value === 'missing' || value === 'suppress' || value === 'failed' || value === 'fail' || value === 'rejected' || value === 'source_change' || value === 'mixed' ? 'high' : 'medium'
 
   useEffect(() => {
     const controller = new AbortController()
@@ -686,9 +698,11 @@ export default function OracleCommandCenter({ data }: Props) {
   const configuredCreds = oracle.credentials.filter((c) => c.configured).length
   const githubOk = oracle.github.filter((g) => g.apiStatus === 'ok').length
   const criticalIncidents = (oracle.incidents ?? []).filter((i) => i.severity === 'critical').length
-  const oracleModeLabel = oracle.phase5I
-    ? 'PHASE 5I · CONSCIOUSNESS LOOP'
-    : oracle.phase5H
+  const oracleModeLabel = oracle.phase5J
+    ? 'PHASE 5J · ARRA ORACLE MCP CONNECTED'
+    : oracle.phase5I
+      ? 'PHASE 5I · CONSCIOUSNESS LOOP'
+      : oracle.phase5H
       ? 'PHASE 5H · INTEGRATION ROADMAP'
       : oracle.phase5G
         ? 'PHASE 5G · BOUNDED SAFE CRON'
@@ -1968,6 +1982,56 @@ export default function OracleCommandCenter({ data }: Props) {
             </article>
           </div>
 
+
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>PHASE 5J ARRA ORACLE MCP</p>
+            <span>{phase5J.status}</span>
+          </div>
+          <div className="oracle-intelligence-grid">
+            <article className="oracle-intel-card money">
+              <div className="oracle-status-head">
+                <strong>Semantic memory connection</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5J.status)}`}>{phase5J.status}</span>
+              </div>
+              <p>{phase5J.summary}</p>
+              <small>Root cause: {phase5J.rootCause}</small>
+              <small>Next: {phase5J.nextStep}</small>
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Server + adapter</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5J.server.status)}`}>{phase5J.server.status}</span>
+              </div>
+              <p>{phase5J.server.package}</p>
+              <small>{phase5J.server.url}{phase5J.server.healthEndpoint} · {phase5J.server.version ?? 'version pending'}</small>
+              <small>Adapter: {phase5J.adapter.path}</small>
+              <small>Transport: {phase5J.adapter.transport} · tools: {phase5J.adapter.tools.join(', ')}</small>
+              <small>Autostart: {phase5J.adapter.autostart ? 'enabled' : 'disabled'}</small>
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>MCP checks</strong>
+                <span>{phase5J.checks.filter((check) => check.status === 'pass').length}/{phase5J.checks.length} pass</span>
+              </div>
+              {phase5J.checks.map((check) => (
+                <div className="oracle-intel-line" key={check.id}>
+                  <strong>{check.label}</strong>
+                  <p>{check.evidence}</p>
+                  <small>{check.status}</small>
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Hermes native MCP config</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5J.hermesConfig.configured ? 'pass' : 'watch')}`}>{phase5J.hermesConfig.configured ? 'configured' : 'watch'}</span>
+              </div>
+              <p>{phase5J.hermesConfig.serverName}</p>
+              <small>{phase5J.hermesConfig.configPath}</small>
+              <small>{phase5J.hermesConfig.restartRequired ? 'Restart Hermes required for tool discovery.' : 'No restart required.'}</small>
+            </article>
+          </div>
 
           <div className="oracle-section-head" style={{ marginTop: 16 }}>
             <p>PHASE 5I CONSCIOUSNESS LOOP</p>

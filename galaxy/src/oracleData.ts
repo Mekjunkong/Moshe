@@ -736,6 +736,44 @@ export interface OraclePhase5ILayer {
   }
 }
 
+
+export interface OraclePhase5JMcpCheck {
+  id: string
+  label: string
+  status: 'pass' | 'watch' | 'fail'
+  evidence: string
+}
+
+export interface OraclePhase5JLayer {
+  updatedAt: string
+  phase: 'phase_5j'
+  summary: string
+  status: 'connected' | 'watch' | 'blocked'
+  rootCause: string
+  server: {
+    package: string
+    url: string
+    healthEndpoint: string
+    version?: string
+    status: 'ok' | 'watch' | 'fail'
+  }
+  adapter: {
+    path: string
+    transport: 'stdio-json-lines'
+    tools: string[]
+    autostart: boolean
+    status: 'ready' | 'watch' | 'fail'
+  }
+  hermesConfig: {
+    configured: boolean
+    serverName: string
+    restartRequired: boolean
+    configPath: string
+  }
+  checks: OraclePhase5JMcpCheck[]
+  nextStep: string
+}
+
 export interface OracleTodayLearning {
   title: string
   source: string
@@ -867,6 +905,7 @@ export interface OracleData {
   phase5G?: OraclePhase5GLayer
   phase5H?: OraclePhase5HLayer
   phase5I?: OraclePhase5ILayer
+  phase5J?: OraclePhase5JLayer
   nextActions: string[]
 }
 
@@ -1125,6 +1164,18 @@ export const ORACLE_FALLBACK_DATA: OracleData = {
     dailyReflection: { status: 'blocked', prompt: 'Generate a fresh Oracle snapshot.', outputPath: 'ψ/memory/reflections/', maxFrequency: 'manual', delivery: 'local' },
     nextThought: { title: 'Generate a fresh Oracle snapshot.', lane: 'safe_now', why: 'No live consciousness snapshot exists yet.', safeAction: 'Run npm run build.' },
     topPhaseGate: { status: 'blocked', blockers: ['Generate a fresh Oracle snapshot.'], watchItems: [], nextStep: 'Run npm run build.' },
+  },
+  phase5J: {
+    updatedAt: new Date(0).toISOString(),
+    phase: 'phase_5j',
+    summary: 'Waiting for Phase 5J Arra Oracle MCP connection.',
+    status: 'blocked',
+    rootCause: 'No live MCP readiness snapshot exists yet.',
+    server: { package: 'arra-oracle@github:Soul-Brews-Studio/arra-oracle#main', url: 'http://127.0.0.1:47778', healthEndpoint: '/api/health', status: 'watch' },
+    adapter: { path: 'galaxy/scripts/arraOracleMcpAdapter.mjs', transport: 'stdio-json-lines', tools: [], autostart: false, status: 'watch' },
+    hermesConfig: { configured: false, serverName: 'arra_oracle', restartRequired: true, configPath: '~/.hermes/config.yaml' },
+    checks: [],
+    nextStep: 'Run npm run build.',
   },
   nextActions: [
     'Run node scripts/generateOracleData.mjs',

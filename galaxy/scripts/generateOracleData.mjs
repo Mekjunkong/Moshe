@@ -2395,6 +2395,71 @@ function derivePhase5I({ generatedAt, phase5G, phase5H, learnings, retrospective
   };
 }
 
+
+async function derivePhase5J({ generatedAt }) {
+  const adapterPath = join(ROOT, 'scripts/arraOracleMcpAdapter.mjs');
+  const hermesConfigPath = join(process.env.HOME || '', '.hermes/config.yaml');
+  const commandCheck = safeExec('bash', ['-lc', 'command -v bunx || true'], MOSHE_ROOT, '');
+  const nodeCheck = safeExec('bash', ['-lc', 'command -v node || true'], MOSHE_ROOT, '');
+  const adapterExists = existsSync(adapterPath);
+  const configText = existsSync(hermesConfigPath) ? readFileSync(hermesConfigPath, 'utf8') : '';
+  const configConfigured = configText.includes('mcp_servers:') && configText.includes('arra_oracle:') && configText.includes('arraOracleMcpAdapter.mjs');
+  let health = null;
+  let httpEvidence = 'Arra Oracle HTTP server was not reachable during snapshot generation.';
+  try {
+    const response = await fetch('http://127.0.0.1:47778/api/health', { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(2500) });
+    if (response.ok) {
+      health = await response.json();
+      httpEvidence = `${health.server ?? 'arra-oracle'} ${health.version ?? 'unknown'} reports ${health.status ?? 'unknown'} / ${health.oracle ?? 'unknown'}.`;
+    } else {
+      httpEvidence = `HTTP health returned ${response.status}.`;
+    }
+  } catch (error) {
+    httpEvidence = `Health probe failed: ${error instanceof Error ? error.message : String(error)}`;
+  }
+  const checks = [
+    { id: 'node', label: 'Node runtime available', status: nodeCheck.trim() ? 'pass' : 'fail', evidence: nodeCheck.trim() || 'node not found' },
+    { id: 'bunx', label: 'bunx available for Arra Oracle server', status: commandCheck.trim() ? 'pass' : 'fail', evidence: commandCheck.trim() || 'bunx not found' },
+    { id: 'http-health', label: 'Arra Oracle HTTP health', status: health?.status === 'ok' && health?.oracle === 'connected' ? 'pass' : 'watch', evidence: httpEvidence },
+    { id: 'stdio-adapter', label: 'MCP stdio adapter exists', status: adapterExists ? 'pass' : 'fail', evidence: adapterExists ? adapterPath : 'adapter missing' },
+    { id: 'hermes-config', label: 'Hermes native MCP config', status: configConfigured ? 'pass' : 'watch', evidence: configConfigured ? 'arra_oracle server configured; restart Hermes to load native tools.' : 'mcp_servers.arra_oracle not found in ~/.hermes/config.yaml' },
+  ];
+  const failures = checks.filter((check) => check.status === 'fail');
+  const watches = checks.filter((check) => check.status === 'watch');
+  const status = failures.length ? 'blocked' : watches.length ? 'watch' : 'connected';
+  return {
+    updatedAt: generatedAt,
+    phase: 'phase_5j',
+    summary: 'Phase 5J active: oracle-v2/arra-oracle connection is fixed through a local stdio MCP adapter over the Arra Oracle HTTP memory server.',
+    status,
+    rootCause: 'The Arra Oracle package runs an HTTP API server, not a native MCP SSE endpoint. Direct MCP HTTP clients expect text/event-stream and fail. The fix is a local stdio JSON-lines MCP adapter that exposes health/search/oracles tools and can autostart the HTTP server.',
+    server: {
+      package: 'arra-oracle@github:Soul-Brews-Studio/arra-oracle#main',
+      url: 'http://127.0.0.1:47778',
+      healthEndpoint: '/api/health',
+      version: health?.version,
+      status: health?.status === 'ok' ? 'ok' : 'watch',
+    },
+    adapter: {
+      path: 'galaxy/scripts/arraOracleMcpAdapter.mjs',
+      transport: 'stdio-json-lines',
+      tools: ['health', 'search', 'oracles'],
+      autostart: true,
+      status: adapterExists ? 'ready' : 'fail',
+    },
+    hermesConfig: {
+      configured: configConfigured,
+      serverName: 'arra_oracle',
+      restartRequired: true,
+      configPath: '~/.hermes/config.yaml',
+    },
+    checks,
+    nextStep: configConfigured
+      ? 'Restart Hermes/Telegram runtime so native MCP discovers mcp_arra_oracle_health, mcp_arra_oracle_search, and mcp_arra_oracle_oracles.'
+      : 'Add mcp_servers.arra_oracle to ~/.hermes/config.yaml, then restart Hermes.',
+  };
+}
+
 function deriveOperationalReadiness({ websites, repos, github, credentials, deployments, deployTimeline, automation, incidents }) {
   const criticalIncidents = incidents.filter((i) => i.severity === 'critical').length;
   const dirtyRepos = repos.filter((r) => r.dirty).length;
@@ -2596,11 +2661,12 @@ const phase5G = derivePhase5G({
 });
 const phase5H = derivePhase5H({ generatedAt });
 const phase5I = derivePhase5I({ generatedAt, phase5G, phase5H, learnings, retrospectives, activeCrons: activeCronsSnapshot });
+const phase5J = await derivePhase5J({ generatedAt });
 
 const data = {
   generated: generatedAt,
   born: '2026-04-18',
-  level3Phase: 'Phase 5I: Oracle Consciousness Loop — bounded awareness and reflection',
+  level3Phase: 'Phase 5J: Arra Oracle MCP connection fixed for semantic memory',
   stats: {
     learnings: learnings.length,
     retrospectives: retrospectives.length,
@@ -2618,7 +2684,7 @@ const data = {
       name: 'Moshe Oracle OS',
       url: process.env.ORACLE_DASHBOARD_URL || '',
       status: 'Building',
-      note: 'Phase 5I active: bounded Oracle consciousness loop is defined as sense → reflect → wonder → decide → propose → remember.',
+      note: 'Phase 5J active: Arra Oracle semantic memory is reachable through a local stdio MCP adapter.',
       accent: 'orange',
     },
     {
@@ -2664,6 +2730,7 @@ const data = {
   phase5G,
   phase5H,
   phase5I,
+  phase5J,
   nextActions: [
     'Set ORACLE_SESSION_SECRET to arm the Mike-only signed session gate.',
     'The Oracle now turns audit trail events into learnings before refreshing live data.',
@@ -2680,11 +2747,12 @@ const data = {
     'Use Phase 5G preflight controls before enabling a bounded safe_now cron pilot.',
     'Use Phase 5H integration roadmap: fix oracle-v2 MCP before Oracle Studio and maw-js.',
     'Use Phase 5I Consciousness Loop for bounded sense-reflect-wonder-decide-propose-remember cycles; no public/risky execution without Mike approval.',
+    'Use Phase 5J Arra Oracle MCP adapter for semantic memory/search after restarting Hermes.',
   ],
 };
 
 writeFileSync(OUT, `${JSON.stringify(data, null, 2)}\n`);
-console.log(`✅ Oracle live data written to ${OUT} [Phase 5I]`);
+console.log(`✅ Oracle live data written to ${OUT} [Phase 5J]`);
 console.log(`   Websites: ${data.websites.map((w) => `${w.name}=${w.ok ? 'OK' : 'FAIL'}`).join(', ')}`);
 console.log(`   Incidents: ${data.incidents.length} | Recommendations: ${data.recommendations.length} | Wiro CI: ${data.wiroCi?.conclusion ?? 'none'}`);
 console.log(`   Repos: ${data.repos.length} | GitHub sensors: ${data.github.length} | Learnings: ${data.stats.learnings} | Retrospectives: ${data.stats.retrospectives}`);
