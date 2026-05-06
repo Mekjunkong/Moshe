@@ -477,6 +477,80 @@ export interface OraclePhase5DLayer {
   }
 }
 
+
+
+export interface OracleQualityRubricScore {
+  id: string
+  label: string
+  score: number
+  evidence: string
+  decision: 'send' | 'test_manually' | 'keep_watching' | 'ignore'
+}
+
+export interface OracleTasteFilterRule {
+  id: string
+  pattern: string
+  action: 'downrank' | 'suppress' | 'rewrite'
+  reason: string
+  source: string
+}
+
+export interface OracleWiroSignalCandidate {
+  id: string
+  title: string
+  observedFact: string
+  hypothesis: string
+  tinyTest: string
+  decision: 'test_manually' | 'keep_watching' | 'ignore'
+  score: number
+  risk: 'low' | 'medium'
+}
+
+export interface OracleApprovalUxOption {
+  label: string
+  decision: 'approve_once' | 'draft_only' | 'not_useful' | 'ask_later'
+  effect: string
+}
+
+export interface OraclePhase5ELayer {
+  updatedAt: string
+  phase: 'phase_5e'
+  summary: string
+  qualityRubric: {
+    status: 'active'
+    minimumSendScore: number
+    annoyanceLimit: number
+    scores: OracleQualityRubricScore[]
+  }
+  tasteFilters: {
+    status: 'active'
+    rules: OracleTasteFilterRule[]
+    suppressedPhrases: string[]
+    lastCorrection: string
+  }
+  wiroFirstOpportunityFilter: {
+    status: 'active'
+    candidates: OracleWiroSignalCandidate[]
+    rule: string
+  }
+  approvalUx: {
+    status: 'drafted' | 'ready'
+    template: string
+    options: OracleApprovalUxOption[]
+  }
+  safeExecutorPilot: {
+    status: 'ready' | 'watch' | 'blocked'
+    actionId: string
+    whySafe: string
+    requiredBeforeTopPhase: string[]
+  }
+  mikeNeedsNow: {
+    status: 'quiet' | 'ask' | 'act'
+    headline: string
+    bullets: string[]
+  }
+}
+
 export interface OracleTodayLearning {
   title: string
   source: string
@@ -603,6 +677,7 @@ export interface OracleData {
   phase5B?: OraclePhase5BLayer
   phase5C?: OraclePhase5CLayer
   phase5D?: OraclePhase5DLayer
+  phase5E?: OraclePhase5ELayer
   nextActions: string[]
 }
 
@@ -808,6 +883,17 @@ export const ORACLE_FALLBACK_DATA: OracleData = {
     repoHygieneClassifications: [],
     deploySmokeGates: [],
     topPhaseReadiness: { status: 'blocked', blockers: ['Generate a fresh Oracle snapshot.'], watchItems: [], nextStep: 'Run npm run build.' },
+  },
+  phase5E: {
+    updatedAt: new Date(0).toISOString(),
+    phase: 'phase_5e',
+    summary: 'Waiting for Phase 5E quality intelligence.',
+    qualityRubric: { status: 'active', minimumSendScore: 18, annoyanceLimit: 2, scores: [] },
+    tasteFilters: { status: 'active', rules: [], suppressedPhrases: [], lastCorrection: 'No correction loaded yet.' },
+    wiroFirstOpportunityFilter: { status: 'active', candidates: [], rule: 'Prefer Wiro-backed observed facts over generic opportunity ideas.' },
+    approvalUx: { status: 'drafted', template: 'What this does / Risk / Rollback / Why now', options: [] },
+    safeExecutorPilot: { status: 'watch', actionId: 'queue-refresh-oracle-snapshot', whySafe: 'Internal snapshot refresh only.', requiredBeforeTopPhase: [] },
+    mikeNeedsNow: { status: 'quiet', headline: 'Generate a fresh Oracle snapshot.', bullets: [] },
   },
   nextActions: [
     'Run node scripts/generateOracleData.mjs',

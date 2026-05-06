@@ -302,13 +302,13 @@ function deriveApprovalQueue(opportunityRadar) {
       source: hasLanding ? 'outbox/one-person-business/ai-booking-assistant-landing-page-copy.md' : 'Oracle intelligence layer',
     },
     {
-      id: 'approve-top-opportunity',
-      title: 'Review top opportunity direction',
+      id: 'test-top-opportunity',
+      title: 'Choose whether to test top opportunity manually',
       category: 'approval-required',
       businessArea: 'business_opportunity',
       risk: 'medium',
       reason: top ? `${top.title} is currently ranked ${top.score}/100.` : 'Opportunity radar needs Mike direction before public execution.',
-      proposedAction: top ? `Mike approves whether to validate: ${top.title}.` : 'Mike chooses the first niche to validate.',
+      proposedAction: top ? `Mike decides whether this is worth a tiny manual test: ${top.title}.` : 'Mike chooses whether any niche is worth watching or testing manually.',
       nextSafeStep: 'Prepare options and evidence for Mike, but do not contact prospects.',
       source: top?.source || 'Oracle intelligence layer',
     },
@@ -1791,6 +1791,190 @@ function derivePhase5D({ generatedAt, phase5A, phase5C, repos }) {
   };
 }
 
+
+function deriveQualityRubricScores({ intelligenceLayer, phase5B }) {
+  const top = intelligenceLayer.opportunityRadar[0];
+  const feedbackCounts = phase5B.feedbackPersistence.counts;
+  const noisyPenalty = Math.min(3, feedbackCounts.noisy + feedbackCounts.ignored);
+  const genericOpportunity = top ? /ai booking|booking assistant|inquiry responder/i.test(top.title) : false;
+  const scores = [
+    {
+      id: 'evidence',
+      label: 'Evidence quality',
+      score: top?.source?.includes('outbox') ? 4 : 2,
+      evidence: top ? `Top opportunity source: ${top.source}` : 'No opportunity artifact found.',
+      decision: top ? 'test_manually' : 'keep_watching',
+    },
+    {
+      id: 'fit-to-mike',
+      label: 'Fit to Mike/Wiro assets',
+      score: top && /tour|operator|booking|inquiry|wiro/i.test(`${top.title} ${top.thesis}`) ? 5 : 2,
+      evidence: 'Prioritize Wiro4x4, Chiang Mai tourism, Thai/English, coding leverage, and Mike-owned assets.',
+      decision: top ? 'test_manually' : 'keep_watching',
+    },
+    {
+      id: 'revenue-potential',
+      label: 'Revenue potential',
+      score: top?.score >= 90 ? 4 : top?.score >= 80 ? 3 : 2,
+      evidence: top ? `${top.title} ranked ${top.score}/100 before quality filters.` : 'No current offer scored.',
+      decision: top?.score >= 90 ? 'test_manually' : 'keep_watching',
+    },
+    {
+      id: 'effort',
+      label: 'Effort to validate',
+      score: 4,
+      evidence: 'Manual Wiro-style examples can validate before building SaaS or outreach.',
+      decision: 'test_manually',
+    },
+    {
+      id: 'annoyance-risk',
+      label: 'Annoyance risk',
+      score: Math.max(1, genericOpportunity ? 2 - noisyPenalty : 4 - noisyPenalty),
+      evidence: 'Mike rejected approval/framing around generic opportunity reports; future reports must avoid “approve idea” language.',
+      decision: genericOpportunity ? 'keep_watching' : 'send',
+    },
+  ];
+  return scores;
+}
+
+function deriveTasteFilters({ phase5B }) {
+  const negativeSignals = phase5B.feedbackPersistence.entries.filter((entry) => ['noisy', 'missing-context', 'ignored'].includes(entry.rating)).slice(0, 8);
+  return {
+    status: 'active',
+    rules: [
+      {
+        id: 'no-approve-ideas',
+        pattern: 'approve opportunity / approve idea / approve direction',
+        action: 'rewrite',
+        reason: 'Mike corrected that business ideas should not be framed as approvals; they are hypotheses to watch/test/ignore.',
+        source: 'Telegram correction 2026-05-06',
+      },
+      {
+        id: 'downrank-generic-ai-saas',
+        pattern: 'generic AI SaaS without Wiro observed fact',
+        action: 'downrank',
+        reason: 'Generic opportunity hunting feels low quality unless tied to a real Wiro inquiry, itinerary, pricing, guest, or ops pattern.',
+        source: 'Mike preference + Phase 5E quality fix',
+      },
+      {
+        id: 'suppress-high-decision-load',
+        pattern: 'more than one optional action in a proactive report',
+        action: 'suppress',
+        reason: 'Reports should reduce decision load, not ask Mike to approve multiple speculative ideas.',
+        source: 'Evening Wiro Business Pulse correction',
+      },
+      ...negativeSignals.map((entry, index) => ({
+        id: `ledger-negative-${index + 1}`,
+        pattern: entry.targetId || 'negative feedback signal',
+        action: entry.rating === 'missing-context' ? 'rewrite' : 'downrank',
+        reason: entry.note || `Feedback ledger rating: ${entry.rating}`,
+        source: phase5B.feedbackPersistence.pathLabel,
+      })),
+    ],
+    suppressedPhrases: ['approve this idea', 'approve opportunity', 'greenlight the business', 'send outreach now', 'AI SaaS is obvious'],
+    lastCorrection: 'Mike said the evening report approval framing was not good; Phase 5E rewrites opportunity recommendations as watch/test/ignore hypotheses.',
+  };
+}
+
+function deriveWiroFirstCandidates({ intelligenceLayer }) {
+  const top = intelligenceLayer.opportunityRadar[0];
+  return [
+    {
+      id: 'wiro-inquiry-response-manual-test',
+      title: 'Wiro inquiry response manual test',
+      observedFact: 'Wiro4x4 receives custom-tour inquiries where fast, accurate English/Hebrew/Thai replies matter.',
+      hypothesis: 'A human-approved AI draft can reduce reply time and improve quote consistency without becoming SaaS yet.',
+      tinyTest: 'Create 5 realistic Wiro inquiry examples and compare current reply vs AI-assisted draft; do not contact anyone.',
+      decision: top ? 'test_manually' : 'keep_watching',
+      score: 22,
+      risk: 'low',
+    },
+    {
+      id: 'wiro-itinerary-os-watch',
+      title: 'Wiro internal itinerary OS watch item',
+      observedFact: 'Itinerary, pricing, prep checklist, and guide notes repeat across tours.',
+      hypothesis: 'A single internal Wiro operating sheet/app may produce value before any micro-SaaS packaging.',
+      tinyTest: 'Map one real Wiro booking from inquiry → itinerary → quote → prep checklist using a private template.',
+      decision: 'keep_watching',
+      score: 18,
+      risk: 'low',
+    },
+    {
+      id: 'generic-ai-saas-suppressed',
+      title: 'Generic AI SaaS idea without Wiro evidence',
+      observedFact: 'Broad AI SaaS ideas are easy to generate but often feel generic.',
+      hypothesis: 'Suppress until tied to a real Wiro/customer signal.',
+      tinyTest: 'No action. Wait for a real inquiry, repeated task, or guest pain.',
+      decision: 'ignore',
+      score: 8,
+      risk: 'low',
+    },
+  ];
+}
+
+function deriveApprovalUxTemplate() {
+  return {
+    status: 'ready',
+    template: 'What this does: <one sentence>\nRisk: <low/medium/high + reason>\nRollback: <how to undo/stop>\nWhy now: <evidence or watch item>\nDecision: approve once / draft only / not useful / ask later',
+    options: [
+      { label: 'Approve once', decision: 'approve_once', effect: 'Run only this scoped action once; no recurring automation.' },
+      { label: 'Draft only', decision: 'draft_only', effect: 'Prepare private artifact only; do not send/publish/deploy.' },
+      { label: 'Not useful', decision: 'not_useful', effect: 'Downrank similar future suggestions in the taste filter.' },
+      { label: 'Ask me later', decision: 'ask_later', effect: 'Defer without treating it as approval or rejection.' },
+    ],
+  };
+}
+
+function derivePhase5E({ generatedAt, intelligenceLayer, phase5B, phase5C, phase5D }) {
+  const scores = deriveQualityRubricScores({ intelligenceLayer, phase5B });
+  const totalScore = scores.reduce((sum, item) => sum + item.score, 0);
+  const annoyanceScore = scores.find((item) => item.id === 'annoyance-risk')?.score ?? 0;
+  const candidates = deriveWiroFirstCandidates({ intelligenceLayer });
+  const topCandidate = candidates.find((item) => item.decision === 'test_manually') || candidates[0];
+  const readinessStatus = phase5D.topPhaseReadiness.status === 'blocked'
+    ? 'blocked'
+    : phase5C.executorRuns.counts.completed > 0
+      ? 'ready'
+      : 'watch';
+  return {
+    updatedAt: generatedAt,
+    phase: 'phase_5e',
+    summary: 'Phase 5E active: Oracle now applies a quality/taste filter before proactive reports, keeps Wiro-first opportunity hypotheses, and improves approval UX before more autonomy.',
+    qualityRubric: {
+      status: 'active',
+      minimumSendScore: 18,
+      annoyanceLimit: 2,
+      scores,
+    },
+    tasteFilters: deriveTasteFilters({ phase5B }),
+    wiroFirstOpportunityFilter: {
+      status: 'active',
+      candidates,
+      rule: 'A proactive business suggestion must be tied to an observed Wiro/Mike asset or stay as keep-watching/ignore.',
+    },
+    approvalUx: deriveApprovalUxTemplate(),
+    safeExecutorPilot: {
+      status: readinessStatus,
+      actionId: 'queue-refresh-oracle-snapshot',
+      whySafe: 'It only regenerates the internal Oracle snapshot, records started/completed/failed state, and has no external customer/public side effect.',
+      requiredBeforeTopPhase: phase5C.executorRuns.counts.completed > 0
+        ? ['Keep successful run history visible and bounded.']
+        : ['Run one signed-session safe executor pilot locally/admin.', 'Persist completed or failed run state.', 'Do not promote recurring cron until the pilot is visible.'],
+    },
+    mikeNeedsNow: {
+      status: totalScore >= 18 && annoyanceScore > 2 ? 'ask' : 'quiet',
+      headline: topCandidate.decision === 'test_manually'
+        ? 'One low-risk Wiro manual test is worth preparing; no approval framing needed.'
+        : 'No business action needed now; keep watching for real Wiro signals.',
+      bullets: [
+        `Quality score total: ${totalScore}; annoyance score: ${annoyanceScore}.`,
+        `Top Wiro-first candidate: ${topCandidate.title} (${topCandidate.decision}).`,
+        'Future proactive reports should say watch/test/ignore, not approve.',
+      ],
+    },
+  };
+}
+
 function deriveOperationalReadiness({ websites, repos, github, credentials, deployments, deployTimeline, automation, incidents }) {
   const criticalIncidents = incidents.filter((i) => i.severity === 'critical').length;
   const dirtyRepos = repos.filter((r) => r.dirty).length;
@@ -1970,11 +2154,18 @@ const phase5D = derivePhase5D({
   phase5C,
   repos,
 });
+const phase5E = derivePhase5E({
+  generatedAt,
+  intelligenceLayer,
+  phase5B,
+  phase5C,
+  phase5D,
+});
 
 const data = {
   generated: generatedAt,
   born: '2026-04-18',
-  level3Phase: 'Phase 5D: Approval callbacks, cron promotion drafts, repo hygiene classification, and deploy smoke gates',
+  level3Phase: 'Phase 5E: Quality intelligence, taste filters, Wiro-first reports, and approval UX',
   stats: {
     learnings: learnings.length,
     retrospectives: retrospectives.length,
@@ -1992,7 +2183,7 @@ const data = {
       name: 'Moshe Oracle OS',
       url: process.env.ORACLE_DASHBOARD_URL || '',
       status: 'Building',
-      note: 'Phase 5D active: approval callbacks, cron promotion drafts, repo hygiene classification, and deploy smoke gates protect top-phase automation.',
+      note: 'Phase 5E active: quality intelligence filters noisy reports before more autonomy.',
       accent: 'orange',
     },
     {
@@ -2033,6 +2224,7 @@ const data = {
   phase5B,
   phase5C,
   phase5D,
+  phase5E,
   nextActions: [
     'Set ORACLE_SESSION_SECRET to arm the Mike-only signed session gate.',
     'The Oracle now turns audit trail events into learnings before refreshing live data.',
@@ -2044,11 +2236,12 @@ const data = {
     'Use Phase 5C run states and promotion gates before scheduling any safe_now autonomous execution.',
     'Use Phase 5D approval callbacks, repo classifications, and deploy smoke gates before top-phase claims.',
     'Enable ORACLE_TERMINAL_ENABLED=true only on Mike local/admin runtime before using the Terminal tab.',
+    'Use Phase 5E taste filters: proactive reports must be Wiro-first and framed as watch/test/ignore.',
   ],
 };
 
 writeFileSync(OUT, `${JSON.stringify(data, null, 2)}\n`);
-console.log(`✅ Oracle live data written to ${OUT} [Phase 5D]`);
+console.log(`✅ Oracle live data written to ${OUT} [Phase 5E]`);
 console.log(`   Websites: ${data.websites.map((w) => `${w.name}=${w.ok ? 'OK' : 'FAIL'}`).join(', ')}`);
 console.log(`   Incidents: ${data.incidents.length} | Recommendations: ${data.recommendations.length} | Wiro CI: ${data.wiroCi?.conclusion ?? 'none'}`);
 console.log(`   Repos: ${data.repos.length} | GitHub sensors: ${data.github.length} | Learnings: ${data.stats.learnings} | Retrospectives: ${data.stats.retrospectives}`);

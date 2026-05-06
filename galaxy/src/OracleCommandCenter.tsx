@@ -309,6 +309,17 @@ export default function OracleCommandCenter({ data }: Props) {
     deploySmokeGates: [],
     topPhaseReadiness: { status: 'blocked' as const, blockers: [], watchItems: [], nextStep: 'Generate a fresh Oracle snapshot.' },
   }
+  const phase5E = oracle.phase5E ?? {
+    updatedAt: oracle.generated,
+    phase: 'phase_5e' as const,
+    summary: 'Phase 5E quality intelligence is waiting for a live snapshot.',
+    qualityRubric: { status: 'active' as const, minimumSendScore: 18, annoyanceLimit: 2, scores: [] },
+    tasteFilters: { status: 'active' as const, rules: [], suppressedPhrases: [], lastCorrection: 'No correction loaded yet.' },
+    wiroFirstOpportunityFilter: { status: 'active' as const, candidates: [], rule: 'Prefer Wiro-backed observed facts.' },
+    approvalUx: { status: 'drafted' as const, template: 'What / Risk / Rollback / Why now', options: [] },
+    safeExecutorPilot: { status: 'watch' as const, actionId: 'queue-refresh-oracle-snapshot', whySafe: 'Internal snapshot refresh only.', requiredBeforeTopPhase: [] },
+    mikeNeedsNow: { status: 'quiet' as const, headline: 'Generate a fresh Oracle snapshot.', bullets: [] },
+  }
   const [feedbackState, setFeedbackState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
   const [executorState, setExecutorState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
   const [approvalState, setApprovalState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
@@ -633,8 +644,10 @@ export default function OracleCommandCenter({ data }: Props) {
   const configuredCreds = oracle.credentials.filter((c) => c.configured).length
   const githubOk = oracle.github.filter((g) => g.apiStatus === 'ok').length
   const criticalIncidents = (oracle.incidents ?? []).filter((i) => i.severity === 'critical').length
-  const oracleModeLabel = oracle.phase5D
-    ? 'PHASE 5D · APPROVAL + CRON GATES'
+  const oracleModeLabel = oracle.phase5E
+    ? 'PHASE 5E · QUALITY INTELLIGENCE'
+    : oracle.phase5D
+      ? 'PHASE 5D · APPROVAL + CRON GATES'
     : oracle.phase5C
       ? 'PHASE 5C · RUN-STATE AUTONOMY LOOP'
       : oracle.phase5B
@@ -1902,6 +1915,83 @@ export default function OracleCommandCenter({ data }: Props) {
               <p>{phase5D.topPhaseReadiness.nextStep}</p>
               {phase5D.topPhaseReadiness.blockers.map((blocker) => <small key={blocker}>BLOCKER · {blocker}</small>)}
               {phase5D.topPhaseReadiness.watchItems.map((item) => <small key={item}>WATCH · {item}</small>)}
+            </article>
+          </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>PHASE 5E QUALITY INTELLIGENCE</p>
+            <span>{phase5E.mikeNeedsNow.status}</span>
+          </div>
+          <div className="oracle-intelligence-grid">
+            <article className="oracle-intel-card money">
+              <div className="oracle-status-head">
+                <strong>Mike needs now</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5E.mikeNeedsNow.status)}`}>{phase5E.mikeNeedsNow.status}</span>
+              </div>
+              <p>{phase5E.mikeNeedsNow.headline}</p>
+              {phase5E.mikeNeedsNow.bullets.map((item) => <small key={item}>• {item}</small>)}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Quality rubric</strong>
+                <span>{phase5E.qualityRubric.scores.reduce((sum, item) => sum + item.score, 0)} pts</span>
+              </div>
+              {phase5E.qualityRubric.scores.map((item) => (
+                <div className="oracle-intel-line" key={item.id}>
+                  <strong>{item.label} · {item.score}/5</strong>
+                  <p>{item.evidence}</p>
+                  <small>{item.decision}</small>
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Taste filter</strong>
+                <span>{phase5E.tasteFilters.rules.length} rules</span>
+              </div>
+              <p>{phase5E.tasteFilters.lastCorrection}</p>
+              {phase5E.tasteFilters.rules.slice(0, 4).map((rule) => (
+                <div className="oracle-intel-line" key={rule.id}>
+                  <strong>{rule.pattern}</strong>
+                  <p>{rule.reason}</p>
+                  <small>{rule.action} · {rule.source}</small>
+                </div>
+              ))}
+            </article>
+          </div>
+          <div className="oracle-intelligence-grid" style={{ marginTop: 12 }}>
+            <article className="oracle-intel-card money">
+              <div className="oracle-status-head">
+                <strong>Wiro-first opportunity filter</strong>
+                <span>{phase5E.wiroFirstOpportunityFilter.candidates.length} candidates</span>
+              </div>
+              <p>{phase5E.wiroFirstOpportunityFilter.rule}</p>
+              {phase5E.wiroFirstOpportunityFilter.candidates.map((item) => (
+                <div className="oracle-intel-line" key={item.id}>
+                  <strong>{item.title} · {item.score}</strong>
+                  <p>{item.observedFact}</p>
+                  <small>{item.decision}: {item.tinyTest}</small>
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Approval UX</strong>
+                <span>{phase5E.approvalUx.status}</span>
+              </div>
+              <p>{phase5E.approvalUx.template}</p>
+              {phase5E.approvalUx.options.map((option) => (
+                <small key={option.decision}>• {option.label}: {option.effect}</small>
+              ))}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Safe executor pilot</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5E.safeExecutorPilot.status)}`}>{phase5E.safeExecutorPilot.status}</span>
+              </div>
+              <p>{phase5E.safeExecutorPilot.whySafe}</p>
+              <small>Action: {phase5E.safeExecutorPilot.actionId}</small>
+              {phase5E.safeExecutorPilot.requiredBeforeTopPhase.map((item) => <small key={item}>• {item}</small>)}
             </article>
           </div>
 
