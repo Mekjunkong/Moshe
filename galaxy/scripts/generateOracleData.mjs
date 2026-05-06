@@ -1975,6 +1975,164 @@ function derivePhase5E({ generatedAt, intelligenceLayer, phase5B, phase5C, phase
   };
 }
 
+
+function deriveLearningActionMemoryRules({ phase5B, phase5C, phase5D, phase5E }) {
+  const rules = [
+    {
+      id: 'business-ideas-are-hypotheses',
+      signal: phase5E.tasteFilters.lastCorrection,
+      learnedPreference: 'Frame business opportunities as keep_watching/test_manually/ignore, never as idea approval.',
+      appliedTo: ['Evening Wiro Business Pulse', 'opportunity radar', 'approval queue copy'],
+      confidence: 'high',
+    },
+    {
+      id: 'wiro-evidence-first',
+      signal: 'Wiro4x4 is the strongest testbed for Mike-owned leverage.',
+      learnedPreference: 'Rank Wiro observed facts above generic AI/SaaS patterns.',
+      appliedTo: ['quality rubric', 'Wiro-first candidates', 'Mike needs now panel'],
+      confidence: 'high',
+    },
+    {
+      id: 'missing-history-is-watch',
+      signal: phase5D.topPhaseReadiness.watchItems.join(' | ') || 'No Phase 5D watch item currently active.',
+      learnedPreference: 'Missing safe-run or approval history is a watch item, not a hard blocker, unless a concrete unsafe prerequisite fails.',
+      appliedTo: ['top-phase gate', 'safe executor pilot', 'deploy smoke wording'],
+      confidence: 'medium',
+    },
+  ];
+  const negativeEntries = phase5B.feedbackPersistence.entries.filter((entry) => ['noisy', 'missing-context', 'ignored'].includes(entry.rating));
+  negativeEntries.slice(0, 5).forEach((entry, index) => {
+    rules.push({
+      id: `feedback-negative-${index + 1}`,
+      signal: `${entry.targetId || 'unknown'} rated ${entry.rating}`,
+      learnedPreference: entry.note || 'Downrank similar future proactive output unless more evidence is attached.',
+      appliedTo: ['taste filter', 'report quality gate'],
+      confidence: 'medium',
+    });
+  });
+  return rules;
+}
+
+function deriveReportQualityGates({ phase5E }) {
+  const suppressed = phase5E.tasteFilters.suppressedPhrases.join(' | ');
+  const hasWiroTest = phase5E.wiroFirstOpportunityFilter.candidates.some((item) => item.decision === 'test_manually' && /wiro/i.test(item.title));
+  const annoyanceScore = phase5E.qualityRubric.scores.find((item) => item.id === 'annoyance-risk')?.score ?? 0;
+  return [
+    {
+      id: 'no-approval-framing',
+      label: 'No idea-approval framing',
+      status: suppressed.includes('approve this idea') ? 'pass' : 'fail',
+      rule: 'Reports must not ask Mike to approve speculative business ideas.',
+      evidence: suppressed || 'No suppressed phrases configured.',
+    },
+    {
+      id: 'wiro-first-evidence',
+      label: 'Wiro-first evidence attached',
+      status: hasWiroTest ? 'pass' : 'watch',
+      rule: 'At least one opportunity candidate should be tied to a Wiro/Mike observed fact before being suggested.',
+      evidence: phase5E.wiroFirstOpportunityFilter.candidates.map((item) => `${item.title}:${item.decision}`).join(' · '),
+    },
+    {
+      id: 'single-low-risk-next-action',
+      label: 'Single low-risk next action',
+      status: phase5E.mikeNeedsNow.bullets.length <= 3 ? 'pass' : 'watch',
+      rule: 'Proactive reports should end with at most one optional low-risk next action.',
+      evidence: `${phase5E.mikeNeedsNow.bullets.length} Mike-needs-now bullets.`,
+    },
+    {
+      id: 'annoyance-budget',
+      label: 'Annoyance budget visible',
+      status: annoyanceScore >= phase5E.qualityRubric.annoyanceLimit ? 'pass' : 'watch',
+      rule: 'Do not send when annoyance risk is too low/uncertain or quality evidence is weak.',
+      evidence: `Annoyance score ${annoyanceScore}; limit ${phase5E.qualityRubric.annoyanceLimit}.`,
+    },
+  ];
+}
+
+function deriveSafePilotEvidence({ phase5C, phase5E }) {
+  const latestCompleted = phase5C.executorRuns.runs.find((run) => run.state === 'completed');
+  const latestFailed = phase5C.executorRuns.runs.find((run) => run.state === 'failed');
+  if (latestCompleted) {
+    return {
+      actionId: phase5E.safeExecutorPilot.actionId,
+      status: 'completed',
+      latestRunId: latestCompleted.id,
+      evidence: `Completed safe executor run ${latestCompleted.id} at ${latestCompleted.finishedAt || latestCompleted.startedAt}.`,
+      nextStep: 'Review run evidence, then consider one bounded safe_now cron pilot.',
+    };
+  }
+  if (latestFailed) {
+    return {
+      actionId: phase5E.safeExecutorPilot.actionId,
+      status: 'failed',
+      latestRunId: latestFailed.id,
+      evidence: `Latest safe executor run failed: ${latestFailed.error || latestFailed.summary || 'unknown error'}`,
+      nextStep: 'Debug the failed safe executor run before cron promotion.',
+    };
+  }
+  return {
+    actionId: phase5E.safeExecutorPilot.actionId,
+    status: phase5E.safeExecutorPilot.status === 'blocked' ? 'missing' : 'ready',
+    evidence: 'No persisted completed safe executor pilot yet.',
+    nextStep: 'Run one signed-session local/admin safe executor pilot and persist completed/failed state.',
+  };
+}
+
+function deriveCronQualityCompliance({ activeCrons, phase5E }) {
+  const relevant = activeCrons.filter((job) => /Wiro|Business|Opportunity|Oracle|Pulse|summary/i.test(`${job.name || ''} ${job.prompt || ''}`));
+  const notes = [];
+  if (!relevant.length) notes.push('No relevant cron prompt text available in snapshot.');
+  if (phase5E.tasteFilters.suppressedPhrases.includes('approve this idea')) notes.push('Suppressed approval language is configured.');
+  if (phase5E.wiroFirstOpportunityFilter.rule) notes.push('Wiro-first rule is configured for proactive business reports.');
+  return {
+    status: notes.some((note) => note.includes('Suppressed')) && notes.some((note) => note.includes('Wiro-first')) ? 'pass' : 'watch',
+    checkedJobs: relevant.length,
+    notes,
+  };
+}
+
+function derivePhase5F({ generatedAt, activeCrons, phase5B, phase5C, phase5D, phase5E }) {
+  const learningRules = deriveLearningActionMemoryRules({ phase5B, phase5C, phase5D, phase5E });
+  const reportQualityGates = deriveReportQualityGates({ phase5E });
+  const safePilotEvidence = deriveSafePilotEvidence({ phase5C, phase5E });
+  const cronQualityCompliance = deriveCronQualityCompliance({ activeCrons, phase5E });
+  const blockers = [];
+  const watchItems = [];
+  if (reportQualityGates.some((gate) => gate.status === 'fail')) blockers.push('A proactive report quality gate is failing.');
+  if (phase5D.topPhaseReadiness.status === 'blocked') blockers.push('Phase 5D top-phase readiness is still blocked.');
+  if (safePilotEvidence.status !== 'completed') watchItems.push('Safe executor pilot evidence is not completed yet.');
+  if (cronQualityCompliance.status !== 'pass') watchItems.push('Cron quality compliance needs prompt evidence or update.');
+  if (learningRules.length < 2) watchItems.push('Learning action memory needs more durable feedback examples.');
+  const status = blockers.length ? 'blocked' : watchItems.length ? 'watch' : 'ready';
+  return {
+    updatedAt: generatedAt,
+    phase: 'phase_5f',
+    summary: 'Phase 5F active: Oracle converts feedback, approvals, executor runs, and cron quality rules into action memory before bounded top-phase automation.',
+    learningActionMemory: {
+      status: 'active',
+      rules: learningRules,
+      sourceCounts: {
+        feedbackEntries: phase5B.feedbackPersistence.entries.length,
+        approvalDecisions: phase5D.approvalCallbacks.decisions.length,
+        executorRuns: phase5C.executorRuns.runs.length,
+      },
+    },
+    reportQualityGates,
+    safePilotEvidence,
+    cronQualityCompliance,
+    topPhaseGate: {
+      status,
+      blockers,
+      watchItems,
+      nextStep: blockers.length
+        ? 'Fix report-quality or Phase 5D blockers before more autonomy.'
+        : status === 'watch'
+          ? 'Run one safe executor pilot and record at least one feedback/approval decision.'
+          : 'Ready for one bounded safe_now cron pilot with quality gates enforced.',
+    },
+  };
+}
+
 function deriveOperationalReadiness({ websites, repos, github, credentials, deployments, deployTimeline, automation, incidents }) {
   const criticalIncidents = incidents.filter((i) => i.severity === 'critical').length;
   const dirtyRepos = repos.filter((r) => r.dirty).length;
@@ -2161,11 +2319,19 @@ const phase5E = derivePhase5E({
   phase5C,
   phase5D,
 });
+const phase5F = derivePhase5F({
+  generatedAt,
+  activeCrons: activeCronsSnapshot,
+  phase5B,
+  phase5C,
+  phase5D,
+  phase5E,
+});
 
 const data = {
   generated: generatedAt,
   born: '2026-04-18',
-  level3Phase: 'Phase 5E: Quality intelligence, taste filters, Wiro-first reports, and approval UX',
+  level3Phase: 'Phase 5F: Learning action memory, report quality gates, and safe pilot evidence',
   stats: {
     learnings: learnings.length,
     retrospectives: retrospectives.length,
@@ -2183,7 +2349,7 @@ const data = {
       name: 'Moshe Oracle OS',
       url: process.env.ORACLE_DASHBOARD_URL || '',
       status: 'Building',
-      note: 'Phase 5E active: quality intelligence filters noisy reports before more autonomy.',
+      note: 'Phase 5F active: feedback and quality rules are converted into action memory before bounded automation.',
       accent: 'orange',
     },
     {
@@ -2225,6 +2391,7 @@ const data = {
   phase5C,
   phase5D,
   phase5E,
+  phase5F,
   nextActions: [
     'Set ORACLE_SESSION_SECRET to arm the Mike-only signed session gate.',
     'The Oracle now turns audit trail events into learnings before refreshing live data.',
@@ -2237,11 +2404,12 @@ const data = {
     'Use Phase 5D approval callbacks, repo classifications, and deploy smoke gates before top-phase claims.',
     'Enable ORACLE_TERMINAL_ENABLED=true only on Mike local/admin runtime before using the Terminal tab.',
     'Use Phase 5E taste filters: proactive reports must be Wiro-first and framed as watch/test/ignore.',
+    'Use Phase 5F learning action memory before creating any recurring safe_now cron pilot.',
   ],
 };
 
 writeFileSync(OUT, `${JSON.stringify(data, null, 2)}\n`);
-console.log(`✅ Oracle live data written to ${OUT} [Phase 5E]`);
+console.log(`✅ Oracle live data written to ${OUT} [Phase 5F]`);
 console.log(`   Websites: ${data.websites.map((w) => `${w.name}=${w.ok ? 'OK' : 'FAIL'}`).join(', ')}`);
 console.log(`   Incidents: ${data.incidents.length} | Recommendations: ${data.recommendations.length} | Wiro CI: ${data.wiroCi?.conclusion ?? 'none'}`);
 console.log(`   Repos: ${data.repos.length} | GitHub sensors: ${data.github.length} | Learnings: ${data.stats.learnings} | Retrospectives: ${data.stats.retrospectives}`);

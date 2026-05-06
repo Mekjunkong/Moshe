@@ -551,6 +551,60 @@ export interface OraclePhase5ELayer {
   }
 }
 
+
+
+export interface OracleLearningMemoryRule {
+  id: string
+  signal: string
+  learnedPreference: string
+  appliedTo: string[]
+  confidence: 'low' | 'medium' | 'high'
+}
+
+export interface OracleReportQualityGate {
+  id: string
+  label: string
+  status: 'pass' | 'watch' | 'fail'
+  rule: string
+  evidence: string
+}
+
+export interface OracleSafePilotEvidence {
+  actionId: string
+  status: 'missing' | 'ready' | 'completed' | 'failed'
+  latestRunId?: string
+  evidence: string
+  nextStep: string
+}
+
+export interface OraclePhase5FLayer {
+  updatedAt: string
+  phase: 'phase_5f'
+  summary: string
+  learningActionMemory: {
+    status: 'active'
+    rules: OracleLearningMemoryRule[]
+    sourceCounts: {
+      feedbackEntries: number
+      approvalDecisions: number
+      executorRuns: number
+    }
+  }
+  reportQualityGates: OracleReportQualityGate[]
+  safePilotEvidence: OracleSafePilotEvidence
+  cronQualityCompliance: {
+    status: 'pass' | 'watch' | 'fail'
+    checkedJobs: number
+    notes: string[]
+  }
+  topPhaseGate: {
+    status: 'blocked' | 'watch' | 'ready'
+    blockers: string[]
+    watchItems: string[]
+    nextStep: string
+  }
+}
+
 export interface OracleTodayLearning {
   title: string
   source: string
@@ -678,6 +732,7 @@ export interface OracleData {
   phase5C?: OraclePhase5CLayer
   phase5D?: OraclePhase5DLayer
   phase5E?: OraclePhase5ELayer
+  phase5F?: OraclePhase5FLayer
   nextActions: string[]
 }
 
@@ -894,6 +949,16 @@ export const ORACLE_FALLBACK_DATA: OracleData = {
     approvalUx: { status: 'drafted', template: 'What this does / Risk / Rollback / Why now', options: [] },
     safeExecutorPilot: { status: 'watch', actionId: 'queue-refresh-oracle-snapshot', whySafe: 'Internal snapshot refresh only.', requiredBeforeTopPhase: [] },
     mikeNeedsNow: { status: 'quiet', headline: 'Generate a fresh Oracle snapshot.', bullets: [] },
+  },
+  phase5F: {
+    updatedAt: new Date(0).toISOString(),
+    phase: 'phase_5f',
+    summary: 'Waiting for Phase 5F learning action memory.',
+    learningActionMemory: { status: 'active', rules: [], sourceCounts: { feedbackEntries: 0, approvalDecisions: 0, executorRuns: 0 } },
+    reportQualityGates: [],
+    safePilotEvidence: { actionId: 'queue-refresh-oracle-snapshot', status: 'missing', evidence: 'No live snapshot generated yet.', nextStep: 'Generate a fresh Oracle snapshot.' },
+    cronQualityCompliance: { status: 'watch', checkedJobs: 0, notes: [] },
+    topPhaseGate: { status: 'blocked', blockers: ['Generate a fresh Oracle snapshot.'], watchItems: [], nextStep: 'Run npm run build.' },
   },
   nextActions: [
     'Run node scripts/generateOracleData.mjs',

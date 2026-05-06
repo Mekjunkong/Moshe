@@ -320,6 +320,16 @@ export default function OracleCommandCenter({ data }: Props) {
     safeExecutorPilot: { status: 'watch' as const, actionId: 'queue-refresh-oracle-snapshot', whySafe: 'Internal snapshot refresh only.', requiredBeforeTopPhase: [] },
     mikeNeedsNow: { status: 'quiet' as const, headline: 'Generate a fresh Oracle snapshot.', bullets: [] },
   }
+  const phase5F = oracle.phase5F ?? {
+    updatedAt: oracle.generated,
+    phase: 'phase_5f' as const,
+    summary: 'Phase 5F learning action memory is waiting for a live snapshot.',
+    learningActionMemory: { status: 'active' as const, rules: [], sourceCounts: { feedbackEntries: 0, approvalDecisions: 0, executorRuns: 0 } },
+    reportQualityGates: [],
+    safePilotEvidence: { actionId: 'queue-refresh-oracle-snapshot', status: 'missing' as const, evidence: 'No live snapshot generated yet.', nextStep: 'Generate a fresh Oracle snapshot.' },
+    cronQualityCompliance: { status: 'watch' as const, checkedJobs: 0, notes: [] },
+    topPhaseGate: { status: 'blocked' as const, blockers: ['Generate a fresh Oracle snapshot.'], watchItems: [], nextStep: 'Run npm run build.' },
+  }
   const [feedbackState, setFeedbackState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
   const [executorState, setExecutorState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
   const [approvalState, setApprovalState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
@@ -644,8 +654,10 @@ export default function OracleCommandCenter({ data }: Props) {
   const configuredCreds = oracle.credentials.filter((c) => c.configured).length
   const githubOk = oracle.github.filter((g) => g.apiStatus === 'ok').length
   const criticalIncidents = (oracle.incidents ?? []).filter((i) => i.severity === 'critical').length
-  const oracleModeLabel = oracle.phase5E
-    ? 'PHASE 5E · QUALITY INTELLIGENCE'
+  const oracleModeLabel = oracle.phase5F
+    ? 'PHASE 5F · LEARNING ACTION MEMORY'
+    : oracle.phase5E
+      ? 'PHASE 5E · QUALITY INTELLIGENCE'
     : oracle.phase5D
       ? 'PHASE 5D · APPROVAL + CRON GATES'
     : oracle.phase5C
@@ -1915,6 +1927,68 @@ export default function OracleCommandCenter({ data }: Props) {
               <p>{phase5D.topPhaseReadiness.nextStep}</p>
               {phase5D.topPhaseReadiness.blockers.map((blocker) => <small key={blocker}>BLOCKER · {blocker}</small>)}
               {phase5D.topPhaseReadiness.watchItems.map((item) => <small key={item}>WATCH · {item}</small>)}
+            </article>
+          </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>PHASE 5F LEARNING ACTION MEMORY</p>
+            <span>{phase5F.topPhaseGate.status}</span>
+          </div>
+          <div className="oracle-intelligence-grid">
+            <article className="oracle-intel-card money">
+              <div className="oracle-status-head">
+                <strong>Top-phase gate</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5F.topPhaseGate.status)}`}>{phase5F.topPhaseGate.status}</span>
+              </div>
+              <p>{phase5F.topPhaseGate.nextStep}</p>
+              {phase5F.topPhaseGate.blockers.map((item) => <small key={item}>Blocker: {item}</small>)}
+              {phase5F.topPhaseGate.watchItems.map((item) => <small key={item}>Watch: {item}</small>)}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Learning action memory</strong>
+                <span>{phase5F.learningActionMemory.rules.length} rules</span>
+              </div>
+              <p>Sources: {phase5F.learningActionMemory.sourceCounts.feedbackEntries} feedback · {phase5F.learningActionMemory.sourceCounts.approvalDecisions} approvals · {phase5F.learningActionMemory.sourceCounts.executorRuns} runs</p>
+              {phase5F.learningActionMemory.rules.slice(0, 4).map((rule) => (
+                <div className="oracle-intel-line" key={rule.id}>
+                  <strong>{rule.learnedPreference}</strong>
+                  <p>{rule.signal}</p>
+                  <small>{rule.confidence} · {rule.appliedTo.join(' · ')}</small>
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Report quality gates</strong>
+                <span>{phase5F.reportQualityGates.filter((gate) => gate.status === 'pass').length}/{phase5F.reportQualityGates.length} pass</span>
+              </div>
+              {phase5F.reportQualityGates.map((gate) => (
+                <div className="oracle-intel-line" key={gate.id}>
+                  <strong>{gate.label}</strong>
+                  <p>{gate.rule}</p>
+                  <small>{gate.status}: {gate.evidence}</small>
+                </div>
+              ))}
+            </article>
+          </div>
+          <div className="oracle-intelligence-grid" style={{ marginTop: 12 }}>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Safe pilot evidence</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5F.safePilotEvidence.status)}`}>{phase5F.safePilotEvidence.status}</span>
+              </div>
+              <p>{phase5F.safePilotEvidence.evidence}</p>
+              <small>Action: {phase5F.safePilotEvidence.actionId}</small>
+              <small>{phase5F.safePilotEvidence.nextStep}</small>
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Cron quality compliance</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5F.cronQualityCompliance.status)}`}>{phase5F.cronQualityCompliance.status}</span>
+              </div>
+              <p>{phase5F.cronQualityCompliance.checkedJobs} relevant job(s) checked.</p>
+              {phase5F.cronQualityCompliance.notes.map((note) => <small key={note}>• {note}</small>)}
             </article>
           </div>
 
