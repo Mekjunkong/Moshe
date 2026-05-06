@@ -474,6 +474,17 @@ export default function OracleCommandCenter({ data }: Props) {
     message: latestDeploy?.deployedCommitMessage ?? oracle.deployments[0]?.gitCommitMessage ?? mosheRepo?.commitSubject ?? 'No deployment message available.',
     updated: latestDeploy?.timestamp ?? oracle.deployments[0]?.createdAt ?? oracle.generated,
   }
+  const readiness = oracle.operationalReadiness ?? {
+    score: 0,
+    status: 'watch' as const,
+    summary: 'Waiting for live readiness data.',
+    checks: [],
+  }
+  const readinessBadge = readiness.status === 'excellent' || readiness.status === 'steady'
+    ? 'low'
+    : readiness.status === 'watch'
+      ? 'medium'
+      : 'high'
 
   return (
     <aside className="oracle-shell" aria-label="Oracle OS command center">
@@ -536,6 +547,27 @@ export default function OracleCommandCenter({ data }: Props) {
             <span className={`oracle-risk-badge ${criticalIncidents > 0 ? 'high' : projectWarnings.length > 0 ? 'medium' : 'low'}`}>
               {criticalIncidents > 0 ? 'ACTION NEEDED' : projectWarnings.length > 0 ? 'WATCH' : 'CLEAR'}
             </span>
+          </div>
+
+          <div className="oracle-readiness-panel" aria-label="Oracle operational readiness">
+            <div className="oracle-readiness-score">
+              <span>{readiness.score}</span>
+              <small>/100</small>
+            </div>
+            <div className="oracle-readiness-body">
+              <div className="oracle-status-head">
+                <strong>Autonomy readiness</strong>
+                <span className={`oracle-risk-badge ${readinessBadge}`}>{readiness.status.toUpperCase()}</span>
+              </div>
+              <p>{readiness.summary}</p>
+              <div className="oracle-readiness-checks">
+                {readiness.checks.slice(0, 4).map((check) => (
+                  <span className={`oracle-readiness-chip ${check.status}`} key={check.label} title={check.detail}>
+                    {check.label}: {check.status}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
 
           <div className="oracle-section-head" style={{ marginTop: 16 }}>
@@ -1170,6 +1202,22 @@ export default function OracleCommandCenter({ data }: Props) {
               <small>{deploymentFreshness.message} · updated {timeAgo(deploymentFreshness.updated)}</small>
             </div>
           </article>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>READINESS CHECKS</p>
+            <span>{readiness.score}/100 · {readiness.status}</span>
+          </div>
+          <div className="oracle-readiness-list">
+            {readiness.checks.map((check) => (
+              <article className={`oracle-readiness-row ${check.status}`} key={check.label}>
+                <div>
+                  <strong>{check.label}</strong>
+                  <small>{check.detail}</small>
+                </div>
+                <span>{check.weight} pts</span>
+              </article>
+            ))}
+          </div>
 
           <div className="oracle-section-head" style={{ marginTop: 16 }}>
             <p>IMPROVEMENT BACKLOG</p>

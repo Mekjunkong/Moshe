@@ -684,6 +684,91 @@ function deriveDeployTimeline(deployments, repos) {
   return events.slice(0, 10);
 }
 
+function deriveOperationalReadiness({ websites, repos, github, credentials, deployments, deployTimeline, automation, incidents }) {
+  const criticalIncidents = incidents.filter((i) => i.severity === 'critical').length;
+  const dirtyRepos = repos.filter((r) => r.dirty).length;
+  const onlineSites = websites.filter((w) => w.ok).length;
+  const githubOk = github.filter((g) => g.apiStatus === 'ok').length;
+  const configuredCreds = credentials.filter((c) => c.configured).length;
+  const latestDeploy = deployTimeline.find((event) => event.event === 'deploy') || null;
+  const deploymentState = latestDeploy?.syncState === 'in-sync'
+    ? 'pass'
+    : latestDeploy?.syncState && latestDeploy.syncState !== 'unknown'
+      ? 'fail'
+      : 'watch';
+  const deploymentDetail = latestDeploy?.syncState
+    ? `${latestDeploy.project}: ${latestDeploy.syncState}`
+    : deployments.length
+      ? 'Deployment metadata exists, commit comparison is not confirmed yet.'
+      : 'No deployment metadata available in this snapshot.';
+  const checks = [
+    {
+      label: 'Sites online',
+      status: onlineSites === websites.length && websites.length > 0 ? 'pass' : onlineSites > 0 ? 'watch' : 'fail',
+      detail: `${onlineSites}/${websites.length} monitored sites reachable`,
+      weight: 25,
+    },
+    {
+      label: 'Repo cleanliness',
+      status: dirtyRepos === 0 ? 'pass' : dirtyRepos <= 2 ? 'watch' : 'fail',
+      detail: dirtyRepos === 0 ? 'Tracked repos are clean.' : `${dirtyRepos} tracked repo(s) have local changes.`,
+      weight: 20,
+    },
+    {
+      label: 'Cloud sensors',
+      status: github.length === 0 ? 'watch' : githubOk === github.length ? 'pass' : githubOk > 0 ? 'watch' : 'fail',
+      detail: `${githubOk}/${github.length} GitHub sensors are API OK`,
+      weight: 15,
+    },
+    {
+      label: 'Live deploy freshness',
+      status: deploymentState,
+      detail: deploymentDetail,
+      weight: 20,
+    },
+    {
+      label: 'Session gate',
+      status: automation.sessionConfigured ? 'pass' : 'watch',
+      detail: automation.sessionConfigured ? 'Mike-only signed session gate is configured.' : 'Browser stays preview-only until ORACLE_SESSION_SECRET is configured.',
+      weight: 10,
+    },
+    {
+      label: 'Critical alerts',
+      status: criticalIncidents === 0 ? 'pass' : 'fail',
+      detail: criticalIncidents === 0 ? 'No critical incidents in the current snapshot.' : `${criticalIncidents} critical incident(s) need attention.`,
+      weight: 10,
+    },
+    {
+      label: 'Credential readiness',
+      status: configuredCreds === credentials.length ? 'pass' : 'watch',
+      detail: `${configuredCreds}/${credentials.length} optional sensor credentials configured by name only`,
+      weight: 10,
+    },
+  ];
+  const maxScore = checks.reduce((total, check) => total + check.weight, 0);
+  const earnedScore = checks.reduce((total, check) => {
+    if (check.status === 'pass') return total + check.weight;
+    if (check.status === 'watch') return total + check.weight * 0.5;
+    return total;
+  }, 0);
+  const score = Math.round((earnedScore / maxScore) * 100);
+  const watchCount = checks.filter((check) => check.status === 'watch').length;
+  const failCount = checks.filter((check) => check.status === 'fail').length;
+  const status = failCount > 0
+    ? score >= 50 ? 'watch' : 'critical'
+    : score >= 90 ? 'excellent' : score >= 75 ? 'steady' : score >= 50 ? 'watch' : 'critical';
+  return {
+    score,
+    status,
+    summary: failCount
+      ? `${failCount} failing check(s), ${watchCount} watch item(s). Fix failures before relying on autonomy.`
+      : watchCount
+        ? `${watchCount} watch item(s). Oracle is usable, but not fully verified.`
+        : 'All readiness checks passed. Oracle is clear for read-only monitoring.',
+    checks,
+  };
+}
+
 // ── Data collection ─────────────────────────────────────────────────────────
 
 const learnings = readMarkdown(join(PSI, 'memory/learnings'));
@@ -735,6 +820,16 @@ const incidents = deriveIncidents(websites, repos, github, credentialsConfig, ge
 const recommendations = deriveRecommendations(incidents, repos);
 const wiroCi = deriveWiroCi(github);
 const deployTimeline = deriveDeployTimeline(deployments, repos);
+const operationalReadiness = deriveOperationalReadiness({
+  websites,
+  repos,
+  github,
+  credentials: credentialsConfig,
+  deployments,
+  deployTimeline,
+  automation,
+  incidents,
+});
 
 const data = {
   generated: generatedAt,
@@ -791,6 +886,7 @@ const data = {
   wiroCi,
   deployTimeline,
   automation,
+  operationalReadiness,
   nextActions: [
     'Set ORACLE_SESSION_SECRET to arm the Mike-only signed session gate.',
     'The Oracle now turns audit trail events into learnings before refreshing live data.',

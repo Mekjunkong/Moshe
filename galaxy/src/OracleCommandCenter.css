@@ -1717,8 +1717,132 @@
   color: rgba(203, 213, 225, 0.62);
 }
 
+.oracle-readiness-panel {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  background:
+    radial-gradient(circle at 88% 12%, rgba(167, 139, 250, 0.16), transparent 34%),
+    linear-gradient(135deg, rgba(6, 14, 26, 0.96), rgba(15, 23, 42, 0.86));
+}
+
+.oracle-readiness-score {
+  width: 76px;
+  height: 76px;
+  border-radius: 24px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  border: 1px solid rgba(34, 211, 238, 0.28);
+  background: linear-gradient(180deg, rgba(8, 47, 73, 0.72), rgba(2, 6, 23, 0.72));
+  box-shadow: inset 0 1px 0 rgba(248, 250, 252, 0.05), 0 16px 34px rgba(8, 47, 73, 0.22);
+}
+
+.oracle-readiness-score span {
+  color: #67e8f9;
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 0.95;
+}
+
+.oracle-readiness-score small {
+  color: rgba(203, 213, 225, 0.54);
+  font-size: 10px;
+}
+
+.oracle-readiness-body p {
+  margin: 7px 0 0;
+  color: rgba(226, 232, 240, 0.8);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.oracle-readiness-checks {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.oracle-readiness-chip,
+.oracle-readiness-row > span {
+  border-radius: 999px;
+  padding: 5px 8px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.45px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  color: rgba(226, 232, 240, 0.76);
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.oracle-readiness-chip.pass,
+.oracle-readiness-row.pass > span {
+  border-color: rgba(61, 214, 140, 0.25);
+  color: #a7f3d0;
+  background: rgba(6, 78, 59, 0.22);
+}
+
+.oracle-readiness-chip.watch,
+.oracle-readiness-row.watch > span {
+  border-color: rgba(245, 158, 11, 0.26);
+  color: #fde68a;
+  background: rgba(120, 53, 15, 0.22);
+}
+
+.oracle-readiness-chip.fail,
+.oracle-readiness-row.fail > span {
+  border-color: rgba(248, 113, 113, 0.28);
+  color: #fecaca;
+  background: rgba(127, 29, 29, 0.22);
+}
+
+.oracle-readiness-list {
+  display: grid;
+  gap: 8px;
+}
+
+.oracle-readiness-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 11px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(15, 23, 42, 0.64);
+}
+
+.oracle-readiness-row strong {
+  display: block;
+  color: #e2e8f0;
+  font-size: 11px;
+}
+
+.oracle-readiness-row small {
+  display: block;
+  margin-top: 4px;
+  color: rgba(203, 213, 225, 0.56);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
 @media (max-width: 520px) {
-  .oracle-deploy-freshness {
+  .oracle-deploy-freshness,
+  .oracle-readiness-panel,
+  .oracle-readiness-row {
     grid-template-columns: 1fr;
+  }
+
+  .oracle-readiness-score {
+    width: 100%;
+    height: auto;
+    min-height: 64px;
   }
 }

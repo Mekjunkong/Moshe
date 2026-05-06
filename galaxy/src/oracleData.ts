@@ -183,6 +183,20 @@ export interface OracleAutomationAuditEntry {
   detail: string
 }
 
+export interface OracleReadinessCheck {
+  label: string
+  status: 'pass' | 'watch' | 'fail'
+  detail: string
+  weight: number
+}
+
+export interface OracleOperationalReadiness {
+  score: number
+  status: 'excellent' | 'steady' | 'watch' | 'critical'
+  summary: string
+  checks: OracleReadinessCheck[]
+}
+
 // ── Root data contract ──────────────────────────────────────────────────────
 
 export interface OracleData {
@@ -213,6 +227,7 @@ export interface OracleData {
   wiroCi?: OracleWiroCi | null
   deployTimeline?: OracleDeployEvent[]
   automation?: OracleAutomationPolicy | null
+  operationalReadiness?: OracleOperationalReadiness
   nextActions: string[]
 }
 
@@ -305,6 +320,12 @@ export const ORACLE_FALLBACK_DATA: OracleData = {
         requiresConfirmation: true,
       },
     ],
+  },
+  operationalReadiness: {
+    score: 0,
+    status: 'watch',
+    summary: 'Waiting for the first live Oracle readiness snapshot.',
+    checks: [],
   },
   nextActions: [
     'Run node scripts/generateOracleData.mjs',
