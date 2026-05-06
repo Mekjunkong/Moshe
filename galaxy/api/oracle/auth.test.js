@@ -117,6 +117,30 @@ describe('oracle session handler', () => {
 })
 
 describe('oracle action gate', () => {
+  test('GET returns action policy and bounded audit trail', async () => {
+    const previewRes = createRes()
+    await oracleActionsHandler(
+      createReq({
+        body: {
+          actionId: 'refresh-oracle-snapshot',
+          mode: 'preview',
+          confirm: true,
+          reason: 'audit seed',
+        },
+      }),
+      previewRes,
+    )
+
+    const res = createRes()
+    await oracleActionsHandler(createReq({ method: 'GET' }), res)
+    const payload = readJson(res)
+    assert.equal(res.statusCode, 200)
+    assert.equal(payload.ok, true)
+    assert.ok(Array.isArray(payload.actions))
+    assert.ok(Array.isArray(payload.auditTrail))
+    assert.equal(payload.policy.executionMode, 'server-enabled')
+  })
+
   test('execute mode is rejected without a session', async () => {
     const res = createRes()
     await oracleActionsHandler(

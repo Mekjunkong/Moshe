@@ -1,10 +1,10 @@
 {
-  "generated": "2026-05-05T18:41:16.974Z",
+  "generated": "2026-05-06T00:11:55.760Z",
   "born": "2026-04-18",
   "level3Phase": "Phase 3B: Feedback loop — audit-derived learnings, auth, allowlist, audit log, preview mode",
   "stats": {
     "learnings": 10,
-    "retrospectives": 10,
+    "retrospectives": 12,
     "activeProjects": 2,
     "inboxItems": 1,
     "writingDocs": 0,
@@ -13,7 +13,7 @@
   "recentLearnings": [
     {
       "title": "Learning: session gate unlocks execution",
-      "date": "2026-05-05",
+      "date": "2026-05-06",
       "summary": "Mike-only signed session cookie issued."
     },
     {
@@ -27,25 +27,25 @@
       "summary": "Execution is not armed. Set ORACLE_SESSION_SECRET to enable signed session gating."
     },
     {
+      "title": "Oracle action feedback loop",
+      "file": "oracle-action-feedback.md",
+      "date": "2026-05-06",
+      "summary": "updated: 2026-05-06T00:10:11.636Z  Oracle action feedback loop The Oracle now turns session and action audit events into reusable learnings."
+    },
+    {
       "title": "Oracle Action Layer + Wiro Visibility Split",
       "file": "2026-05-05-oracle-action-layer-and-wiro-visibility.md",
       "date": "2026-05-05",
       "summary": "Date: 2026-05-05  Learning Keep Oracle action-layer design separate from Wiro visibility work. Oracle should show future buttons as a preview-only con…"
-    },
-    {
-      "title": "Oracle Phase 2A Smoke Check Learning",
-      "file": "2026-05-05-oracle-phase-2a-smoke-check.md",
-      "date": "2026-05-05",
-      "summary": "Date: 2026-05-05  Learning The Oracle dashboard is safe to treat as a real read-only monitor only after both build-time data generation and a browser …"
     }
   ],
-  "retrospectivesCount": 10,
+  "retrospectivesCount": 12,
   "retrospectivesRecent": [
     "2026-05-05 — Oracle Action Layer + Wiro Visibility — 2026-05-05",
     "2026-05-05 — Oracle Phase 2A Smoke Check — 2026-05-05",
     "2026-05-05 — Retrospective — Oracle Phase 3A Action API Foundation",
-    "2026-05-03 — Oracle Option B + Daily Self-Learning Scan — 2026-05-03",
-    "2026-05-03 — Oracle Phase 2A Intelligence — 2026-05-03"
+    "2026-05-05 — Oracle Overnight Stabilization — 2026-05-06",
+    "2026-05-05 — WIRO4x4 promo video draft — 2026-05-06"
   ],
   "activeCrons": [
     {
@@ -63,19 +63,19 @@
     {
       "name": "Daily Oracle Self-Learning Scan",
       "schedule": "0 7 * * *",
-      "nextRun": "2026-05-06T07:00:00+07:00",
+      "nextRun": "2026-05-07T07:00:00+07:00",
       "status": "active"
     },
     {
       "name": "wiro4x4-daily-market-research",
       "schedule": "0 6 * * *",
-      "nextRun": "2026-05-06T06:00:00+07:00",
+      "nextRun": "2026-05-07T06:00:00+07:00",
       "status": "active"
     },
     {
       "name": "wiro4x4-daily-lead-check",
       "schedule": "10 6 * * *",
-      "nextRun": "2026-05-06T06:10:00+07:00",
+      "nextRun": "2026-05-07T06:10:00+07:00",
       "status": "active"
     }
   ],
@@ -115,7 +115,7 @@
       "ok": true,
       "status": 200,
       "responseMs": null,
-      "checkedAt": "2026-05-05T18:41:05.250Z",
+      "checkedAt": "2026-05-06T00:11:37.997Z",
       "note": "local build target; set ORACLE_DASHBOARD_URL after deploy for public uptime checks"
     },
     {
@@ -123,8 +123,8 @@
       "url": "https://aum-hippie-young.vercel.app/",
       "ok": true,
       "status": 200,
-      "responseMs": 198,
-      "checkedAt": "2026-05-05T18:41:05.448Z",
+      "responseMs": 362,
+      "checkedAt": "2026-05-06T00:11:38.359Z",
       "note": "reachable"
     },
     {
@@ -132,8 +132,8 @@
       "url": "https://www.wiro4x4indochina.com/",
       "ok": true,
       "status": 200,
-      "responseMs": 152,
-      "checkedAt": "2026-05-05T18:41:05.444Z",
+      "responseMs": 668,
+      "checkedAt": "2026-05-06T00:11:38.690Z",
       "note": "reachable"
     }
   ],
@@ -142,12 +142,12 @@
       "name": "Moshe",
       "path": "/Users/pasuthunjunkong/workspace/Moshe",
       "branch": "main",
-      "commit": "d7b3852",
-      "commitFull": "d7b38529abcb60d558567cbf431b4674c6d9bb6b",
-      "commitSubject": "oracle: add signed session gate and feedback loop",
+      "commit": "971539b",
+      "commitFull": "971539be4c185cf3caebef4b646bd4a286b31cce",
+      "commitSubject": "oracle: sync live session-gated status",
       "dirty": true,
-      "changedFiles": 22,
-      "lastCommitAt": "2026-05-05T17:47:57+07:00",
+      "changedFiles": 28,
+      "lastCommitAt": "2026-05-06T01:42:24+07:00",
       "github": "Mekjunkong/Moshe",
       "remoteHost": "github.com"
     },
@@ -172,7 +172,7 @@
       "commitFull": "f4068dc84fa3724c1ba34a6449ec82b9132ec4be",
       "commitSubject": "fix(lint): resolve remaining floating promise warnings (#7)",
       "dirty": true,
-      "changedFiles": 29,
+      "changedFiles": 30,
       "lastCommitAt": "2026-05-04T09:07:10+07:00",
       "github": "Mekjunkong/Wiro4x4",
       "remoteHost": "github.com"
@@ -183,10 +183,10 @@
       "provider": "vercel",
       "project": "galaxy",
       "state": "READY",
-      "url": "https://galaxy-r6242dh5f-pasuthun-junkongs-projects.vercel.app",
-      "createdAt": "2026-05-05T18:28:21.147Z",
-      "gitCommitSha": "d7b38529abcb60d558567cbf431b4674c6d9bb6b",
-      "gitCommitMessage": "oracle: add signed session gate and feedback loop",
+      "url": "https://galaxy-jq0xvyubb-pasuthun-junkongs-projects.vercel.app",
+      "createdAt": "2026-05-05T23:25:11.667Z",
+      "gitCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
+      "gitCommitMessage": "oracle: sync live session-gated status",
       "gitCommitRef": "main",
       "gitDirty": true,
       "note": "read via Vercel CLI auth; no token value exposed"
@@ -195,10 +195,10 @@
       "provider": "vercel",
       "project": "galaxy",
       "state": "READY",
-      "url": "https://galaxy-evsb9op3e-pasuthun-junkongs-projects.vercel.app",
-      "createdAt": "2026-05-05T16:27:12.563Z",
-      "gitCommitSha": "d7b38529abcb60d558567cbf431b4674c6d9bb6b",
-      "gitCommitMessage": "oracle: add signed session gate and feedback loop",
+      "url": "https://galaxy-xkt62khf1-pasuthun-junkongs-projects.vercel.app",
+      "createdAt": "2026-05-05T20:54:34.279Z",
+      "gitCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
+      "gitCommitMessage": "oracle: sync live session-gated status",
       "gitCommitRef": "main",
       "gitDirty": true,
       "note": "read via Vercel CLI auth; no token value exposed"
@@ -207,10 +207,10 @@
       "provider": "vercel",
       "project": "galaxy",
       "state": "READY",
-      "url": "https://galaxy-kuukse2ti-pasuthun-junkongs-projects.vercel.app",
-      "createdAt": "2026-05-05T15:12:13.609Z",
-      "gitCommitSha": "d7b38529abcb60d558567cbf431b4674c6d9bb6b",
-      "gitCommitMessage": "oracle: add signed session gate and feedback loop",
+      "url": "https://galaxy-2y6v29vnu-pasuthun-junkongs-projects.vercel.app",
+      "createdAt": "2026-05-05T20:10:21.563Z",
+      "gitCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
+      "gitCommitMessage": "oracle: sync live session-gated status",
       "gitCommitRef": "main",
       "gitDirty": true,
       "note": "read via Vercel CLI auth; no token value exposed"
@@ -224,7 +224,7 @@
       "apiStatus": "ok",
       "private": false,
       "defaultBranch": "main",
-      "pushedAt": "2026-05-05T10:48:07Z",
+      "pushedAt": "2026-05-05T18:42:31Z",
       "openIssues": 0,
       "openPullRequests": 0,
       "latestWorkflow": null,
@@ -298,16 +298,16 @@
       "severity": "warning",
       "category": "repo-dirty",
       "project": "Moshe",
-      "title": "Moshe: 22 uncommitted changes",
-      "detail": "Branch main · last commit: \"oracle: add signed session gate and feedback loop\"",
-      "detectedAt": "2026-05-05T17:47:57+07:00"
+      "title": "Moshe: 28 uncommitted changes",
+      "detail": "Branch main · last commit: \"oracle: sync live session-gated status\"",
+      "detectedAt": "2026-05-06T01:42:24+07:00"
     },
     {
       "id": "repo-dirty-wiro4x4",
       "severity": "warning",
       "category": "repo-dirty",
       "project": "Wiro4x4",
-      "title": "Wiro4x4: 29 uncommitted changes",
+      "title": "Wiro4x4: 30 uncommitted changes",
       "detail": "Branch main · last commit: \"fix(lint): resolve remaining floating promise warnings (#7)\"",
       "detectedAt": "2026-05-04T09:07:10+07:00"
     },
@@ -318,21 +318,21 @@
       "project": "Oracle OS",
       "title": "5 credential(s) not configured",
       "detail": "VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_PROJECT_NAME, VERCEL_TEAM_ID, GITHUB_TOKEN",
-      "detectedAt": "2026-05-05T18:41:16.974Z"
+      "detectedAt": "2026-05-06T00:11:55.760Z"
     }
   ],
   "recommendations": [
     {
       "project": "Moshe",
       "priority": "medium",
-      "reason": "Moshe: 22 uncommitted changes",
+      "reason": "Moshe: 28 uncommitted changes",
       "risk": "medium",
       "suggestedAction": "Review staged changes in Moshe and commit or stash to keep the branch clean."
     },
     {
       "project": "Wiro4x4",
       "priority": "medium",
-      "reason": "Wiro4x4: 29 uncommitted changes",
+      "reason": "Wiro4x4: 30 uncommitted changes",
       "risk": "medium",
       "suggestedAction": "Review staged changes in Wiro4x4 and commit or stash to keep the branch clean."
     },
@@ -362,12 +362,12 @@
       "project": "galaxy",
       "event": "deploy",
       "state": "READY",
-      "url": "https://galaxy-r6242dh5f-pasuthun-junkongs-projects.vercel.app",
-      "timestamp": "2026-05-05T18:28:21.147Z",
-      "deployedCommitSha": "d7b38529abcb60d558567cbf431b4674c6d9bb6b",
-      "deployedCommitMessage": "oracle: add signed session gate and feedback loop",
+      "url": "https://galaxy-jq0xvyubb-pasuthun-junkongs-projects.vercel.app",
+      "timestamp": "2026-05-05T23:25:11.667Z",
+      "deployedCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
+      "deployedCommitMessage": "oracle: sync live session-gated status",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "d7b38529abcb60d558567cbf431b4674c6d9bb6b",
+      "sourceCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
       "syncState": "in-sync",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
@@ -376,12 +376,12 @@
       "project": "galaxy",
       "event": "deploy",
       "state": "READY",
-      "url": "https://galaxy-evsb9op3e-pasuthun-junkongs-projects.vercel.app",
-      "timestamp": "2026-05-05T16:27:12.563Z",
-      "deployedCommitSha": "d7b38529abcb60d558567cbf431b4674c6d9bb6b",
-      "deployedCommitMessage": "oracle: add signed session gate and feedback loop",
+      "url": "https://galaxy-xkt62khf1-pasuthun-junkongs-projects.vercel.app",
+      "timestamp": "2026-05-05T20:54:34.279Z",
+      "deployedCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
+      "deployedCommitMessage": "oracle: sync live session-gated status",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "d7b38529abcb60d558567cbf431b4674c6d9bb6b",
+      "sourceCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
       "syncState": "in-sync",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
@@ -390,12 +390,12 @@
       "project": "galaxy",
       "event": "deploy",
       "state": "READY",
-      "url": "https://galaxy-kuukse2ti-pasuthun-junkongs-projects.vercel.app",
-      "timestamp": "2026-05-05T15:12:13.609Z",
-      "deployedCommitSha": "d7b38529abcb60d558567cbf431b4674c6d9bb6b",
-      "deployedCommitMessage": "oracle: add signed session gate and feedback loop",
+      "url": "https://galaxy-2y6v29vnu-pasuthun-junkongs-projects.vercel.app",
+      "timestamp": "2026-05-05T20:10:21.563Z",
+      "deployedCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
+      "deployedCommitMessage": "oracle: sync live session-gated status",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "d7b38529abcb60d558567cbf431b4674c6d9bb6b",
+      "sourceCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
       "syncState": "in-sync",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
@@ -404,11 +404,11 @@
       "project": "Moshe",
       "event": "commit",
       "state": "uncommitted-changes",
-      "timestamp": "2026-05-05T17:47:57+07:00",
+      "timestamp": "2026-05-06T01:42:24+07:00",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "d7b38529abcb60d558567cbf431b4674c6d9bb6b",
+      "sourceCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
       "syncState": "behind",
-      "note": "oracle: add signed session gate and feedback loop"
+      "note": "oracle: sync live session-gated status"
     },
     {
       "provider": "git",

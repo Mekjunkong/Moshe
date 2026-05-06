@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   appendAuditEntry,
@@ -60,6 +61,41 @@ function getPolicy() {
 
 function writeAudit(auditPath, entry) {
   appendAuditEntry(auditPath, entry)
+}
+
+function readAuditEntries(auditPath, limit = 12) {
+  if (!existsSync(auditPath)) return []
+  try {
+    return readFileSync(auditPath, 'utf8')
+      .split('\n')
+      .filter(Boolean)
+      .slice(-limit)
+      .reverse()
+      .map((line, index) => {
+        try {
+          const parsed = JSON.parse(line)
+          return {
+            id: parsed.requestId || `audit-${index}`,
+            requestedAt: parsed.at || parsed.requestedAt || new Date(0).toISOString(),
+            actor: parsed.actor || 'unknown',
+            actionId: parsed.actionId || 'unknown',
+            outcome: parsed.outcome || 'unknown',
+            detail: parsed.detail || parsed.error || 'No detail recorded.',
+          }
+        } catch {
+          return {
+            id: `audit-${index}`,
+            requestedAt: new Date(0).toISOString(),
+            actor: 'unknown',
+            actionId: 'parse-error',
+            outcome: 'denied',
+            detail: 'Audit entry could not be parsed.',
+          }
+        }
+      })
+  } catch {
+    return []
+  }
 }
 
 function readBody(req) {
@@ -124,12 +160,23 @@ export default async function handler(req, res) {
   const policy = getPolicy()
   const requestId = randomUUID()
 
+  if (req.method === 'GET') {
+    return responseJson(res, 200, {
+      ok: true,
+      requestId,
+      message: 'Oracle action policy and bounded audit trail loaded.',
+      policy,
+      actions: policy.actions,
+      auditTrail: readAuditEntries(policy.auditPath),
+    })
+  }
+
   if (req.method !== 'POST') {
     return responseJson(res, 405, {
       ok: false,
       requestId,
       error: 'method_not_allowed',
-      allowedMethods: ['POST'],
+      allowedMethods: ['GET', 'POST'],
     })
   }
 
@@ -278,6 +325,7 @@ export default async function handler(req, res) {
           policy,
           action,
           reason: reason || undefined,
+          auditTrail: readAuditEntries(policy.auditPath),
           output: execution.output,
           session: {
             actor: session.actor || 'Mike',
@@ -330,6 +378,7 @@ export default async function handler(req, res) {
           policy,
           action,
           reason: reason || undefined,
+          auditTrail: readAuditEntries(policy.auditPath),
           repo: execution.repo,
           workflow: execution.workflow,
           ref: execution.ref,
@@ -382,6 +431,7 @@ export default async function handler(req, res) {
     policy,
     action,
     reason: reason || undefined,
+    auditTrail: readAuditEntries(policy.auditPath),
     nextStep: 'Add a Mike-only signed session cookie before enabling browser execution.',
   })
 }

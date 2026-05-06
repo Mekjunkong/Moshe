@@ -16,10 +16,19 @@ interface OracleActionManifestItem {
   requiresConfirmation: boolean
 }
 
+interface OracleActionAuditEntry {
+  id: string
+  requestedAt: string
+  actor: string
+  actionId: string
+  outcome: 'allowed' | 'denied' | 'preview' | string
+  detail: string
+}
+
 interface OracleActionPreviewResponse {
   ok: boolean
   requestId?: string
-  decision?: 'preview' | 'executed'
+  decision?: 'preview' | 'executed' | 'queued'
   message?: string
   error?: string
   nextStep?: string
@@ -30,6 +39,7 @@ interface OracleActionPreviewResponse {
     actor: string
     expiresAt: string
   }
+  auditTrail?: OracleActionAuditEntry[]
 }
 
 interface OracleSessionResponse {
@@ -105,6 +115,7 @@ function syncBadgeClass(syncState?: string) {
 }
 
 const tabs = [
+  { id: 'today', label: 'Today', alert: true },
   { id: 'intel', label: 'Intel', alert: true },
   { id: 'overview', label: 'Overview' },
   { id: 'sites', label: 'Sites' },
@@ -116,7 +127,7 @@ const tabs = [
 export default function OracleCommandCenter({ data }: Props) {
   const [oracleRefreshNonce, setOracleRefreshNonce] = useState(0)
   const oracle = useOracleLiveData(oracleRefreshNonce)
-  const [tab, setTab] = useState<'intel' | 'overview' | 'sites' | 'repos' | 'sensors' | 'learnings'>('intel')
+  const [tab, setTab] = useState<'today' | 'intel' | 'overview' | 'sites' | 'repos' | 'sensors' | 'learnings'>('today')
   const [previewReason, setPreviewReason] = useState('Refresh the Oracle snapshot before any future action.')
   const [previewState, setPreviewState] = useState<{
     status: 'idle' | 'loading' | 'ready' | 'error'
@@ -127,6 +138,7 @@ export default function OracleCommandCenter({ data }: Props) {
     result: null,
     detail: '',
   })
+  const [actionAuditTrail, setActionAuditTrail] = useState<OracleActionAuditEntry[]>([])
   const [sessionPassphrase, setSessionPassphrase] = useState('')
   const [sessionState, setSessionState] = useState<OracleSessionState>({
     status: 'loading',
@@ -176,6 +188,23 @@ export default function OracleCommandCenter({ data }: Props) {
       })
     return () => controller.abort()
   }, [])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    fetch(oracle.automation?.endpoint ?? '/api/oracle/actions', {
+      method: 'GET',
+      credentials: 'include',
+      signal: controller.signal,
+    })
+      .then((response) => response.json() as Promise<OracleActionPreviewResponse>)
+      .then((payload) => {
+        if (payload?.auditTrail) setActionAuditTrail(payload.auditTrail)
+      })
+      .catch((error: Error) => {
+        if (error.name !== 'AbortError') console.warn('Oracle action audit unavailable', error.message)
+      })
+    return () => controller.abort()
+  }, [oracle.automation?.endpoint, oracleRefreshNonce])
 
   const unlockSession = async () => {
     setSessionState((current) => ({
@@ -246,59 +275,11 @@ export default function OracleCommandCenter({ data }: Props) {
     }
   }
 
-  const runSnapshotPreview = async () => {
-    const actionId = 'refresh-oracle-snapshot'
+  const runOracleAction = async (actionId: string, mode: 'preview' | 'execute') => {
     const action = oracle.automation?.actions.find((item) => item.id === actionId) ?? null
-    setPreviewState({ status: 'loading', result: null, detail: 'Sending preview request…' })
+    const actionTitle = action?.title ?? actionId
 
-    try {
-      const response = await fetch(oracle.automation?.endpoint ?? '/api/oracle/actions', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          actionId,
-          mode: 'preview',
-          confirm: true,
-          reason: previewReason,
-        }),
-      })
-
-      const payload = (await response.json().catch(() => null)) as OracleActionPreviewResponse | null
-      if (!response.ok || !payload) {
-        throw new Error(payload?.message ?? payload?.error ?? `HTTP ${response.status}`)
-      }
-
-      setPreviewState({
-        status: 'ready',
-        result: { ...payload, source: 'live-api' },
-        detail: payload.message ?? 'Preview accepted from the live action API.',
-      })
-      return
-    } catch (error) {
-      const fallback: OracleActionPreviewResponse = {
-        ok: true,
-        requestId: `local-preview-${Date.now()}`,
-        decision: 'preview',
-        message: 'Local preview generated from the dashboard manifest because the API endpoint was not reachable in this environment.',
-        nextStep: 'Deploy the action API to a serverless environment to use the live preview endpoint.',
-        source: 'local-fallback',
-        action: action ?? undefined,
-        policy: oracle.automation,
-      }
-
-      setPreviewState({
-        status: 'error',
-        result: fallback,
-        detail: error instanceof Error ? error.message : 'Preview request failed.',
-      })
-    }
-  }
-
-  const runSnapshotExecute = async () => {
-    const actionId = 'refresh-oracle-snapshot'
-    const action = oracle.automation?.actions.find((item) => item.id === actionId) ?? null
-    if (sessionState.status !== 'authenticated') {
+    if (mode === 'execute' && sessionState.status !== 'authenticated') {
       setPreviewState({
         status: 'error',
         result: {
@@ -313,7 +294,11 @@ export default function OracleCommandCenter({ data }: Props) {
       return
     }
 
-    setPreviewState({ status: 'loading', result: null, detail: 'Sending execute request…' })
+    setPreviewState({
+      status: 'loading',
+      result: null,
+      detail: `${mode === 'execute' ? 'Executing' : 'Previewing'} ${actionTitle}…`,
+    })
 
     try {
       const response = await fetch(oracle.automation?.endpoint ?? '/api/oracle/actions', {
@@ -322,7 +307,7 @@ export default function OracleCommandCenter({ data }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           actionId,
-          mode: 'execute',
+          mode,
           confirm: true,
           reason: previewReason,
         }),
@@ -336,11 +321,31 @@ export default function OracleCommandCenter({ data }: Props) {
       setPreviewState({
         status: 'ready',
         result: { ...payload, source: 'live-api' },
-        detail: payload.message ?? 'Oracle action executed.',
+        detail: payload.message ?? `${actionTitle} ${mode === 'execute' ? 'executed' : 'previewed'}.`,
       })
-      setOracleRefreshNonce((n) => n + 1)
+      if (payload.auditTrail) setActionAuditTrail(payload.auditTrail)
+      if (mode === 'execute') setOracleRefreshNonce((n) => n + 1)
       return
     } catch (error) {
+      if (mode === 'preview') {
+        const fallback: OracleActionPreviewResponse = {
+          ok: true,
+          requestId: `local-preview-${Date.now()}`,
+          decision: 'preview',
+          message: 'Local preview generated from the dashboard manifest because the API endpoint was not reachable in this environment.',
+          nextStep: 'Deploy the action API to a serverless environment to use the live preview endpoint.',
+          source: 'local-fallback',
+          action: action ?? undefined,
+          policy: oracle.automation,
+        }
+        setPreviewState({
+          status: 'error',
+          result: fallback,
+          detail: error instanceof Error ? error.message : 'Preview request failed.',
+        })
+        return
+      }
+
       setPreviewState({
         status: 'error',
         result: {
@@ -356,6 +361,9 @@ export default function OracleCommandCenter({ data }: Props) {
     }
   }
 
+  const runSnapshotPreview = () => runOracleAction('refresh-oracle-snapshot', 'preview')
+  const runSnapshotExecute = () => runOracleAction('refresh-oracle-snapshot', 'execute')
+
   const previewAction = previewState.result?.action ?? oracle.automation?.actions[0] ?? null
   const projectNodes = data.documents.filter((d) => d.clusterId === 'projects').length
   const memoryNodes = data.documents.filter((d) => d.clusterId === 'memory').length
@@ -369,6 +377,32 @@ export default function OracleCommandCenter({ data }: Props) {
   const oracleModeLabel = oracle.automation?.sessionConfigured
     ? 'PHASE 3B · SESSION-GATED ACTIONS'
     : 'PHASE 2A · READ ONLY'
+  const wiroSite = oracle.websites.find((site) => site.name.toLowerCase().includes('wiro'))
+  const wiroGithub = oracle.github.find((repo) => repo.repo.toLowerCase().includes('wiro'))
+  const highPriorityRecommendations = (oracle.recommendations ?? []).slice(0, 5)
+  const projectWarnings = [
+    ...(oracle.incidents ?? []).map((incident) => ({
+      id: incident.id,
+      title: incident.title,
+      project: incident.project,
+      detail: incident.detail,
+      severity: incident.severity,
+      url: incident.url,
+    })),
+    ...oracle.repos.filter((repo) => repo.dirty).slice(0, 4).map((repo) => ({
+      id: `dirty-${repo.name}`,
+      title: `${repo.name} has local changes`,
+      project: repo.name,
+      detail: `${repo.changedFiles} changed files on ${repo.branch}. Review before deploy/commit.`,
+      severity: 'warning' as const,
+      url: repo.github,
+    })),
+  ].slice(0, 6)
+  const reportSchedule = [
+    { label: 'Morning command brief', cadence: 'Daily · 08:00', detail: 'Top actions, website health, Wiro CI, repo warnings.' },
+    { label: 'Wiro business pulse', cadence: 'Daily · 18:00', detail: 'Guest leads, site status, quote/itinerary opportunities.' },
+    { label: 'Weekly Oracle review', cadence: 'Monday · 09:00', detail: 'Projects, memory, deployments, learnings, next bets.' },
+  ]
 
   return (
     <aside className="oracle-shell" aria-label="Oracle OS command center">
@@ -410,14 +444,93 @@ export default function OracleCommandCenter({ data }: Props) {
             aria-controls={`oracle-panel-${t.id}`}
             aria-selected={tab === t.id}
             tabIndex={tab === t.id ? 0 : -1}
-            className={`oracle-tab${tab === t.id ? ' active' : ''}${t.id === 'intel' && criticalIncidents > 0 ? ' has-alert' : ''}`}
+            className={`oracle-tab${tab === t.id ? ' active' : ''}${(t.id === 'intel' || t.id === 'today') && criticalIncidents > 0 ? ' has-alert' : ''}`}
             onClick={() => setTab(t.id)}
           >
             {t.label}
-            {t.id === 'intel' && criticalIncidents > 0 && <span className="oracle-tab-dot" aria-hidden="true" />}
+            {(t.id === 'intel' || t.id === 'today') && criticalIncidents > 0 && <span className="oracle-tab-dot" aria-hidden="true" />}
           </button>
         ))}
       </div>
+
+      {/* ── Today tab ── */}
+      {tab === 'today' && (
+        <section id="oracle-panel-today" role="tabpanel" aria-labelledby="oracle-tab-today" className="oracle-section oracle-scroll">
+          <div className="oracle-today-hero">
+            <div>
+              <p>Mike command center</p>
+              <h2>Today</h2>
+              <small>Generated {timeAgo(oracle.generated)} · {onlineSites}/{oracle.websites.length || 0} sites online · {dirtyRepos} dirty repos</small>
+            </div>
+            <span className={`oracle-risk-badge ${criticalIncidents > 0 ? 'high' : projectWarnings.length > 0 ? 'medium' : 'low'}`}>
+              {criticalIncidents > 0 ? 'ACTION NEEDED' : projectWarnings.length > 0 ? 'WATCH' : 'CLEAR'}
+            </span>
+          </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>TOP 5 RECOMMENDED ACTIONS</p>
+            <span>{highPriorityRecommendations.length || 0} ready</span>
+          </div>
+          {highPriorityRecommendations.length > 0 ? (
+            <ol className="oracle-today-actions">
+              {highPriorityRecommendations.map((rec, idx) => (
+                <li key={`${rec.project}-${idx}`}>
+                  <span>{idx + 1}</span>
+                  <div>
+                    <strong>{rec.suggestedAction}</strong>
+                    <small>{rec.project} · {rec.priority.toUpperCase()} priority · {rec.risk.toUpperCase()} risk</small>
+                    <p>{rec.reason}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <div className="oracle-live-card"><strong>No urgent recommendation</strong><small className="oracle-muted">Oracle did not detect a high-value action in the current snapshot.</small></div>
+          )}
+
+          <div className="oracle-today-grid">
+            <article className={`oracle-status-card ${wiroSite?.ok && oracle.wiroCi?.conclusion !== 'failure' ? 'ok' : 'warn'}`}>
+              <div className="oracle-status-head">
+                <strong>Wiro cockpit</strong>
+                <span>{wiroSite?.ok ? 'SITE ONLINE' : 'CHECK SITE'}</span>
+              </div>
+              <div className="oracle-wiro-row"><span>Website</span><code>{wiroSite?.status ?? '—'} · {wiroSite?.responseMs ? `${wiroSite.responseMs}ms` : '—'}</code></div>
+              <div className="oracle-wiro-row"><span>CI</span><code>{oracle.wiroCi?.conclusion ?? oracle.wiroCi?.status ?? 'no data'}</code></div>
+              <div className="oracle-wiro-row"><span>GitHub</span><code>{wiroGithub?.apiStatus ?? 'no data'}</code></div>
+              <p className="oracle-wiro-opp">Watch the tour website, Wiro CI, and GitHub health as one business cockpit.</p>
+              {wiroSite?.url && isHttpUrl(wiroSite.url) && <a href={wiroSite.url} target="_blank" rel="noopener noreferrer" className="oracle-link">Open Wiro ↗</a>}
+            </article>
+
+            <article className="oracle-status-card warn">
+              <div className="oracle-status-head">
+                <strong>Project warnings</strong>
+                <span>{projectWarnings.length}</span>
+              </div>
+              {projectWarnings.length > 0 ? projectWarnings.slice(0, 4).map((warning) => (
+                <div className="oracle-warning-line" key={warning.id}>
+                  <strong>{warning.project}</strong>
+                  <small>{warning.title}</small>
+                  <p>{warning.detail}</p>
+                </div>
+              )) : <small className="oracle-muted">No project warnings in this snapshot.</small>}
+            </article>
+          </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>NEXT REPORTS</p>
+            <span>{reportSchedule.length} scheduled templates</span>
+          </div>
+          <div className="oracle-report-grid">
+            {reportSchedule.map((report) => (
+              <article className="oracle-report-card" key={report.label}>
+                <strong>{report.label}</strong>
+                <span>{report.cadence}</span>
+                <p>{report.detail}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── Intel tab ── */}
       {tab === 'intel' && (
@@ -764,8 +877,41 @@ export default function OracleCommandCenter({ data }: Props) {
                     <small>
                       {action.transport} · {action.requiresConfirmation ? 'confirmation required' : 'no confirmation'}
                     </small>
+                    <div className="oracle-action-buttons">
+                      <button type="button" className="oracle-session-secondary" onClick={() => runOracleAction(action.id, 'preview')} disabled={previewState.status === 'loading'}>
+                        Preview
+                      </button>
+                      <button type="button" className="oracle-preview-button" onClick={() => runOracleAction(action.id, 'execute')} disabled={sessionState.status !== 'authenticated' || previewState.status === 'loading'}>
+                        Execute
+                      </button>
+                    </div>
                   </article>
                 ))}
+              </div>
+              <div className="oracle-audit-panel">
+                <div className="oracle-preview-head">
+                  <div>
+                    <strong>Audit trail</strong>
+                    <p>Last server-side action decisions. Secrets and passphrases are never shown here.</p>
+                  </div>
+                  <span className="oracle-risk-badge low">{actionAuditTrail.length} EVENTS</span>
+                </div>
+                {actionAuditTrail.length > 0 ? (
+                  <div className="oracle-audit-list">
+                    {actionAuditTrail.slice(0, 8).map((entry) => (
+                      <div className="oracle-audit-row" key={entry.id}>
+                        <span className={`oracle-risk-badge ${entry.outcome === 'denied' ? 'medium' : 'low'}`}>{entry.outcome.toUpperCase()}</span>
+                        <div>
+                          <strong>{entry.actionId}</strong>
+                          <small>{entry.actor} · {timeAgo(entry.requestedAt)}</small>
+                          <p>{entry.detail}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <small className="oracle-muted">No action audit events available from this runtime yet.</small>
+                )}
               </div>
             </article>
           ) : (
