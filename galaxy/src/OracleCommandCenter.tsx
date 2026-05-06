@@ -693,6 +693,8 @@ export default function OracleCommandCenter({ data }: Props) {
                   </div>
                   <p>{lane.summary}</p>
                   <small>{lane.examples.slice(0, 3).join(' · ')}</small>
+                  {lane.allowedWork?.length > 0 && <small>Allowed: {lane.allowedWork.slice(0, 2).join(' · ')}</small>}
+                  {lane.blockedWork?.length > 0 && <small>Blocked: {lane.blockedWork.slice(0, 2).join(' · ')}</small>}
                 </article>
               ))}
             </div>
@@ -745,8 +747,10 @@ export default function OracleCommandCenter({ data }: Props) {
                     {item.category === 'safe' ? 'SAFE NOW' : item.category === 'draft-only' ? 'DRAFT ONLY' : 'APPROVAL'}
                   </span>
                 </div>
-                <p>{item.reason}</p>
-                <small>{item.proposedAction}</small>
+                <p>{item.riskReason ?? item.reason}</p>
+                <small>{item.nextSafeStep ?? item.proposedAction}</small>
+                {item.businessArea && <small>{item.businessArea} · {item.autonomyLevel ?? item.category}</small>}
+                {item.approvalTrigger && <small>{item.approvalTrigger}</small>}
               </article>
             ))}
           </div>

@@ -219,11 +219,17 @@ export interface OracleOpportunityRadarItem {
 }
 
 export interface OracleApprovalQueueItem {
+  id?: string
   title: string
   category: 'safe' | 'draft-only' | 'approval-required'
+  autonomyLevel?: 'safe_now' | 'draft_only' | 'approval_required'
+  businessArea?: 'oracle_os' | 'wiro_growth' | 'deploy_reliability' | 'business_opportunity' | 'memory_continuity' | 'customer_or_public'
   risk: 'low' | 'medium' | 'high'
+  riskReason?: string
   reason: string
   proposedAction: string
+  nextSafeStep?: string
+  approvalTrigger?: string
   source: string
 }
 
@@ -234,13 +240,31 @@ export interface OracleAutonomyRouterLane {
   summary: string
   examples: string[]
   count: number
+  canExecute: boolean
+  allowedWork: string[]
+  blockedWork: string[]
+}
+
+export interface OracleAutonomyRouterDecision {
+  id: string
+  title: string
+  autonomyLevel: 'safe_now' | 'draft_only' | 'approval_required'
+  businessArea: string
+  risk: 'low' | 'medium' | 'high'
+  riskReason: string
+  nextSafeStep: string
+  approvalTrigger: string
+  source: string
 }
 
 export interface OracleAutonomyRouter {
   updatedAt: string
+  phase: 'phase_4'
   summary: string
   lanes: OracleAutonomyRouterLane[]
+  decisions: OracleAutonomyRouterDecision[]
   guardrails: string[]
+  phase5Requirements: string[]
 }
 
 export interface OracleTerminalPolicy {
@@ -403,9 +427,12 @@ export const ORACLE_FALLBACK_DATA: OracleData = {
     approvalQueue: [],
     autonomyRouter: {
       updatedAt: new Date(0).toISOString(),
+      phase: 'phase_4',
       summary: 'Waiting for the first autonomy router snapshot.',
       lanes: [],
+      decisions: [],
       guardrails: [],
+      phase5Requirements: [],
     },
   },
   terminal: {

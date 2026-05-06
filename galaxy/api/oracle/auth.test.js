@@ -143,6 +143,8 @@ describe('oracle action gate', () => {
     assert.ok(Array.isArray(payload.actions))
     assert.ok(Array.isArray(payload.auditTrail))
     assert.equal(payload.policy.executionMode, 'server-enabled')
+    assert.equal(payload.policy.autonomyRouter.phase, 'phase_4')
+    assert.equal(payload.actions.find((action) => action.id === 'dispatch-wiro-ci').autonomyLevel, 'approval_required')
   })
 
   test('execute mode is rejected without a session', async () => {
@@ -164,7 +166,7 @@ describe('oracle action gate', () => {
     assert.equal(payload.error, 'unauthorized')
   })
 
-  test('execute mode reaches the allowlist when a valid session cookie is present', async () => {
+  test('approval-required execute mode is blocked without explicit Mike approval', async () => {
     const token = createSessionToken('test-session-secret', 'Mike', 60_000)
     const res = createRes()
     await oracleActionsHandler(
@@ -176,6 +178,30 @@ describe('oracle action gate', () => {
           actionId: 'dispatch-wiro-ci',
           mode: 'execute',
           confirm: true,
+          reason: 'router check',
+        },
+      }),
+      res,
+    )
+
+    const payload = readJson(res)
+    assert.equal(res.statusCode, 428)
+    assert.equal(payload.error, 'approval_required')
+  })
+
+  test('execute mode reaches the allowlist when a valid session cookie and Mike approval are present', async () => {
+    const token = createSessionToken('test-session-secret', 'Mike', 60_000)
+    const res = createRes()
+    await oracleActionsHandler(
+      createReq({
+        headers: {
+          cookie: `${SESSION_COOKIE_NAME}=${token}`,
+        },
+        body: {
+          actionId: 'dispatch-wiro-ci',
+          mode: 'execute',
+          confirm: true,
+          approvedByMike: true,
           reason: 'gate check',
         },
       }),

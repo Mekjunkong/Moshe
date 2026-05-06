@@ -248,6 +248,30 @@ function deriveOpportunityRadar() {
   return items;
 }
 
+const AUTONOMY_LEVEL_BY_CATEGORY = {
+  safe: 'safe_now',
+  'draft-only': 'draft_only',
+  'approval-required': 'approval_required',
+};
+
+function enrichQueueItem(item, index) {
+  const autonomyLevel = AUTONOMY_LEVEL_BY_CATEGORY[item.category] || 'approval_required';
+  const approvalTrigger = autonomyLevel === 'safe_now'
+    ? 'No approval needed if the action stays read-only, internal, reversible, and secret-safe.'
+    : autonomyLevel === 'draft_only'
+      ? 'Mike approval required before publishing, sending, deploying, spending, or contacting anyone.'
+      : 'Mike approval required before execution.';
+  return {
+    id: item.id || `${autonomyLevel}-${index + 1}`,
+    autonomyLevel,
+    businessArea: item.businessArea || 'oracle_os',
+    riskReason: item.riskReason || item.reason,
+    nextSafeStep: item.nextSafeStep || item.proposedAction,
+    approvalTrigger,
+    ...item,
+  };
+}
+
 function deriveApprovalQueue(opportunityRadar) {
   const outreachPath = join(MOSHE_ROOT, 'outbox/one-person-business/ai-booking-assistant-first-outreach-pack.md');
   const landingPath = join(MOSHE_ROOT, 'outbox/one-person-business/ai-booking-assistant-landing-page-copy.md');
@@ -256,70 +280,103 @@ function deriveApprovalQueue(opportunityRadar) {
   const top = opportunityRadar[0];
   const queue = [
     {
+      id: 'safe-demo-pack',
       title: 'Build internal Wiro-style demo pack',
       category: 'safe',
+      businessArea: 'business_opportunity',
       risk: 'low',
       reason: 'Uses synthetic/Wiro-style examples only and does not contact external leads.',
       proposedAction: 'Create 5 sample inquiries and AI draft replies for the top offer.',
+      nextSafeStep: 'Draft the demo pack locally in outbox with synthetic examples only.',
       source: top?.source || 'Oracle intelligence layer',
     },
     {
+      id: 'draft-landing-roi',
       title: 'Prepare landing page and ROI calculator drafts',
       category: 'draft-only',
+      businessArea: 'business_opportunity',
       risk: 'low',
       reason: 'Draft artifacts increase speed to validation but do not publish or contact customers.',
       proposedAction: hasLanding ? 'Review the existing landing copy and improve the offer proof stack.' : 'Draft landing page copy, ROI calculator, and demo script for Mike review.',
+      nextSafeStep: hasLanding ? 'Improve the private draft only.' : 'Create private copy/calculator drafts only.',
       source: hasLanding ? 'outbox/one-person-business/ai-booking-assistant-landing-page-copy.md' : 'Oracle intelligence layer',
     },
     {
+      id: 'approve-top-opportunity',
       title: 'Review top opportunity direction',
       category: 'approval-required',
+      businessArea: 'business_opportunity',
       risk: 'medium',
       reason: top ? `${top.title} is currently ranked ${top.score}/100.` : 'Opportunity radar needs Mike direction before public execution.',
       proposedAction: top ? `Mike approves whether to validate: ${top.title}.` : 'Mike chooses the first niche to validate.',
+      nextSafeStep: 'Prepare options and evidence for Mike, but do not contact prospects.',
       source: top?.source || 'Oracle intelligence layer',
     },
     {
+      id: 'approval-outreach-send',
       title: 'Send first outreach batch',
       category: 'approval-required',
+      businessArea: 'customer_or_public',
       risk: 'medium',
       reason: hasOutreach ? 'Outreach pack exists, but messages must not be sent without Mike approval.' : 'Outreach requires approved copy and lead list first.',
       proposedAction: 'Approve target niche, message wording, and daily message limit before any sending.',
+      nextSafeStep: 'Keep outreach as a draft and wait for explicit Mike approval.',
       source: 'outbox/one-person-business/ai-booking-assistant-first-outreach-pack.md',
     },
     {
+      id: 'approval-publish-landing',
       title: 'Publish landing page copy',
       category: 'approval-required',
+      businessArea: 'customer_or_public',
       risk: 'medium',
       reason: hasLanding ? 'Landing copy exists but public publishing affects brand and offer positioning.' : 'Landing copy can be drafted safely first.',
       proposedAction: hasLanding ? 'Mike reviews copy, pricing, promise, and CTA before publish.' : 'Draft landing page copy as a safe artifact.',
+      nextSafeStep: hasLanding ? 'Prepare review checklist for Mike.' : 'Draft private landing copy only.',
       source: 'outbox/one-person-business/ai-booking-assistant-landing-page-copy.md',
     },
   ];
-  return queue;
+  return queue.map(enrichQueueItem);
 }
 
 function deriveAutonomyRouter(approvalQueue) {
   const count = (category) => approvalQueue.filter((item) => item.category === category).length;
+  const decisions = approvalQueue.map((item) => ({
+    id: item.id,
+    title: item.title,
+    autonomyLevel: item.autonomyLevel,
+    businessArea: item.businessArea,
+    risk: item.risk,
+    riskReason: item.riskReason,
+    nextSafeStep: item.nextSafeStep,
+    approvalTrigger: item.approvalTrigger,
+    source: item.source,
+  }));
   return {
     updatedAt: new Date().toISOString(),
-    summary: 'Oracle routes every autonomous idea into safe_now, draft_only, or approval_required before execution.',
+    phase: 'phase_4',
+    summary: 'Phase 4 is active: Oracle classifies every recommendation before action and keeps execution behind safe/draft/approval lanes.',
     lanes: [
       {
         id: 'safe_now',
         label: 'safe_now',
         status: 'active',
-        summary: 'Moshe can execute without interrupting Mike when the work is read-only, reversible, internal, or draft-generation only with no external side effect.',
+        summary: 'Moshe can execute without interrupting Mike only when work is read-only, reversible, internal, or safe draft-generation with no external side effect.',
         examples: ['read-only research', 'local verification', 'internal demo artifacts', 'dashboard copy/UI improvements'],
         count: count('safe'),
+        canExecute: true,
+        allowedWork: ['read local/project files', 'run tests/builds/checks', 'write internal markdown/json artifacts', 'draft private assets'],
+        blockedWork: ['customer contact', 'public publish', 'spend money', 'delete/cleanup unknown files', 'force push'],
       },
       {
         id: 'draft_only',
         label: 'draft_only',
         status: 'guarded',
-        summary: 'Moshe may prepare the asset but must not publish, send, spend, deploy risky changes, or contact anyone.',
+        summary: 'Moshe may prepare assets but must stop before publish/send/spend/deploy/contact.',
         examples: ['landing page draft', 'outreach message draft', 'ROI calculator draft', 'lead list draft'],
         count: count('draft-only'),
+        canExecute: false,
+        allowedWork: ['prepare private drafts', 'organize evidence', 'create review checklist'],
+        blockedWork: ['send the draft', 'publish the page', 'commit/push/deploy public workflow changes without Mike approval'],
       },
       {
         id: 'approval_required',
@@ -328,13 +385,26 @@ function deriveAutonomyRouter(approvalQueue) {
         summary: 'Mike approval is required before anything customer-facing, public, paid, destructive, cleanup/delete, commit/push, deploy, or outbound.',
         examples: ['send outreach', 'publish page', 'spend money', 'commit/push/deploy', 'delete/cleanup files'],
         count: count('approval-required'),
+        canExecute: false,
+        allowedWork: ['summarize options for Mike', 'prepare rollback/verification plan'],
+        blockedWork: ['execute without explicit approval', 'expose secrets', 'change live business workflow'],
       },
     ],
+    decisions,
     guardrails: [
+      'Classify every recommendation before execution.',
       'Never send customer-facing messages without Mike approval.',
       'Never spend money, subscribe, or publish publicly without Mike approval.',
       'Never delete/cleanup unknown files or force push.',
       'Never expose secrets; show configured/missing only.',
+      'Commit/push/deploy only when Mike explicitly approves that scope.',
+    ],
+    phase5Requirements: [
+      'Signal Quality / Feedback Ledger records whether proactive outputs are useful or noisy.',
+      'Deployment Freshness Gap sensor compares live production, git HEAD, and local snapshot age.',
+      'Repo Hygiene / Ship Readiness sensor blocks mixed dirty worktrees from deploy recommendations.',
+      'Evidence Chain extractor turns build/test/smoke/deploy proof into reusable safety facts.',
+      'Safe Executor only runs allowlisted safe_now actions with audit logs and rollback notes.',
     ],
   };
 }
@@ -475,7 +545,11 @@ function oracleAutomationPolicy() {
         title: 'Refresh Oracle snapshot',
         description: 'Regenerate the read-only Oracle data bundle and re-evaluate sensors.',
         transport: 'local-script',
+        autonomyLevel: 'safe_now',
+        businessArea: 'oracle_os',
         risk: 'low',
+        riskReason: 'Local read-only snapshot regeneration; no deploy, no push, no external contact.',
+        nextSafeStep: 'Run generator and inspect JSON before any commit/deploy.',
         requiresConfirmation: true,
       },
       {
@@ -483,7 +557,11 @@ function oracleAutomationPolicy() {
         title: 'Dispatch Wiro CI',
         description: 'Trigger the allowlisted GitHub workflow that verifies Wiro4x4 health.',
         transport: 'github-api',
+        autonomyLevel: 'approval_required',
+        businessArea: 'deploy_reliability',
         risk: 'medium',
+        riskReason: 'Creates an external GitHub event and consumes CI minutes.',
+        nextSafeStep: 'Preview the workflow request and wait for Mike approval before dispatch.',
         requiresConfirmation: true,
       },
       {
@@ -491,7 +569,11 @@ function oracleAutomationPolicy() {
         title: 'Request Vercel redeploy',
         description: 'Ask Vercel to redeploy the Oracle dashboard after a confirmed change.',
         transport: 'vercel-api',
+        autonomyLevel: 'approval_required',
+        businessArea: 'deploy_reliability',
         risk: 'medium',
+        riskReason: 'Changes live production surface and must be tied to verified commits/artifacts.',
+        nextSafeStep: 'Prepare deployment evidence and wait for Mike approval.',
         requiresConfirmation: true,
       },
     ],
@@ -1097,7 +1179,7 @@ const intelligenceLayer = deriveIntelligenceLayer(active);
 const data = {
   generated: generatedAt,
   born: '2026-04-18',
-  level3Phase: 'Phase 3B: Feedback loop — audit-derived learnings, auth, allowlist, audit log, preview mode',
+  level3Phase: 'Phase 4: Autonomy Router — every recommendation classified into safe_now, draft_only, or approval_required before action',
   stats: {
     learnings: learnings.length,
     retrospectives: retrospectives.length,
@@ -1115,7 +1197,7 @@ const data = {
       name: 'Moshe Oracle OS',
       url: process.env.ORACLE_DASHBOARD_URL || '',
       status: 'Building',
-      note: 'Phase 3A active: server-side action API foundation, auth, allowlist, audit log.',
+      note: 'Phase 4 active: autonomy router classifies recommendations before action; Phase 5 needs feedback ledger, freshness sensors, and safe executor loops.',
       accent: 'orange',
     },
     {

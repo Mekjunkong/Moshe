@@ -20,7 +20,11 @@ const ACTIONS = [
     title: 'Refresh Oracle snapshot',
     description: 'Regenerate the read-only Oracle data bundle and re-evaluate sensors.',
     transport: 'local-script',
+    autonomyLevel: 'safe_now',
+    businessArea: 'oracle_os',
     risk: 'low',
+    riskReason: 'Local read-only snapshot regeneration; no deploy, no push, no external contact.',
+    nextSafeStep: 'Run the generator and inspect the JSON diff before any commit/deploy.',
     requiresConfirmation: true,
   },
   {
@@ -28,7 +32,11 @@ const ACTIONS = [
     title: 'Dispatch Wiro CI',
     description: 'Trigger the allowlisted GitHub workflow that verifies Wiro4x4 health.',
     transport: 'github-api',
+    autonomyLevel: 'approval_required',
+    businessArea: 'deploy_reliability',
     risk: 'medium',
+    riskReason: 'Creates an external GitHub event and consumes CI minutes.',
+    nextSafeStep: 'Preview the workflow request, then wait for Mike approval before dispatch.',
     requiresConfirmation: true,
   },
   {
@@ -36,10 +44,33 @@ const ACTIONS = [
     title: 'Request Vercel redeploy',
     description: 'Ask Vercel to redeploy the Oracle dashboard after a confirmed change.',
     transport: 'vercel-api',
+    autonomyLevel: 'approval_required',
+    businessArea: 'deploy_reliability',
     risk: 'medium',
+    riskReason: 'Changes live production surface and must be tied to verified commits/artifacts.',
+    nextSafeStep: 'Prepare deployment evidence and wait for Mike approval.',
     requiresConfirmation: true,
   },
 ]
+
+function getAutonomyRouter() {
+  const count = (level) => ACTIONS.filter((action) => action.autonomyLevel === level).length
+  return {
+    phase: 'phase_4',
+    summary: 'Every API action is classified before execution; approval_required actions stay blocked unless Mike explicitly approves and a signed session is present.',
+    lanes: [
+      { id: 'safe_now', count: count('safe_now'), canExecute: true },
+      { id: 'draft_only', count: count('draft_only'), canExecute: false },
+      { id: 'approval_required', count: count('approval_required'), canExecute: false },
+    ],
+    guardrails: [
+      'signed-session-cookie required for execute mode',
+      'same-origin POST required',
+      'explicit confirm=true required',
+      'approval_required means Mike must approve the specific scope before execution',
+    ],
+  }
+}
 
 function getPolicy() {
   const session = sessionPolicy()
@@ -52,8 +83,9 @@ function getPolicy() {
     authHeader: session.authHeader,
     auditPath: process.env.ORACLE_ACTION_AUDIT_PATH || '/tmp/oracle-action-audit.jsonl',
     executionMode: session.configured ? 'server-enabled' : 'preview-only',
+    autonomyRouter: getAutonomyRouter(),
     note: session.configured
-      ? 'Oracle execute mode is gated by a Mike-only signed session cookie with audit logging.'
+      ? 'Oracle execute mode is gated by a Mike-only signed session cookie with audit logging and Phase 4 autonomy classification.'
       : 'Preview trigger is wired to the action API path. Set ORACLE_SESSION_SECRET to arm Mike-only session-gated execution.',
     actions: ACTIONS,
   }
@@ -204,6 +236,7 @@ export default async function handler(req, res) {
   const actionId = String(body?.actionId ?? '').trim()
   const mode = body?.mode === 'execute' ? 'execute' : 'preview'
   const confirm = body?.confirm === true
+  const approvedByMike = body?.approvedByMike === true
   const reason = String(body?.reason ?? '').trim()
   const action = getAction(actionId)
 
@@ -301,6 +334,28 @@ export default async function handler(req, res) {
         error: 'unauthorized',
         message: 'Mike-only session cookie required for execution.',
         policy,
+      })
+    }
+
+    if (action.autonomyLevel === 'approval_required' && !approvedByMike) {
+      writeAudit(policy.auditPath, {
+        requestId,
+        outcome: 'denied',
+        actor: session.actor || 'Mike',
+        sessionId: session.id,
+        actionId,
+        detail: 'Phase 4 Autonomy Router blocked approval_required execution without approvedByMike=true.',
+        reason,
+        ...auditContext(req),
+      })
+      return responseJson(res, 428, {
+        ok: false,
+        requestId,
+        error: 'approval_required',
+        message: 'Phase 4 Autonomy Router requires explicit Mike approval for this action before execution.',
+        policy,
+        action,
+        nextSafeStep: action.nextSafeStep,
       })
     }
 

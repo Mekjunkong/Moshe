@@ -1,11 +1,11 @@
 {
-  "generated": "2026-05-06T06:40:34.875Z",
+  "generated": "2026-05-06T08:48:14.438Z",
   "born": "2026-04-18",
-  "level3Phase": "Phase 3B: Feedback loop — audit-derived learnings, auth, allowlist, audit log, preview mode",
+  "level3Phase": "Phase 4: Autonomy Router — every recommendation classified into safe_now, draft_only, or approval_required before action",
   "stats": {
-    "learnings": 13,
+    "learnings": 15,
     "retrospectives": 17,
-    "activeProjects": 5,
+    "activeProjects": 6,
     "inboxItems": 1,
     "writingDocs": 0,
     "labExperiments": 0
@@ -33,10 +33,10 @@
       "summary": "Date: 2026-05-06 Learning: A Hermes cron job can report RuntimeError: even when the code/build work succeeded, if the autonomous agent hits the maximu…"
     },
     {
-      "title": "Oracle Intelligence + Terminal Layer — 2026-05-06",
-      "file": "2026-05-06-oracle-intelligence-terminal-layer.md",
+      "title": "Oracle Autonomy Router — 2026-05-06",
+      "file": "2026-05-06-oracle-autonomy-router.md",
       "date": "2026-05-06",
-      "summary": "What changed - Added Oracle Intelligence Layer v1 to Galaxy dashboard:   - Today’s Learnings"
+      "summary": "Learning Oracle autonomous improvement needs explicit routing before execution. Every proposed action should be classified into one of three lanes: 1.…"
     }
   ],
   "retrospectivesCount": 17,
@@ -84,7 +84,7 @@
       "name": "Moshe Oracle OS",
       "url": "",
       "status": "Building",
-      "note": "Phase 3A active: server-side action API foundation, auth, allowlist, audit log.",
+      "note": "Phase 4 active: autonomy router classifies recommendations before action; Phase 5 needs feedback ledger, freshness sensors, and safe executor loops.",
       "accent": "orange"
     },
     {
@@ -115,7 +115,7 @@
       "ok": true,
       "status": 200,
       "responseMs": null,
-      "checkedAt": "2026-05-06T06:40:24.320Z",
+      "checkedAt": "2026-05-06T08:48:03.438Z",
       "note": "local build target; set ORACLE_DASHBOARD_URL after deploy for public uptime checks"
     },
     {
@@ -123,8 +123,8 @@
       "url": "https://aum-hippie-young.vercel.app/",
       "ok": true,
       "status": 200,
-      "responseMs": 206,
-      "checkedAt": "2026-05-06T06:40:24.526Z",
+      "responseMs": 178,
+      "checkedAt": "2026-05-06T08:48:03.616Z",
       "note": "reachable"
     },
     {
@@ -132,8 +132,8 @@
       "url": "https://www.wiro4x4indochina.com/",
       "ok": true,
       "status": 200,
-      "responseMs": 187,
-      "checkedAt": "2026-05-06T06:40:24.529Z",
+      "responseMs": 166,
+      "checkedAt": "2026-05-06T08:48:03.624Z",
       "note": "reachable"
     }
   ],
@@ -142,12 +142,12 @@
       "name": "Moshe",
       "path": "/Users/pasuthunjunkong/workspace/Moshe",
       "branch": "main",
-      "commit": "06f9632",
-      "commitFull": "06f96325f2305145359192ea6fc0b201a4cabb1b",
-      "commitSubject": "oracle: keep intelligence radar populated in production",
+      "commit": "27cd254",
+      "commitFull": "27cd254c574d5cdc389155fe93a9dd16bfcae81a",
+      "commitSubject": "oracle: add autonomy router lanes",
       "dirty": true,
-      "changedFiles": 35,
-      "lastCommitAt": "2026-05-06T13:05:33+07:00",
+      "changedFiles": 37,
+      "lastCommitAt": "2026-05-06T13:40:46+07:00",
       "github": "Mekjunkong/Moshe",
       "remoteHost": "github.com"
     },
@@ -167,18 +167,30 @@
     {
       "name": "Wiro4x4",
       "path": "/Users/pasuthunjunkong/workspace/wiro4x4",
-      "branch": "main",
-      "commit": "f4068dc",
-      "commitFull": "f4068dc84fa3724c1ba34a6449ec82b9132ec4be",
-      "commitSubject": "fix(lint): resolve remaining floating promise warnings (#7)",
+      "branch": "wiro-impeccable-polish",
+      "commit": "f7fc3a3",
+      "commitFull": "f7fc3a387a1238e7017db91c034cafa9425df0f6",
+      "commitSubject": "style: refine Wiro4x4 typography",
       "dirty": true,
-      "changedFiles": 30,
-      "lastCommitAt": "2026-05-04T09:07:10+07:00",
+      "changedFiles": 1,
+      "lastCommitAt": "2026-05-06T14:36:57+07:00",
       "github": "Mekjunkong/Wiro4x4",
       "remoteHost": "github.com"
     }
   ],
   "deployments": [
+    {
+      "provider": "vercel",
+      "project": "galaxy",
+      "state": "READY",
+      "url": "https://galaxy-m4uw7pd92-pasuthun-junkongs-projects.vercel.app",
+      "createdAt": "2026-05-06T06:40:56.392Z",
+      "gitCommitSha": "27cd254c574d5cdc389155fe93a9dd16bfcae81a",
+      "gitCommitMessage": "oracle: add autonomy router lanes",
+      "gitCommitRef": "main",
+      "gitDirty": true,
+      "note": "read via Vercel CLI auth; no token value exposed"
+    },
     {
       "provider": "vercel",
       "project": "galaxy",
@@ -202,18 +214,6 @@
       "gitCommitRef": "main",
       "gitDirty": true,
       "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "vercel",
-      "project": "galaxy",
-      "state": "READY",
-      "url": "https://galaxy-davytvezu-pasuthun-junkongs-projects.vercel.app",
-      "createdAt": "2026-05-06T03:14:57.693Z",
-      "gitCommitSha": "d56b570b20cdc87de0abe5f9499aadc943461cb3",
-      "gitCommitMessage": "oracle: refresh readiness snapshot",
-      "gitCommitRef": "main",
-      "gitDirty": true,
-      "note": "read via Vercel CLI auth; no token value exposed"
     }
   ],
   "github": [
@@ -224,7 +224,7 @@
       "apiStatus": "ok",
       "private": false,
       "defaultBranch": "main",
-      "pushedAt": "2026-05-06T06:05:35Z",
+      "pushedAt": "2026-05-06T06:40:47Z",
       "openIssues": 0,
       "openPullRequests": 0,
       "latestWorkflow": null,
@@ -250,7 +250,7 @@
       "apiStatus": "ok",
       "private": false,
       "defaultBranch": "main",
-      "pushedAt": "2026-05-04T02:07:13Z",
+      "pushedAt": "2026-05-06T07:45:30Z",
       "openIssues": 0,
       "openPullRequests": 0,
       "latestWorkflow": {
@@ -298,18 +298,9 @@
       "severity": "warning",
       "category": "repo-dirty",
       "project": "Moshe",
-      "title": "Moshe: 35 uncommitted changes",
-      "detail": "Branch main · last commit: \"oracle: keep intelligence radar populated in production\"",
-      "detectedAt": "2026-05-06T13:05:33+07:00"
-    },
-    {
-      "id": "repo-dirty-wiro4x4",
-      "severity": "warning",
-      "category": "repo-dirty",
-      "project": "Wiro4x4",
-      "title": "Wiro4x4: 30 uncommitted changes",
-      "detail": "Branch main · last commit: \"fix(lint): resolve remaining floating promise warnings (#7)\"",
-      "detectedAt": "2026-05-04T09:07:10+07:00"
+      "title": "Moshe: 37 uncommitted changes",
+      "detail": "Branch main · last commit: \"oracle: add autonomy router lanes\"",
+      "detectedAt": "2026-05-06T13:40:46+07:00"
     },
     {
       "id": "creds-missing",
@@ -318,23 +309,16 @@
       "project": "Oracle OS",
       "title": "5 credential(s) not configured",
       "detail": "VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_PROJECT_NAME, VERCEL_TEAM_ID, GITHUB_TOKEN",
-      "detectedAt": "2026-05-06T06:40:34.875Z"
+      "detectedAt": "2026-05-06T08:48:14.438Z"
     }
   ],
   "recommendations": [
     {
       "project": "Moshe",
       "priority": "medium",
-      "reason": "Moshe: 35 uncommitted changes",
+      "reason": "Moshe: 37 uncommitted changes",
       "risk": "medium",
       "suggestedAction": "Review staged changes in Moshe and commit or stash to keep the branch clean."
-    },
-    {
-      "project": "Wiro4x4",
-      "priority": "medium",
-      "reason": "Wiro4x4: 30 uncommitted changes",
-      "risk": "medium",
-      "suggestedAction": "Review staged changes in Wiro4x4 and commit or stash to keep the branch clean."
     },
     {
       "project": "Oracle OS",
@@ -358,6 +342,42 @@
   },
   "deployTimeline": [
     {
+      "provider": "git",
+      "project": "Wiro4x4",
+      "event": "commit",
+      "state": "uncommitted-changes",
+      "timestamp": "2026-05-06T14:36:57+07:00",
+      "sourceRepo": "Wiro4x4",
+      "sourceCommitSha": "f7fc3a387a1238e7017db91c034cafa9425df0f6",
+      "syncState": "behind",
+      "note": "style: refine Wiro4x4 typography"
+    },
+    {
+      "provider": "vercel",
+      "project": "galaxy",
+      "event": "deploy",
+      "state": "READY",
+      "url": "https://galaxy-m4uw7pd92-pasuthun-junkongs-projects.vercel.app",
+      "timestamp": "2026-05-06T06:40:56.392Z",
+      "deployedCommitSha": "27cd254c574d5cdc389155fe93a9dd16bfcae81a",
+      "deployedCommitMessage": "oracle: add autonomy router lanes",
+      "sourceRepo": "Moshe",
+      "sourceCommitSha": "27cd254c574d5cdc389155fe93a9dd16bfcae81a",
+      "syncState": "in-sync",
+      "note": "read via Vercel CLI auth; no token value exposed"
+    },
+    {
+      "provider": "git",
+      "project": "Moshe",
+      "event": "commit",
+      "state": "uncommitted-changes",
+      "timestamp": "2026-05-06T13:40:46+07:00",
+      "sourceRepo": "Moshe",
+      "sourceCommitSha": "27cd254c574d5cdc389155fe93a9dd16bfcae81a",
+      "syncState": "behind",
+      "note": "oracle: add autonomy router lanes"
+    },
+    {
       "provider": "vercel",
       "project": "galaxy",
       "event": "deploy",
@@ -367,20 +387,9 @@
       "deployedCommitSha": "06f96325f2305145359192ea6fc0b201a4cabb1b",
       "deployedCommitMessage": "oracle: keep intelligence radar populated in production",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "06f96325f2305145359192ea6fc0b201a4cabb1b",
-      "syncState": "in-sync",
-      "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "git",
-      "project": "Moshe",
-      "event": "commit",
-      "state": "uncommitted-changes",
-      "timestamp": "2026-05-06T13:05:33+07:00",
-      "sourceRepo": "Moshe",
-      "sourceCommitSha": "06f96325f2305145359192ea6fc0b201a4cabb1b",
+      "sourceCommitSha": "27cd254c574d5cdc389155fe93a9dd16bfcae81a",
       "syncState": "behind",
-      "note": "oracle: keep intelligence radar populated in production"
+      "note": "read via Vercel CLI auth; no token value exposed"
     },
     {
       "provider": "vercel",
@@ -392,34 +401,9 @@
       "deployedCommitSha": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
       "deployedCommitMessage": "oracle: log readiness deployment",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "06f96325f2305145359192ea6fc0b201a4cabb1b",
+      "sourceCommitSha": "27cd254c574d5cdc389155fe93a9dd16bfcae81a",
       "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "vercel",
-      "project": "galaxy",
-      "event": "deploy",
-      "state": "READY",
-      "url": "https://galaxy-davytvezu-pasuthun-junkongs-projects.vercel.app",
-      "timestamp": "2026-05-06T03:14:57.693Z",
-      "deployedCommitSha": "d56b570b20cdc87de0abe5f9499aadc943461cb3",
-      "deployedCommitMessage": "oracle: refresh readiness snapshot",
-      "sourceRepo": "Moshe",
-      "sourceCommitSha": "06f96325f2305145359192ea6fc0b201a4cabb1b",
-      "syncState": "behind",
-      "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "git",
-      "project": "Wiro4x4",
-      "event": "commit",
-      "state": "uncommitted-changes",
-      "timestamp": "2026-05-04T09:07:10+07:00",
-      "sourceRepo": "Wiro4x4",
-      "sourceCommitSha": "f4068dc84fa3724c1ba34a6449ec82b9132ec4be",
-      "syncState": "behind",
-      "note": "fix(lint): resolve remaining floating promise warnings (#7)"
     },
     {
       "provider": "git",
@@ -434,24 +418,28 @@
     }
   ],
   "automation": {
-    "enabled": true,
-    "authConfigured": true,
-    "sessionConfigured": true,
+    "enabled": false,
+    "authConfigured": false,
+    "sessionConfigured": false,
     "endpoint": "/api/oracle/actions",
     "sessionEndpoint": "/api/oracle/session",
     "authHeader": "HttpOnly signed session cookie",
-    "authMethod": "signed-session-cookie",
+    "authMethod": "preview-only",
     "auditPath": "/tmp/oracle-action-audit.jsonl",
-    "executionMode": "server-enabled",
+    "executionMode": "preview-only",
     "sessionTtlMinutes": 480,
-    "note": "Oracle execute mode is gated by a Mike-only signed session cookie with audit logging.",
+    "note": "Preview trigger is wired to the action API path. Set ORACLE_SESSION_SECRET to arm Mike-only session-gated execution.",
     "actions": [
       {
         "id": "refresh-oracle-snapshot",
         "title": "Refresh Oracle snapshot",
         "description": "Regenerate the read-only Oracle data bundle and re-evaluate sensors.",
         "transport": "local-script",
+        "autonomyLevel": "safe_now",
+        "businessArea": "oracle_os",
         "risk": "low",
+        "riskReason": "Local read-only snapshot regeneration; no deploy, no push, no external contact.",
+        "nextSafeStep": "Run generator and inspect JSON before any commit/deploy.",
         "requiresConfirmation": true
       },
       {
@@ -459,7 +447,11 @@
         "title": "Dispatch Wiro CI",
         "description": "Trigger the allowlisted GitHub workflow that verifies Wiro4x4 health.",
         "transport": "github-api",
+        "autonomyLevel": "approval_required",
+        "businessArea": "deploy_reliability",
         "risk": "medium",
+        "riskReason": "Creates an external GitHub event and consumes CI minutes.",
+        "nextSafeStep": "Preview the workflow request and wait for Mike approval before dispatch.",
         "requiresConfirmation": true
       },
       {
@@ -467,15 +459,19 @@
         "title": "Request Vercel redeploy",
         "description": "Ask Vercel to redeploy the Oracle dashboard after a confirmed change.",
         "transport": "vercel-api",
+        "autonomyLevel": "approval_required",
+        "businessArea": "deploy_reliability",
         "risk": "medium",
+        "riskReason": "Changes live production surface and must be tied to verified commits/artifacts.",
+        "nextSafeStep": "Prepare deployment evidence and wait for Mike approval.",
         "requiresConfirmation": true
       }
     ]
   },
   "operationalReadiness": {
-    "score": 86,
+    "score": 82,
     "status": "steady",
-    "summary": "2 watch item(s). Oracle is usable, but not fully verified.",
+    "summary": "3 watch item(s). Oracle is usable, but not fully verified.",
     "checks": [
       {
         "label": "Sites online",
@@ -503,8 +499,8 @@
       },
       {
         "label": "Session gate",
-        "status": "pass",
-        "detail": "Mike-only signed session gate is configured.",
+        "status": "watch",
+        "detail": "Browser stays preview-only until ORACLE_SESSION_SECRET is configured.",
         "weight": 10
       },
       {
@@ -522,7 +518,7 @@
     ]
   },
   "intelligenceLayer": {
-    "updatedAt": "2026-05-06T06:40:34.886Z",
+    "updatedAt": "2026-05-06T08:48:14.448Z",
     "summary": "Oracle is learning from ψ and opportunity artifacts. Top money radar: AI Inquiry and Quote Copilot for Tour Operators (95/100).",
     "todayLearnings": [
       {
@@ -596,6 +592,12 @@
     ],
     "approvalQueue": [
       {
+        "id": "safe-demo-pack",
+        "autonomyLevel": "safe_now",
+        "businessArea": "business_opportunity",
+        "riskReason": "Uses synthetic/Wiro-style examples only and does not contact external leads.",
+        "nextSafeStep": "Draft the demo pack locally in outbox with synthetic examples only.",
+        "approvalTrigger": "No approval needed if the action stays read-only, internal, reversible, and secret-safe.",
         "title": "Build internal Wiro-style demo pack",
         "category": "safe",
         "risk": "low",
@@ -604,6 +606,12 @@
         "source": "outbox/one-person-business/business-radar-mike-2026-05-06.md"
       },
       {
+        "id": "draft-landing-roi",
+        "autonomyLevel": "draft_only",
+        "businessArea": "business_opportunity",
+        "riskReason": "Draft artifacts increase speed to validation but do not publish or contact customers.",
+        "nextSafeStep": "Improve the private draft only.",
+        "approvalTrigger": "Mike approval required before publishing, sending, deploying, spending, or contacting anyone.",
         "title": "Prepare landing page and ROI calculator drafts",
         "category": "draft-only",
         "risk": "low",
@@ -612,6 +620,12 @@
         "source": "outbox/one-person-business/ai-booking-assistant-landing-page-copy.md"
       },
       {
+        "id": "approve-top-opportunity",
+        "autonomyLevel": "approval_required",
+        "businessArea": "business_opportunity",
+        "riskReason": "AI Inquiry and Quote Copilot for Tour Operators is currently ranked 95/100.",
+        "nextSafeStep": "Prepare options and evidence for Mike, but do not contact prospects.",
+        "approvalTrigger": "Mike approval required before execution.",
         "title": "Review top opportunity direction",
         "category": "approval-required",
         "risk": "medium",
@@ -620,6 +634,12 @@
         "source": "outbox/one-person-business/business-radar-mike-2026-05-06.md"
       },
       {
+        "id": "approval-outreach-send",
+        "autonomyLevel": "approval_required",
+        "businessArea": "customer_or_public",
+        "riskReason": "Outreach pack exists, but messages must not be sent without Mike approval.",
+        "nextSafeStep": "Keep outreach as a draft and wait for explicit Mike approval.",
+        "approvalTrigger": "Mike approval required before execution.",
         "title": "Send first outreach batch",
         "category": "approval-required",
         "risk": "medium",
@@ -628,6 +648,12 @@
         "source": "outbox/one-person-business/ai-booking-assistant-first-outreach-pack.md"
       },
       {
+        "id": "approval-publish-landing",
+        "autonomyLevel": "approval_required",
+        "businessArea": "customer_or_public",
+        "riskReason": "Landing copy exists but public publishing affects brand and offer positioning.",
+        "nextSafeStep": "Prepare review checklist for Mike.",
+        "approvalTrigger": "Mike approval required before execution.",
         "title": "Publish landing page copy",
         "category": "approval-required",
         "risk": "medium",
@@ -637,34 +663,60 @@
       }
     ],
     "autonomyRouter": {
-      "updatedAt": "2026-05-06T06:40:34.885Z",
-      "summary": "Oracle routes every autonomous idea into safe_now, draft_only, or approval_required before execution.",
+      "updatedAt": "2026-05-06T08:48:14.448Z",
+      "phase": "phase_4",
+      "summary": "Phase 4 is active: Oracle classifies every recommendation before action and keeps execution behind safe/draft/approval lanes.",
       "lanes": [
         {
           "id": "safe_now",
           "label": "safe_now",
           "status": "active",
-          "summary": "Moshe can execute without interrupting Mike when the work is read-only, reversible, internal, or draft-generation only with no external side effect.",
+          "summary": "Moshe can execute without interrupting Mike only when work is read-only, reversible, internal, or safe draft-generation with no external side effect.",
           "examples": [
             "read-only research",
             "local verification",
             "internal demo artifacts",
             "dashboard copy/UI improvements"
           ],
-          "count": 1
+          "count": 1,
+          "canExecute": true,
+          "allowedWork": [
+            "read local/project files",
+            "run tests/builds/checks",
+            "write internal markdown/json artifacts",
+            "draft private assets"
+          ],
+          "blockedWork": [
+            "customer contact",
+            "public publish",
+            "spend money",
+            "delete/cleanup unknown files",
+            "force push"
+          ]
         },
         {
           "id": "draft_only",
           "label": "draft_only",
           "status": "guarded",
-          "summary": "Moshe may prepare the asset but must not publish, send, spend, deploy risky changes, or contact anyone.",
+          "summary": "Moshe may prepare assets but must stop before publish/send/spend/deploy/contact.",
           "examples": [
             "landing page draft",
             "outreach message draft",
             "ROI calculator draft",
             "lead list draft"
           ],
-          "count": 1
+          "count": 1,
+          "canExecute": false,
+          "allowedWork": [
+            "prepare private drafts",
+            "organize evidence",
+            "create review checklist"
+          ],
+          "blockedWork": [
+            "send the draft",
+            "publish the page",
+            "commit/push/deploy public workflow changes without Mike approval"
+          ]
         },
         {
           "id": "approval_required",
@@ -678,23 +730,99 @@
             "commit/push/deploy",
             "delete/cleanup files"
           ],
-          "count": 3
+          "count": 3,
+          "canExecute": false,
+          "allowedWork": [
+            "summarize options for Mike",
+            "prepare rollback/verification plan"
+          ],
+          "blockedWork": [
+            "execute without explicit approval",
+            "expose secrets",
+            "change live business workflow"
+          ]
+        }
+      ],
+      "decisions": [
+        {
+          "id": "safe-demo-pack",
+          "title": "Build internal Wiro-style demo pack",
+          "autonomyLevel": "safe_now",
+          "businessArea": "business_opportunity",
+          "risk": "low",
+          "riskReason": "Uses synthetic/Wiro-style examples only and does not contact external leads.",
+          "nextSafeStep": "Draft the demo pack locally in outbox with synthetic examples only.",
+          "approvalTrigger": "No approval needed if the action stays read-only, internal, reversible, and secret-safe.",
+          "source": "outbox/one-person-business/business-radar-mike-2026-05-06.md"
+        },
+        {
+          "id": "draft-landing-roi",
+          "title": "Prepare landing page and ROI calculator drafts",
+          "autonomyLevel": "draft_only",
+          "businessArea": "business_opportunity",
+          "risk": "low",
+          "riskReason": "Draft artifacts increase speed to validation but do not publish or contact customers.",
+          "nextSafeStep": "Improve the private draft only.",
+          "approvalTrigger": "Mike approval required before publishing, sending, deploying, spending, or contacting anyone.",
+          "source": "outbox/one-person-business/ai-booking-assistant-landing-page-copy.md"
+        },
+        {
+          "id": "approve-top-opportunity",
+          "title": "Review top opportunity direction",
+          "autonomyLevel": "approval_required",
+          "businessArea": "business_opportunity",
+          "risk": "medium",
+          "riskReason": "AI Inquiry and Quote Copilot for Tour Operators is currently ranked 95/100.",
+          "nextSafeStep": "Prepare options and evidence for Mike, but do not contact prospects.",
+          "approvalTrigger": "Mike approval required before execution.",
+          "source": "outbox/one-person-business/business-radar-mike-2026-05-06.md"
+        },
+        {
+          "id": "approval-outreach-send",
+          "title": "Send first outreach batch",
+          "autonomyLevel": "approval_required",
+          "businessArea": "customer_or_public",
+          "risk": "medium",
+          "riskReason": "Outreach pack exists, but messages must not be sent without Mike approval.",
+          "nextSafeStep": "Keep outreach as a draft and wait for explicit Mike approval.",
+          "approvalTrigger": "Mike approval required before execution.",
+          "source": "outbox/one-person-business/ai-booking-assistant-first-outreach-pack.md"
+        },
+        {
+          "id": "approval-publish-landing",
+          "title": "Publish landing page copy",
+          "autonomyLevel": "approval_required",
+          "businessArea": "customer_or_public",
+          "risk": "medium",
+          "riskReason": "Landing copy exists but public publishing affects brand and offer positioning.",
+          "nextSafeStep": "Prepare review checklist for Mike.",
+          "approvalTrigger": "Mike approval required before execution.",
+          "source": "outbox/one-person-business/ai-booking-assistant-landing-page-copy.md"
         }
       ],
       "guardrails": [
+        "Classify every recommendation before execution.",
         "Never send customer-facing messages without Mike approval.",
         "Never spend money, subscribe, or publish publicly without Mike approval.",
         "Never delete/cleanup unknown files or force push.",
-        "Never expose secrets; show configured/missing only."
+        "Never expose secrets; show configured/missing only.",
+        "Commit/push/deploy only when Mike explicitly approves that scope."
+      ],
+      "phase5Requirements": [
+        "Signal Quality / Feedback Ledger records whether proactive outputs are useful or noisy.",
+        "Deployment Freshness Gap sensor compares live production, git HEAD, and local snapshot age.",
+        "Repo Hygiene / Ship Readiness sensor blocks mixed dirty worktrees from deploy recommendations.",
+        "Evidence Chain extractor turns build/test/smoke/deploy proof into reusable safety facts.",
+        "Safe Executor only runs allowlisted safe_now actions with audit logs and rollback notes."
       ]
     }
   },
   "terminal": {
     "enabled": false,
     "terminalEnabled": false,
-    "sessionConfigured": true,
+    "sessionConfigured": false,
     "endpoint": "/api/oracle/terminal",
-    "authMethod": "signed-session-cookie",
+    "authMethod": "preview-only",
     "defaultCwd": "/Users/pasuthunjunkong/workspace/Moshe",
     "allowedCwdPrefixes": [
       "/Users/pasuthunjunkong/workspace/Moshe",
