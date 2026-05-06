@@ -339,6 +339,15 @@ export default function OracleCommandCenter({ data }: Props) {
     evidence: { safeExecutorPilotCompleted: false, reportQualityGatesPassing: 0, reportQualityGatesTotal: 0, cronQualityStatus: 'watch' as const, sourceBlockers: [] },
     topPhaseGate: { status: 'blocked' as const, blockers: ['Generate a fresh Oracle snapshot.'], watchItems: [], nextStep: 'Run npm run build.' },
   }
+  const phase5H = oracle.phase5H ?? {
+    updatedAt: oracle.generated,
+    phase: 'phase_5h' as const,
+    summary: 'Phase 5H integration roadmap is waiting for a live snapshot.',
+    missingFeatureRoadmap: [],
+    dependencyOrder: [],
+    nextEngineeringStep: { id: 'none', title: 'Generate a fresh Oracle snapshot.', lane: 'safe_now' as const, reason: 'No roadmap snapshot exists yet.', commandHints: [] },
+    guardrails: [],
+  }
   const [feedbackState, setFeedbackState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
   const [executorState, setExecutorState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
   const [approvalState, setApprovalState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
@@ -663,8 +672,10 @@ export default function OracleCommandCenter({ data }: Props) {
   const configuredCreds = oracle.credentials.filter((c) => c.configured).length
   const githubOk = oracle.github.filter((g) => g.apiStatus === 'ok').length
   const criticalIncidents = (oracle.incidents ?? []).filter((i) => i.severity === 'critical').length
-  const oracleModeLabel = oracle.phase5G
-    ? 'PHASE 5G · BOUNDED SAFE CRON'
+  const oracleModeLabel = oracle.phase5H
+    ? 'PHASE 5H · INTEGRATION ROADMAP'
+    : oracle.phase5G
+      ? 'PHASE 5G · BOUNDED SAFE CRON'
     : oracle.phase5F
       ? 'PHASE 5F · LEARNING ACTION MEMORY'
     : oracle.phase5E
@@ -1938,6 +1949,44 @@ export default function OracleCommandCenter({ data }: Props) {
               <p>{phase5D.topPhaseReadiness.nextStep}</p>
               {phase5D.topPhaseReadiness.blockers.map((blocker) => <small key={blocker}>BLOCKER · {blocker}</small>)}
               {phase5D.topPhaseReadiness.watchItems.map((item) => <small key={item}>WATCH · {item}</small>)}
+            </article>
+          </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>PHASE 5H INTEGRATION ROADMAP</p>
+            <span>{phase5H.missingFeatureRoadmap.length} missing features</span>
+          </div>
+          <div className="oracle-intelligence-grid">
+            <article className="oracle-intel-card money">
+              <div className="oracle-status-head">
+                <strong>Next engineering step</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5H.nextEngineeringStep.lane)}`}>{phase5H.nextEngineeringStep.lane}</span>
+              </div>
+              <p>{phase5H.nextEngineeringStep.title}</p>
+              <small>{phase5H.nextEngineeringStep.reason}</small>
+              {phase5H.nextEngineeringStep.commandHints.map((hint) => <small key={hint}>• {hint}</small>)}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Missing features</strong>
+                <span>{phase5H.dependencyOrder.join(' → ')}</span>
+              </div>
+              {phase5H.missingFeatureRoadmap.map((item) => (
+                <div className="oracle-intel-line" key={item.id}>
+                  <strong>#{item.priority} {item.label}</strong>
+                  <p>{item.whyItMatters}</p>
+                  <small>{item.status} · {item.dependency ? `depends on ${item.dependency}` : 'no dependency'} · {item.safetyLane}</small>
+                  {item.command ? <small>Command: {item.command}</small> : null}
+                  <small>Next: {item.nextStep}</small>
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Integration guardrails</strong>
+                <span>safe-first</span>
+              </div>
+              {phase5H.guardrails.map((guardrail) => <small key={guardrail}>• {guardrail}</small>)}
             </article>
           </div>
 

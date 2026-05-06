@@ -2230,6 +2230,78 @@ function derivePhase5G({ generatedAt, phase5D, phase5F }) {
   };
 }
 
+
+function derivePhase5H({ generatedAt }) {
+  const roadmap = [
+    {
+      id: 'oracle-v2-mcp',
+      label: 'oracle-v2 MCP — fix connection (arra-oracle)',
+      status: 'ready_to_debug',
+      priority: 1,
+      command: 'bunx --bun arra-oracle@github:Soul-Brews-Studio/arra-oracle#main',
+      whyItMatters: 'Unlocks semantic Oracle memory/search tools and is the dependency for Oracle Studio.',
+      nextStep: 'Clone or run arra-oracle locally, capture the exact failure, then pin a known-good MCP command/config.',
+      safetyLane: 'safe_now',
+    },
+    {
+      id: 'oracle-studio',
+      label: 'Oracle Studio Dashboard — bunx oracle-studio',
+      status: 'blocked',
+      priority: 2,
+      dependency: 'oracle-v2-mcp',
+      command: 'bunx oracle-studio',
+      whyItMatters: 'Adds real-time Oracle activity feed, knowledge map, search UI, and traces explorer.',
+      nextStep: 'Wait until oracle-v2 HTTP server is healthy, then smoke-run Oracle Studio locally.',
+      safetyLane: 'safe_now',
+    },
+    {
+      id: 'maw-js',
+      label: 'maw-js — multi-oracle fleet CLI',
+      status: 'planned',
+      priority: 3,
+      command: 'bunx -p github:Soul-Brews-Studio/maw-js maw doctor',
+      whyItMatters: 'Gives Moshe a fleet/multi-oracle command surface for future specialist agents.',
+      nextStep: 'Use existing ψ/learn maw-js notes, run doctor locally, then decide whether to install or vendor.',
+      safetyLane: 'safe_now',
+    },
+    {
+      id: 'consciousness-loop',
+      label: 'Consciousness Loop — autonomous thinking system',
+      status: 'planned',
+      priority: 4,
+      dependency: 'oracle-v2-mcp + Phase 5G safe cron controls',
+      whyItMatters: 'Creates a bounded Reflect/Wonder/Soul/Dream/Aspire/Propose/Complete loop for real self-improvement.',
+      nextStep: 'Keep as draft/read-only until MCP memory and bounded safe_now pilot reliability are proven.',
+      safetyLane: 'draft_only',
+    },
+  ];
+  return {
+    updatedAt: generatedAt,
+    phase: 'phase_5h',
+    summary: 'Phase 5H active: missing Oracle ecosystem features are now dependency-ordered and visible before engineering work starts.',
+    missingFeatureRoadmap: roadmap,
+    dependencyOrder: roadmap.map((item) => item.id),
+    nextEngineeringStep: {
+      id: 'debug-oracle-v2-mcp',
+      title: 'Debug oracle-v2 MCP / arra-oracle connection locally',
+      lane: 'safe_now',
+      reason: 'It is the first dependency. Oracle Studio depends on the oracle-v2 HTTP server; Consciousness Loop needs durable semantic memory/search.',
+      commandHints: [
+        'check bun availability before running bunx commands',
+        'try npx/bunx command with timeout and capture exact stderr',
+        'if package install fails, clone Soul-Brews-Studio/arra-oracle and run locally',
+        'do not write secrets into MCP config; only add config after local command is known-good',
+      ],
+    },
+    guardrails: [
+      'Do not expose MCP secrets or tokens in browser JSON/logs.',
+      'Do not enable Consciousness Loop as recurring autonomous execution until bounded safe_now pilot results are reviewed.',
+      'Do not run public/customer/deploy/spend/delete actions from any roadmap feature without Mike approval.',
+      'Treat Oracle Studio and maw-js setup as local/admin smoke first, not production rollout.',
+    ],
+  };
+}
+
 function deriveOperationalReadiness({ websites, repos, github, credentials, deployments, deployTimeline, automation, incidents }) {
   const criticalIncidents = incidents.filter((i) => i.severity === 'critical').length;
   const dirtyRepos = repos.filter((r) => r.dirty).length;
@@ -2429,11 +2501,12 @@ const phase5G = derivePhase5G({
   phase5D,
   phase5F,
 });
+const phase5H = derivePhase5H({ generatedAt });
 
 const data = {
   generated: generatedAt,
   born: '2026-04-18',
-  level3Phase: 'Phase 5G: Bounded safe_now cron pilot controls and preflight gates',
+  level3Phase: 'Phase 5H: Missing feature integration roadmap and dependency order',
   stats: {
     learnings: learnings.length,
     retrospectives: retrospectives.length,
@@ -2451,7 +2524,7 @@ const data = {
       name: 'Moshe Oracle OS',
       url: process.env.ORACLE_DASHBOARD_URL || '',
       status: 'Building',
-      note: 'Phase 5G active: bounded safe_now cron pilot is drafted behind preflight controls.',
+      note: 'Phase 5H active: oracle-v2 MCP, Oracle Studio, maw-js, and Consciousness Loop are dependency-ordered.',
       accent: 'orange',
     },
     {
@@ -2495,6 +2568,7 @@ const data = {
   phase5E,
   phase5F,
   phase5G,
+  phase5H,
   nextActions: [
     'Set ORACLE_SESSION_SECRET to arm the Mike-only signed session gate.',
     'The Oracle now turns audit trail events into learnings before refreshing live data.',
@@ -2509,11 +2583,12 @@ const data = {
     'Use Phase 5E taste filters: proactive reports must be Wiro-first and framed as watch/test/ignore.',
     'Use Phase 5F learning action memory before creating any recurring safe_now cron pilot.',
     'Use Phase 5G preflight controls before enabling a bounded safe_now cron pilot.',
+    'Use Phase 5H integration roadmap: fix oracle-v2 MCP before Oracle Studio, maw-js, or Consciousness Loop.',
   ],
 };
 
 writeFileSync(OUT, `${JSON.stringify(data, null, 2)}\n`);
-console.log(`✅ Oracle live data written to ${OUT} [Phase 5G]`);
+console.log(`✅ Oracle live data written to ${OUT} [Phase 5H]`);
 console.log(`   Websites: ${data.websites.map((w) => `${w.name}=${w.ok ? 'OK' : 'FAIL'}`).join(', ')}`);
 console.log(`   Incidents: ${data.incidents.length} | Recommendations: ${data.recommendations.length} | Wiro CI: ${data.wiroCi?.conclusion ?? 'none'}`);
 console.log(`   Repos: ${data.repos.length} | GitHub sensors: ${data.github.length} | Learnings: ${data.stats.learnings} | Retrospectives: ${data.stats.retrospectives}`);

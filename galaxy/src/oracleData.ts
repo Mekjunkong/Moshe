@@ -649,6 +649,36 @@ export interface OraclePhase5GLayer {
   }
 }
 
+
+
+export interface OracleMissingFeatureRoadmapItem {
+  id: 'oracle-v2-mcp' | 'oracle-studio' | 'maw-js' | 'consciousness-loop'
+  label: string
+  status: 'missing' | 'blocked' | 'ready_to_debug' | 'planned'
+  priority: number
+  dependency?: string
+  command?: string
+  whyItMatters: string
+  nextStep: string
+  safetyLane: 'safe_now' | 'draft_only' | 'approval_required'
+}
+
+export interface OraclePhase5HLayer {
+  updatedAt: string
+  phase: 'phase_5h'
+  summary: string
+  missingFeatureRoadmap: OracleMissingFeatureRoadmapItem[]
+  dependencyOrder: string[]
+  nextEngineeringStep: {
+    id: string
+    title: string
+    lane: 'safe_now' | 'draft_only' | 'approval_required'
+    reason: string
+    commandHints: string[]
+  }
+  guardrails: string[]
+}
+
 export interface OracleTodayLearning {
   title: string
   source: string
@@ -778,6 +808,7 @@ export interface OracleData {
   phase5E?: OraclePhase5ELayer
   phase5F?: OraclePhase5FLayer
   phase5G?: OraclePhase5GLayer
+  phase5H?: OraclePhase5HLayer
   nextActions: string[]
 }
 
@@ -1013,6 +1044,15 @@ export const ORACLE_FALLBACK_DATA: OracleData = {
     preflightControls: [],
     evidence: { safeExecutorPilotCompleted: false, reportQualityGatesPassing: 0, reportQualityGatesTotal: 0, cronQualityStatus: 'watch', sourceBlockers: [] },
     topPhaseGate: { status: 'blocked', blockers: ['Generate a fresh Oracle snapshot.'], watchItems: [], nextStep: 'Run npm run build.' },
+  },
+  phase5H: {
+    updatedAt: new Date(0).toISOString(),
+    phase: 'phase_5h',
+    summary: 'Waiting for Phase 5H integration roadmap.',
+    missingFeatureRoadmap: [],
+    dependencyOrder: [],
+    nextEngineeringStep: { id: 'none', title: 'Generate a fresh Oracle snapshot.', lane: 'safe_now', reason: 'No roadmap snapshot exists yet.', commandHints: [] },
+    guardrails: [],
   },
   nextActions: [
     'Run node scripts/generateOracleData.mjs',
