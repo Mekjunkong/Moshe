@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { afterEach, beforeEach, describe, test } from 'node:test'
 import oracleActionsHandler from './actions.js'
 import oracleSessionHandler from './session.js'
+import oracleTerminalHandler from './terminal.js'
 import { createSessionToken, SESSION_COOKIE_NAME, verifySessionToken } from './auth.js'
 
 function createReq({ method = 'POST', headers = {}, body = {} } = {}) {
@@ -38,18 +39,21 @@ const ORIGINAL_ENV = {
   ORACLE_SESSION_SECRET: process.env.ORACLE_SESSION_SECRET,
   ORACLE_ACTION_AUDIT_PATH: process.env.ORACLE_ACTION_AUDIT_PATH,
   ORACLE_WIRO_CI_DISPATCHER: process.env.ORACLE_WIRO_CI_DISPATCHER,
+  ORACLE_TERMINAL_ENABLED: process.env.ORACLE_TERMINAL_ENABLED,
 }
 
 beforeEach(() => {
   process.env.ORACLE_SESSION_SECRET = 'test-session-secret'
   process.env.ORACLE_ACTION_AUDIT_PATH = '/tmp/oracle-action-audit-test.jsonl'
   process.env.ORACLE_WIRO_CI_DISPATCHER = 'true'
+  process.env.ORACLE_TERMINAL_ENABLED = 'true'
 })
 
 afterEach(() => {
   process.env.ORACLE_SESSION_SECRET = ORIGINAL_ENV.ORACLE_SESSION_SECRET
   process.env.ORACLE_ACTION_AUDIT_PATH = ORIGINAL_ENV.ORACLE_ACTION_AUDIT_PATH
   process.env.ORACLE_WIRO_CI_DISPATCHER = ORIGINAL_ENV.ORACLE_WIRO_CI_DISPATCHER
+  process.env.ORACLE_TERMINAL_ENABLED = ORIGINAL_ENV.ORACLE_TERMINAL_ENABLED
 })
 
 describe('oracle session crypto', () => {
@@ -182,5 +186,59 @@ describe('oracle action gate', () => {
     assert.equal(res.statusCode, 202)
     assert.equal(payload.decision, 'queued')
     assert.equal(payload.repo, 'Mekjunkong/Wiro4x4')
+  })
+})
+
+
+describe('oracle terminal gate', () => {
+  test('GET returns terminal policy and recipes', async () => {
+    const res = createRes()
+    await oracleTerminalHandler(createReq({ method: 'GET' }), res)
+    const payload = readJson(res)
+    assert.equal(res.statusCode, 200)
+    assert.equal(payload.ok, true)
+    assert.equal(payload.policy.terminalEnabled, true)
+    assert.ok(Array.isArray(payload.recipes))
+  })
+
+  test('terminal execute rejects without a signed session', async () => {
+    const res = createRes()
+    await oracleTerminalHandler(createReq({ method: 'POST', body: { command: 'pwd' } }), res)
+    const payload = readJson(res)
+    assert.equal(res.statusCode, 401)
+    assert.equal(payload.error, 'unauthorized')
+  })
+
+  test('terminal execute runs safe commands with a valid session cookie', async () => {
+    const token = createSessionToken('test-session-secret', 'Mike', 60_000)
+    const res = createRes()
+    await oracleTerminalHandler(
+      createReq({
+        method: 'POST',
+        headers: { cookie: `${SESSION_COOKIE_NAME}=${token}` },
+        body: { command: 'printf oracle-terminal-ok', cwd: '/Users/pasuthunjunkong/workspace/Moshe' },
+      }),
+      res,
+    )
+    const payload = readJson(res)
+    assert.equal(res.statusCode, 200)
+    assert.equal(payload.ok, true)
+    assert.equal(payload.stdout, 'oracle-terminal-ok')
+  })
+
+  test('terminal blocks dangerous command patterns', async () => {
+    const token = createSessionToken('test-session-secret', 'Mike', 60_000)
+    const res = createRes()
+    await oracleTerminalHandler(
+      createReq({
+        method: 'POST',
+        headers: { cookie: `${SESSION_COOKIE_NAME}=${token}` },
+        body: { command: 'rm -rf /tmp/whatever' },
+      }),
+      res,
+    )
+    const payload = readJson(res)
+    assert.equal(res.statusCode, 400)
+    assert.equal(payload.error, 'blocked_command')
   })
 })

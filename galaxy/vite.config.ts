@@ -2,10 +2,12 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import oracleActionsHandler from './api/oracle/actions.js'
 import oracleSessionHandler from './api/oracle/session.js'
+import oracleTerminalHandler from './api/oracle/terminal.js'
 
 const ORACLE_API_ROUTES = new Map([
   ['/api/oracle/actions', oracleActionsHandler],
   ['/api/oracle/session', oracleSessionHandler],
+  ['/api/oracle/terminal', oracleTerminalHandler],
 ])
 
 function oracleActionApiPlugin() {

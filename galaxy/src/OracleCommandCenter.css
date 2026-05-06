@@ -1846,3 +1846,284 @@
     min-height: 64px;
   }
 }
+
+/* ── Intelligence Layer v1 ─────────────────────────────────────────────── */
+.oracle-intelligence-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid rgba(245, 158, 11, 0.26);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(245, 158, 11, 0.20), transparent 35%),
+    radial-gradient(circle at 90% 25%, rgba(34, 211, 238, 0.15), transparent 38%),
+    linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(8, 13, 26, 0.88));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 18px 40px rgba(1, 5, 14, 0.28);
+}
+
+.oracle-intelligence-hero p,
+.oracle-intel-card > .oracle-status-head + small {
+  margin: 0;
+}
+
+.oracle-intelligence-hero p {
+  color: #f59e0b;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+.oracle-intelligence-hero h3 {
+  margin: 6px 0;
+  color: #f8fafc;
+  font-size: 18px;
+  line-height: 1.12;
+}
+
+.oracle-intelligence-hero small {
+  display: block;
+  color: rgba(226, 232, 240, 0.72);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.oracle-intelligence-grid,
+.oracle-approval-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.oracle-intel-card,
+.oracle-approval-card {
+  padding: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.13);
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.70);
+}
+
+.oracle-intel-card.money {
+  border-color: rgba(34, 197, 94, 0.22);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(34, 197, 94, 0.12), transparent 32%),
+    rgba(15, 23, 42, 0.72);
+}
+
+.oracle-intel-line,
+.oracle-opportunity-line {
+  padding: 10px 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.10);
+}
+
+.oracle-intel-line:first-of-type,
+.oracle-opportunity-line:first-of-type {
+  border-top: 0;
+}
+
+.oracle-intel-line strong,
+.oracle-opportunity-line strong,
+.oracle-approval-card strong {
+  color: #f8fafc;
+  font-size: 12px;
+}
+
+.oracle-intel-line p,
+.oracle-opportunity-line p,
+.oracle-approval-card p {
+  margin: 5px 0;
+  color: rgba(226, 232, 240, 0.78);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.oracle-intel-line small,
+.oracle-opportunity-line small,
+.oracle-approval-card small {
+  display: block;
+  margin-top: 4px;
+  color: rgba(148, 163, 184, 0.78);
+  font-size: 10px;
+  line-height: 1.42;
+}
+
+.oracle-opportunity-line > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.oracle-approval-card.safe {
+  border-color: rgba(34, 211, 238, 0.22);
+}
+
+.oracle-approval-card.gated {
+  border-color: rgba(245, 158, 11, 0.26);
+}
+
+/* ── Oracle Admin Terminal ──────────────────────────────────────────────── */
+.oracle-terminal-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(245, 158, 11, 0.14), transparent 34%),
+    rgba(15, 23, 42, 0.72);
+}
+
+.oracle-terminal-status.ready {
+  border-color: rgba(34, 211, 238, 0.28);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(34, 211, 238, 0.14), transparent 34%),
+    rgba(15, 23, 42, 0.72);
+}
+
+.oracle-terminal-status strong,
+.oracle-terminal-note strong {
+  color: #f8fafc;
+  font-size: 13px;
+}
+
+.oracle-terminal-status p,
+.oracle-terminal-note p {
+  margin: 5px 0;
+  color: rgba(226, 232, 240, 0.78);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.oracle-terminal-status small,
+.oracle-terminal-actions small {
+  display: block;
+  color: rgba(148, 163, 184, 0.82);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.oracle-terminal-recipes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.oracle-terminal-recipes button,
+.oracle-terminal-actions button {
+  border: 1px solid rgba(34, 211, 238, 0.22);
+  border-radius: 999px;
+  background: rgba(8, 145, 178, 0.12);
+  color: #cffafe;
+  padding: 8px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.oracle-terminal-recipes button:hover,
+.oracle-terminal-actions button:not(:disabled):hover {
+  border-color: rgba(34, 211, 238, 0.48);
+  background: rgba(8, 145, 178, 0.22);
+}
+
+.oracle-terminal-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.oracle-terminal-label {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.oracle-terminal-label span {
+  color: rgba(203, 213, 225, 0.68);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.oracle-terminal-label input,
+.oracle-terminal-label textarea {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 14px;
+  background: rgba(2, 6, 23, 0.72);
+  color: #e5eefc;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.45;
+  padding: 10px;
+  outline: none;
+}
+
+.oracle-terminal-label input:focus,
+.oracle-terminal-label textarea:focus {
+  border-color: rgba(34, 211, 238, 0.42);
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.08);
+}
+
+.oracle-terminal-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.oracle-terminal-output {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 18px;
+  padding: 12px;
+  background: rgba(2, 6, 23, 0.82);
+}
+
+.oracle-terminal-output pre {
+  max-height: 280px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 10px 0 0;
+  color: #d1fae5;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.oracle-terminal-note {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(167, 139, 250, 0.20);
+  background: rgba(88, 28, 135, 0.12);
+}
+
+.oracle-terminal-unlock {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  border-radius: 16px;
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.oracle-terminal-unlock button {
+  justify-self: flex-start;
+}
+
+.oracle-terminal-unlock small {
+  color: rgba(226, 232, 240, 0.68);
+  font-size: 10px;
+  line-height: 1.4;
+}

@@ -1,11 +1,11 @@
 {
-  "generated": "2026-05-06T04:09:36.525Z",
+  "generated": "2026-05-06T05:51:07.726Z",
   "born": "2026-04-18",
   "level3Phase": "Phase 3B: Feedback loop — audit-derived learnings, auth, allowlist, audit log, preview mode",
   "stats": {
-    "learnings": 11,
+    "learnings": 13,
     "retrospectives": 17,
-    "activeProjects": 2,
+    "activeProjects": 5,
     "inboxItems": 1,
     "writingDocs": 0,
     "labExperiments": 0
@@ -33,10 +33,10 @@
       "summary": "Date: 2026-05-06 Learning: A Hermes cron job can report RuntimeError: even when the code/build work succeeded, if the autonomous agent hits the maximu…"
     },
     {
-      "title": "Oracle action feedback loop",
-      "file": "oracle-action-feedback.md",
+      "title": "Oracle Intelligence + Terminal Layer — 2026-05-06",
+      "file": "2026-05-06-oracle-intelligence-terminal-layer.md",
       "date": "2026-05-06",
-      "summary": "updated: 2026-05-06T03:38:57.373Z  Oracle action feedback loop The Oracle now turns session and action audit events into reusable learnings."
+      "summary": "What changed - Added Oracle Intelligence Layer v1 to Galaxy dashboard:   - Today’s Learnings"
     }
   ],
   "retrospectivesCount": 17,
@@ -115,7 +115,7 @@
       "ok": true,
       "status": 200,
       "responseMs": null,
-      "checkedAt": "2026-05-06T04:09:25.521Z",
+      "checkedAt": "2026-05-06T05:50:56.921Z",
       "note": "local build target; set ORACLE_DASHBOARD_URL after deploy for public uptime checks"
     },
     {
@@ -124,7 +124,7 @@
       "ok": true,
       "status": 200,
       "responseMs": 208,
-      "checkedAt": "2026-05-06T04:09:25.729Z",
+      "checkedAt": "2026-05-06T05:50:57.129Z",
       "note": "reachable"
     },
     {
@@ -133,7 +133,7 @@
       "ok": true,
       "status": 200,
       "responseMs": 216,
-      "checkedAt": "2026-05-06T04:09:25.758Z",
+      "checkedAt": "2026-05-06T05:50:57.158Z",
       "note": "reachable"
     }
   ],
@@ -142,12 +142,12 @@
       "name": "Moshe",
       "path": "/Users/pasuthunjunkong/workspace/Moshe",
       "branch": "main",
-      "commit": "d56b570",
-      "commitFull": "d56b570b20cdc87de0abe5f9499aadc943461cb3",
-      "commitSubject": "oracle: refresh readiness snapshot",
+      "commit": "a53ab9c",
+      "commitFull": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
+      "commitSubject": "oracle: log readiness deployment",
       "dirty": true,
-      "changedFiles": 29,
-      "lastCommitAt": "2026-05-06T10:13:11+07:00",
+      "changedFiles": 40,
+      "lastCommitAt": "2026-05-06T11:11:14+07:00",
       "github": "Mekjunkong/Moshe",
       "remoteHost": "github.com"
     },
@@ -183,6 +183,18 @@
       "provider": "vercel",
       "project": "galaxy",
       "state": "READY",
+      "url": "https://galaxy-dghf32dkr-pasuthun-junkongs-projects.vercel.app",
+      "createdAt": "2026-05-06T05:30:33.682Z",
+      "gitCommitSha": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
+      "gitCommitMessage": "oracle: log readiness deployment",
+      "gitCommitRef": "main",
+      "gitDirty": true,
+      "note": "read via Vercel CLI auth; no token value exposed"
+    },
+    {
+      "provider": "vercel",
+      "project": "galaxy",
+      "state": "READY",
       "url": "https://galaxy-davytvezu-pasuthun-junkongs-projects.vercel.app",
       "createdAt": "2026-05-06T03:14:57.693Z",
       "gitCommitSha": "d56b570b20cdc87de0abe5f9499aadc943461cb3",
@@ -202,18 +214,6 @@
       "gitCommitRef": "main",
       "gitDirty": true,
       "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "vercel",
-      "project": "galaxy",
-      "state": "READY",
-      "url": "https://galaxy-o94gvfjom-pasuthun-junkongs-projects.vercel.app",
-      "createdAt": "2026-05-06T03:11:45.814Z",
-      "gitCommitSha": "aa46db6997ea0eb0c8c97027e015db70680fc7e0",
-      "gitCommitMessage": "oracle: add operational readiness panel",
-      "gitCommitRef": "main",
-      "gitDirty": true,
-      "note": "read via Vercel CLI auth; no token value exposed"
     }
   ],
   "github": [
@@ -224,7 +224,7 @@
       "apiStatus": "ok",
       "private": false,
       "defaultBranch": "main",
-      "pushedAt": "2026-05-06T03:13:13Z",
+      "pushedAt": "2026-05-06T04:11:16Z",
       "openIssues": 0,
       "openPullRequests": 0,
       "latestWorkflow": null,
@@ -298,9 +298,9 @@
       "severity": "warning",
       "category": "repo-dirty",
       "project": "Moshe",
-      "title": "Moshe: 29 uncommitted changes",
-      "detail": "Branch main · last commit: \"oracle: refresh readiness snapshot\"",
-      "detectedAt": "2026-05-06T10:13:11+07:00"
+      "title": "Moshe: 40 uncommitted changes",
+      "detail": "Branch main · last commit: \"oracle: log readiness deployment\"",
+      "detectedAt": "2026-05-06T11:11:14+07:00"
     },
     {
       "id": "repo-dirty-wiro4x4",
@@ -318,14 +318,14 @@
       "project": "Oracle OS",
       "title": "5 credential(s) not configured",
       "detail": "VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_PROJECT_NAME, VERCEL_TEAM_ID, GITHUB_TOKEN",
-      "detectedAt": "2026-05-06T04:09:36.525Z"
+      "detectedAt": "2026-05-06T05:51:07.726Z"
     }
   ],
   "recommendations": [
     {
       "project": "Moshe",
       "priority": "medium",
-      "reason": "Moshe: 29 uncommitted changes",
+      "reason": "Moshe: 40 uncommitted changes",
       "risk": "medium",
       "suggestedAction": "Review staged changes in Moshe and commit or stash to keep the branch clean."
     },
@@ -362,13 +362,38 @@
       "project": "galaxy",
       "event": "deploy",
       "state": "READY",
+      "url": "https://galaxy-dghf32dkr-pasuthun-junkongs-projects.vercel.app",
+      "timestamp": "2026-05-06T05:30:33.682Z",
+      "deployedCommitSha": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
+      "deployedCommitMessage": "oracle: log readiness deployment",
+      "sourceRepo": "Moshe",
+      "sourceCommitSha": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
+      "syncState": "in-sync",
+      "note": "read via Vercel CLI auth; no token value exposed"
+    },
+    {
+      "provider": "git",
+      "project": "Moshe",
+      "event": "commit",
+      "state": "uncommitted-changes",
+      "timestamp": "2026-05-06T11:11:14+07:00",
+      "sourceRepo": "Moshe",
+      "sourceCommitSha": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
+      "syncState": "behind",
+      "note": "oracle: log readiness deployment"
+    },
+    {
+      "provider": "vercel",
+      "project": "galaxy",
+      "event": "deploy",
+      "state": "READY",
       "url": "https://galaxy-davytvezu-pasuthun-junkongs-projects.vercel.app",
       "timestamp": "2026-05-06T03:14:57.693Z",
       "deployedCommitSha": "d56b570b20cdc87de0abe5f9499aadc943461cb3",
       "deployedCommitMessage": "oracle: refresh readiness snapshot",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "d56b570b20cdc87de0abe5f9499aadc943461cb3",
-      "syncState": "in-sync",
+      "sourceCommitSha": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
+      "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
     {
@@ -381,32 +406,7 @@
       "deployedCommitSha": "d56b570b20cdc87de0abe5f9499aadc943461cb3",
       "deployedCommitMessage": "oracle: refresh readiness snapshot",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "d56b570b20cdc87de0abe5f9499aadc943461cb3",
-      "syncState": "in-sync",
-      "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "git",
-      "project": "Moshe",
-      "event": "commit",
-      "state": "uncommitted-changes",
-      "timestamp": "2026-05-06T10:13:11+07:00",
-      "sourceRepo": "Moshe",
-      "sourceCommitSha": "d56b570b20cdc87de0abe5f9499aadc943461cb3",
-      "syncState": "behind",
-      "note": "oracle: refresh readiness snapshot"
-    },
-    {
-      "provider": "vercel",
-      "project": "galaxy",
-      "event": "deploy",
-      "state": "READY",
-      "url": "https://galaxy-o94gvfjom-pasuthun-junkongs-projects.vercel.app",
-      "timestamp": "2026-05-06T03:11:45.814Z",
-      "deployedCommitSha": "aa46db6997ea0eb0c8c97027e015db70680fc7e0",
-      "deployedCommitMessage": "oracle: add operational readiness panel",
-      "sourceRepo": "Moshe",
-      "sourceCommitSha": "d56b570b20cdc87de0abe5f9499aadc943461cb3",
+      "sourceCommitSha": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
       "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
@@ -521,10 +521,133 @@
       }
     ]
   },
+  "intelligenceLayer": {
+    "updatedAt": "2026-05-06T05:51:07.735Z",
+    "summary": "Oracle is learning from ψ and opportunity artifacts. Top money radar: AI Inquiry and Quote Copilot for Tour Operators (95/100).",
+    "todayLearnings": [
+      {
+        "title": "2026-05-06 — Cron self-learning guardrail",
+        "source": "ψ/active/oracle-self-learning-2026-05-06.md",
+        "date": "2026-05-06",
+        "insight": "Broad autonomous prompts can hit Hermes max tool-call RuntimeError. Bounded loops with strict tool-call budgets survive better.",
+        "whyItMatters": "Mike wants autonomous intelligence, but reliability matters more than long uncontrolled runs.",
+        "nextAction": "Continue appending learning entries here and later turn repeated patterns into dashboard widgets or scheduled reports."
+      },
+      {
+        "title": "2026-05-06 — Improvement loop needs a cleanliness sensor",
+        "source": "ψ/active/oracle-self-learning-2026-05-06.md",
+        "date": "2026-05-06",
+        "insight": "The Galaxy repo currently has many modified/untracked files while prior retrospectives show successful deployments and UI additions. A Level 3 Oracle should distinguish “active safe work in …",
+        "whyItMatters": "Mike wants Moshe to act like a business/coding partner. If Oracle sees git noise, recent deploy history, and autonomous cron activity together, it can prevent accidental shipping o…",
+        "nextAction": "Add a read-only “Repo Hygiene / Ship Readiness” intelligence card that summari"
+      }
+    ],
+    "opportunityRadar": [
+      {
+        "rank": 1,
+        "title": "AI Inquiry and Quote Copilot for Tour Operators",
+        "score": 95,
+        "fit": "excellent",
+        "thesis": "AI assistant that reads WhatsApp/LINE/email inquiries, asks missing questions, creates trip options, estimates price, drafts Thai/English replies, and schedules follow-up.",
+        "pricing": "12,000–35,000 THB setup + 3,000–12,000 THB/month support, depending on volume and integrations.",
+        "validationStep": "Create 5 realistic inquiry examples from Wiro patterns; show before/after response drafts and quote generation; ask operators if they would pay for a pilot.",
+        "source": "outbox/one-person-business/business-radar-mike-2026-05-06.md"
+      },
+      {
+        "rank": 2,
+        "title": "Wiro Internal Booking/Itinerary OS → Micro-SaaS",
+        "score": 90,
+        "fit": "excellent",
+        "thesis": "Lightweight operating system for bookings: inquiry capture, customer profile, itinerary builder, quote calculator, deposit/payment status, prep checklist, guide notes, follow-up reminders.",
+        "pricing": "2,500–9,000 THB/month SaaS or 25,000–75,000 THB setup + monthly maintenance.",
+        "validationStep": "Build only the Wiro version first. Then show screens to 10 similar operators and ask which part they would pay for.",
+        "source": "outbox/one-person-business/business-radar-mike-2026-05-06.md"
+      },
+      {
+        "rank": 3,
+        "title": "Review/Reputation Autopilot for Tours and Local Services",
+        "score": 87,
+        "fit": "strong",
+        "thesis": "Automated review request system: post-service messages, Google/Tripadvisor review links, negative-feedback interception, testimonials, owner reply drafts, monthly reputation report.",
+        "pricing": "5,000–15,000 THB setup + 2,000–8,000 THB/month.",
+        "validationStep": "Mock one monthly report and 3 message flows. Offer a manual pilot using Google Sheets plus scheduled messages.",
+        "source": "outbox/one-person-business/business-radar-mike-2026-05-06.md"
+      },
+      {
+        "rank": 4,
+        "title": "WhatsApp/LINE Follow-up and No-show Reducer",
+        "score": 85,
+        "fit": "strong",
+        "thesis": "Simple reminder and follow-up automations for inquiries, deposits, trip prep, pickup time, review requests, and abandoned conversations.",
+        "pricing": "8,000–25,000 THB setup + 2,000–7,000 THB/month.",
+        "validationStep": "Ask businesses to count last month’s unanswered inquiries/no-shows; show ROI from recovering 1 booking.",
+        "source": "outbox/one-person-business/business-radar-mike-2026-05-06.md"
+      },
+      {
+        "rank": 5,
+        "title": "AI Trip Planner Lead Magnet for Chiang Mai/North Thailand",
+        "score": 85,
+        "fit": "strong",
+        "thesis": "Public-facing AI trip planner that recommends routes, seasons, durations, packing lists, and Wiro-relevant experiences; captures leads for Wiro or partner tours.",
+        "pricing": "Internal lead value first; if white-labeled, 2,000–8,000 THB/month.",
+        "validationStep": "Create landing page with itinerary quiz and manual AI-generated itinerary delivery. Track opt-ins and Wiro inquiries.",
+        "source": "outbox/one-person-business/business-radar-mike-2026-05-06.md"
+      }
+    ],
+    "approvalQueue": [
+      {
+        "title": "Build internal Wiro-style demo pack",
+        "category": "safe",
+        "risk": "low",
+        "reason": "Uses synthetic/Wiro-style examples only and does not contact external leads.",
+        "proposedAction": "Create 5 sample inquiries and AI draft replies for the top offer.",
+        "source": "outbox/one-person-business/business-radar-mike-2026-05-06.md"
+      },
+      {
+        "title": "Review top opportunity direction",
+        "category": "approval-required",
+        "risk": "medium",
+        "reason": "AI Inquiry and Quote Copilot for Tour Operators is currently ranked 95/100.",
+        "proposedAction": "Mike approves whether to validate: AI Inquiry and Quote Copilot for Tour Operators.",
+        "source": "outbox/one-person-business/business-radar-mike-2026-05-06.md"
+      },
+      {
+        "title": "Send first outreach batch",
+        "category": "approval-required",
+        "risk": "medium",
+        "reason": "Outreach pack exists, but messages must not be sent without Mike approval.",
+        "proposedAction": "Approve target niche, message wording, and daily message limit before any sending.",
+        "source": "outbox/one-person-business/ai-booking-assistant-first-outreach-pack.md"
+      },
+      {
+        "title": "Publish landing page copy",
+        "category": "approval-required",
+        "risk": "medium",
+        "reason": "Landing copy exists but public publishing affects brand and offer positioning.",
+        "proposedAction": "Mike reviews copy, pricing, promise, and CTA before publish.",
+        "source": "outbox/one-person-business/ai-booking-assistant-landing-page-copy.md"
+      }
+    ]
+  },
+  "terminal": {
+    "enabled": false,
+    "terminalEnabled": false,
+    "sessionConfigured": true,
+    "endpoint": "/api/oracle/terminal",
+    "authMethod": "signed-session-cookie",
+    "defaultCwd": "/Users/pasuthunjunkong/workspace/Moshe",
+    "allowedCwdPrefixes": [
+      "/Users/pasuthunjunkong/workspace/Moshe",
+      "/Users/pasuthunjunkong/workspace"
+    ],
+    "note": "Terminal panel is visible but execution is disabled until ORACLE_TERMINAL_ENABLED=true is set on a trusted runtime."
+  },
   "nextActions": [
     "Set ORACLE_SESSION_SECRET to arm the Mike-only signed session gate.",
     "The Oracle now turns audit trail events into learnings before refreshing live data.",
     "Keep the browser read-only until a valid session cookie unlocks execute mode.",
-    "Add execution handlers for GitHub and Vercel only after the audit trail is proven."
+    "Add execution handlers for GitHub and Vercel only after the audit trail is proven.",
+    "Use the Intelligence Layer panels to turn learnings into money radar and approval-ready actions.",
+    "Enable ORACLE_TERMINAL_ENABLED=true only on Mike local/admin runtime before using the Terminal tab."
   ]
 }

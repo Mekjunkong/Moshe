@@ -54,6 +54,22 @@ interface OracleSessionResponse {
   policy?: OracleData['automation']
 }
 
+interface OracleTerminalResponse {
+  ok: boolean
+  requestId?: string
+  command?: string
+  cwd?: string
+  exitCode?: number
+  timedOut?: boolean
+  durationMs?: number
+  stdout?: string
+  stderr?: string
+  error?: string
+  message?: string
+  policy?: OracleData['terminal']
+  recipes?: { label: string; command: string; cwd: string }[]
+}
+
 interface OracleSessionState {
   status: 'loading' | 'ready' | 'authenticated' | 'error'
   message: string
@@ -120,6 +136,7 @@ const tabs = [
   { id: 'overview', label: 'Overview' },
   { id: 'wiro', label: 'Wiro' },
   { id: 'improve', label: 'Improve' },
+  { id: 'terminal', label: 'Terminal' },
   { id: 'sites', label: 'Sites' },
   { id: 'repos', label: 'Repos' },
   { id: 'sensors', label: 'Sensors' },
@@ -129,7 +146,7 @@ const tabs = [
 export default function OracleCommandCenter({ data }: Props) {
   const [oracleRefreshNonce, setOracleRefreshNonce] = useState(0)
   const oracle = useOracleLiveData(oracleRefreshNonce)
-  const [tab, setTab] = useState<'today' | 'intel' | 'overview' | 'wiro' | 'improve' | 'sites' | 'repos' | 'sensors' | 'learnings'>('today')
+  const [tab, setTab] = useState<'today' | 'intel' | 'overview' | 'wiro' | 'improve' | 'terminal' | 'sites' | 'repos' | 'sensors' | 'learnings'>('today')
   const [previewReason, setPreviewReason] = useState('Refresh the Oracle snapshot before any future action.')
   const [previewState, setPreviewState] = useState<{
     status: 'idle' | 'loading' | 'ready' | 'error'
@@ -150,6 +167,14 @@ export default function OracleCommandCenter({ data }: Props) {
     actor: null,
     expiresAt: null,
   })
+  const [terminalCommand, setTerminalCommand] = useState('command -v codex && codex --version')
+  const [terminalCwd, setTerminalCwd] = useState('/Users/pasuthunjunkong/workspace/Moshe')
+  const [terminalState, setTerminalState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; result: OracleTerminalResponse | null }>({
+    status: 'idle',
+    result: null,
+  })
+  const [terminalRecipes, setTerminalRecipes] = useState<{ label: string; command: string; cwd: string }[]>([])
+  const [terminalLivePolicy, setTerminalLivePolicy] = useState<OracleData['terminal'] | null>(null)
   const feedbackLoopNote =
     oracle.nextActions.find((item) => item.toLowerCase().includes('audit trail events into learnings'))
     ?? 'Audit trail events are being converted into reusable learnings.'
@@ -207,6 +232,24 @@ export default function OracleCommandCenter({ data }: Props) {
       })
     return () => controller.abort()
   }, [oracle.automation?.endpoint, oracleRefreshNonce])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    fetch(oracle.terminal?.endpoint ?? '/api/oracle/terminal', {
+      method: 'GET',
+      credentials: 'include',
+      signal: controller.signal,
+    })
+      .then((response) => response.json() as Promise<OracleTerminalResponse>)
+      .then((payload) => {
+        if (payload?.recipes) setTerminalRecipes(payload.recipes)
+        if (payload?.policy) setTerminalLivePolicy(payload.policy)
+      })
+      .catch((error: Error) => {
+        if (error.name !== 'AbortError') console.warn('Oracle terminal policy unavailable', error.message)
+      })
+    return () => controller.abort()
+  }, [oracle.terminal?.endpoint, oracleRefreshNonce])
 
   const unlockSession = async () => {
     setSessionState((current) => ({
@@ -363,6 +406,30 @@ export default function OracleCommandCenter({ data }: Props) {
     }
   }
 
+  const runTerminalCommand = async () => {
+    setTerminalState({ status: 'loading', result: null })
+    try {
+      const response = await fetch(oracle.terminal?.endpoint ?? '/api/oracle/terminal', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: terminalCommand, cwd: terminalCwd, timeoutMs: 120000 }),
+      })
+      const payload = (await response.json().catch(() => null)) as OracleTerminalResponse | null
+      if (!payload) throw new Error(`HTTP ${response.status}`)
+      setTerminalState({ status: payload.ok ? 'ready' : 'error', result: payload })
+    } catch (error) {
+      setTerminalState({
+        status: 'error',
+        result: {
+          ok: false,
+          error: 'terminal_request_failed',
+          message: error instanceof Error ? error.message : 'Unknown terminal error.',
+        },
+      })
+    }
+  }
+
   const runSnapshotPreview = () => runOracleAction('refresh-oracle-snapshot', 'preview')
   const runSnapshotExecute = () => runOracleAction('refresh-oracle-snapshot', 'execute')
 
@@ -485,6 +552,27 @@ export default function OracleCommandCenter({ data }: Props) {
     : readiness.status === 'watch'
       ? 'medium'
       : 'high'
+  const intelligence = oracle.intelligenceLayer ?? {
+    updatedAt: oracle.generated,
+    summary: 'Oracle intelligence layer is waiting for the next generated snapshot.',
+    todayLearnings: [],
+    opportunityRadar: [],
+    approvalQueue: [],
+  }
+  const topMoneyOpportunity = intelligence.opportunityRadar[0] ?? null
+  const safeApprovalItems = intelligence.approvalQueue.filter((item) => item.category === 'safe')
+  const gatedApprovalItems = intelligence.approvalQueue.filter((item) => item.category === 'approval-required')
+  const terminalPolicy = terminalLivePolicy ?? oracle.terminal ?? {
+    enabled: false,
+    terminalEnabled: false,
+    sessionConfigured: false,
+    endpoint: '/api/oracle/terminal',
+    authMethod: 'preview-only' as const,
+    defaultCwd: '/Users/pasuthunjunkong/workspace/Moshe',
+    allowedCwdPrefixes: ['/Users/pasuthunjunkong/workspace/Moshe'],
+    note: 'Terminal policy not loaded yet.',
+  }
+  const terminalReady = terminalPolicy.enabled && sessionState.status === 'authenticated'
 
   return (
     <aside className="oracle-shell" aria-label="Oracle OS command center">
@@ -568,6 +656,70 @@ export default function OracleCommandCenter({ data }: Props) {
                 ))}
               </div>
             </div>
+          </div>
+
+          <div className="oracle-intelligence-hero" aria-label="Oracle intelligence layer">
+            <div>
+              <p>INTELLIGENCE LAYER</p>
+              <h3>{topMoneyOpportunity?.title ?? 'Learning loop warming up'}</h3>
+              <small>{intelligence.summary}</small>
+            </div>
+            <span className={`oracle-risk-badge ${topMoneyOpportunity?.fit === 'excellent' ? 'low' : topMoneyOpportunity ? 'medium' : 'high'}`}>
+              {topMoneyOpportunity ? `${topMoneyOpportunity.score}/100` : 'NO RADAR'}
+            </span>
+          </div>
+
+          <div className="oracle-intelligence-grid">
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Today’s learnings</strong>
+                <span>{intelligence.todayLearnings.length}</span>
+              </div>
+              {intelligence.todayLearnings.length > 0 ? intelligence.todayLearnings.slice(0, 3).map((learning) => (
+                <div className="oracle-intel-line" key={`${learning.title}-${learning.source}`}>
+                  <strong>{learning.title}</strong>
+                  <p>{learning.insight}</p>
+                  <small>{learning.whyItMatters}</small>
+                </div>
+              )) : <small className="oracle-muted">No self-learning entries in this snapshot yet.</small>}
+            </article>
+
+            <article className="oracle-intel-card money">
+              <div className="oracle-status-head">
+                <strong>Money opportunity radar</strong>
+                <span>{intelligence.opportunityRadar.length}</span>
+              </div>
+              {intelligence.opportunityRadar.length > 0 ? intelligence.opportunityRadar.slice(0, 3).map((item) => (
+                <div className="oracle-opportunity-line" key={item.title}>
+                  <div>
+                    <strong>#{item.rank} {item.title}</strong>
+                    <span className={`oracle-risk-badge ${item.fit === 'excellent' ? 'low' : 'medium'}`}>{item.score}/100</span>
+                  </div>
+                  <p>{item.thesis}</p>
+                  <small>{item.pricing}</small>
+                  <small>Validate: {item.validationStep}</small>
+                </div>
+              )) : <small className="oracle-muted">No money radar artifact detected yet.</small>}
+            </article>
+          </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>APPROVAL QUEUE</p>
+            <span>{safeApprovalItems.length} safe · {gatedApprovalItems.length} need Mike</span>
+          </div>
+          <div className="oracle-approval-grid">
+            {intelligence.approvalQueue.map((item) => (
+              <article className={`oracle-approval-card ${item.category === 'safe' ? 'safe' : 'gated'}`} key={item.title}>
+                <div className="oracle-status-head">
+                  <strong>{item.title}</strong>
+                  <span className={`oracle-risk-badge ${item.category === 'safe' ? 'low' : item.risk}`}>
+                    {item.category === 'safe' ? 'CAN PREP' : 'APPROVAL'}
+                  </span>
+                </div>
+                <p>{item.reason}</p>
+                <small>{item.proposedAction}</small>
+              </article>
+            ))}
           </div>
 
           <div className="oracle-section-head" style={{ marginTop: 16 }}>
@@ -1248,6 +1400,90 @@ export default function OracleCommandCenter({ data }: Props) {
                 <p>{loop.signal}</p>
               </article>
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Terminal tab ── */}
+      {tab === 'terminal' && (
+        <section id="oracle-panel-terminal" role="tabpanel" aria-labelledby="oracle-tab-terminal" className="oracle-section oracle-scroll">
+          <div className="oracle-section-head">
+            <p>ADMIN TERMINAL</p>
+            <span>{terminalReady ? 'ready' : terminalPolicy.terminalEnabled ? 'locked' : 'disabled'}</span>
+          </div>
+
+          <div className={`oracle-terminal-status ${terminalReady ? 'ready' : 'locked'}`}>
+            <div>
+              <strong>{terminalReady ? 'Terminal bridge armed' : 'Terminal bridge protected'}</strong>
+              <p>{terminalPolicy.note}</p>
+              <small>Needs: ORACLE_TERMINAL_ENABLED=true + signed Mike session. This is intended for local/admin runtime, not public open access.</small>
+            </div>
+            <span className={`oracle-risk-badge ${terminalReady ? 'low' : terminalPolicy.terminalEnabled ? 'medium' : 'high'}`}>
+              {terminalReady ? 'RUN' : terminalPolicy.terminalEnabled ? 'UNLOCK' : 'OFF'}
+            </span>
+          </div>
+
+          {sessionState.status !== 'authenticated' && (
+            <div className="oracle-terminal-unlock">
+              <label className="oracle-terminal-label">
+                <span>Mike session passphrase</span>
+                <input
+                  type="password"
+                  value={sessionPassphrase}
+                  onChange={(event) => setSessionPassphrase(event.target.value)}
+                  placeholder="Enter local/admin passphrase"
+                />
+              </label>
+              <button type="button" className="oracle-action-button" disabled={!sessionPassphrase || sessionState.status === 'loading'} onClick={unlockSession}>
+                {sessionState.status === 'loading' ? 'Unlocking…' : 'Unlock terminal session'}
+              </button>
+              <small>{sessionState.message} — {sessionState.detail}</small>
+            </div>
+          )}
+
+          <div className="oracle-terminal-recipes">
+            {terminalRecipes.map((recipe) => (
+              <button
+                key={recipe.label}
+                type="button"
+                onClick={() => {
+                  setTerminalCommand(recipe.command)
+                  setTerminalCwd(recipe.cwd)
+                }}
+              >
+                {recipe.label}
+              </button>
+            ))}
+          </div>
+
+          <label className="oracle-terminal-label">
+            <span>Working directory</span>
+            <input value={terminalCwd} onChange={(event) => setTerminalCwd(event.target.value)} spellCheck={false} />
+          </label>
+
+          <label className="oracle-terminal-label">
+            <span>Command</span>
+            <textarea value={terminalCommand} onChange={(event) => setTerminalCommand(event.target.value)} spellCheck={false} rows={4} />
+          </label>
+
+          <div className="oracle-terminal-actions">
+            <button type="button" className="oracle-action-button" disabled={!terminalReady || terminalState.status === 'loading'} onClick={runTerminalCommand}>
+              {terminalState.status === 'loading' ? 'Running…' : 'Run command'}
+            </button>
+            <small>{terminalReady ? 'Commands run through a signed-session, same-origin, denylisted shell bridge.' : 'Unlock session and enable local terminal env first.'}</small>
+          </div>
+
+          <div className="oracle-terminal-output">
+            <div className="oracle-status-head">
+              <strong>Output</strong>
+              <span>{terminalState.result?.exitCode ?? terminalState.result?.error ?? terminalState.status}</span>
+            </div>
+            <pre>{terminalState.result ? `${terminalState.result.stdout ?? ''}${terminalState.result.stderr ? `\n[stderr]\n${terminalState.result.stderr}` : ''}${terminalState.result.message ? `\n${terminalState.result.message}` : ''}` : 'No command run yet.'}</pre>
+          </div>
+
+          <div className="oracle-terminal-note">
+            <strong>Codex usage</strong>
+            <p>For Codex, use this panel to check/install/launch commands. Full interactive PTY should run on Mike local machine; public Vercel stays protected and may not have Codex installed.</p>
           </div>
         </section>
       )}

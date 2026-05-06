@@ -10,7 +10,8 @@
     "generate": "bun scripts/galaxy-gen.ts",
     "generate:oracle": "node scripts/generateOracleData.mjs",
     "dev:full": "concurrently \"bun scripts/galaxy-gen.ts\" \"node scripts/generateOracleData.mjs\" \"vite\"",
-    "test": "node --test api/oracle/auth.test.js scripts/oracleLearning.test.js"
+    "test": "node --test api/oracle/auth.test.js scripts/oracleLearning.test.js",
+    "dev:terminal": "node scripts/oracle-terminal-dev.mjs"
   },
   "dependencies": {
     "knowledge-map-3d": "github:Bombbaza/Multi-Planet-System-Knowledge-Map-3D",

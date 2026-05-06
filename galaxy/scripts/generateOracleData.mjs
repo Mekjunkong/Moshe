@@ -118,6 +118,162 @@ function readMarkdown(dir) {
   }
 }
 
+
+function readMarkdownFile(path) {
+  try {
+    if (!existsSync(path)) return '';
+    return readFileSync(path, 'utf8');
+  } catch {
+    return '';
+  }
+}
+
+function cleanMarkdown(text, max = 220) {
+  const cleaned = String(text || '')
+    .replace(/^[-*]\s+/gm, '')
+    .replace(/[#*_`>]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return cleaned.slice(0, max) + (cleaned.length > max ? '…' : '');
+}
+
+function extractSection(text, heading) {
+  const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(`^##\\s+${escaped}\\s*$([\\s\\S]*?)(?=^##\\s+|\\Z)`, 'mi');
+  const match = String(text || '').match(re);
+  return match ? match[1].trim() : '';
+}
+
+function deriveSelfLearningItems(selfLearningText, activeDocs) {
+  const log = extractSection(selfLearningText, 'Learning Log');
+  const entries = [];
+  const blocks = log.split(/\n(?=###\s+)/).filter((b) => b.trim());
+  for (const block of blocks.slice(0, 4)) {
+    const title = block.match(/^###\s+(.+)/m)?.[1]?.trim() || 'Oracle learning';
+    const learned = block.match(/\*\*Learned:\*\*\s*([^\n]+)/i)?.[1]
+      || block.match(/-\s+\*\*Learned:\*\*\s*([^\n]+)/i)?.[1]
+      || cleanMarkdown(block, 180);
+    const why = block.match(/\*\*Why it matters:\*\*\s*([^\n]+)/i)?.[1]
+      || 'Turns recent work into reusable Oracle behavior.';
+    const next = block.match(/\*\*Safe next action:\*\*\s*([^\n]+)/i)?.[1]
+      || block.match(/\*\*Oracle improvement:\*\*\s*([^\n]+)/i)?.[1]
+      || 'Keep appending bounded learnings and surface them in the dashboard.';
+    entries.push({
+      title,
+      source: 'ψ/active/oracle-self-learning-2026-05-06.md',
+      date: title.match(/\d{4}-\d{2}-\d{2}/)?.[0] || new Date().toISOString().split('T')[0],
+      insight: cleanMarkdown(learned, 190),
+      whyItMatters: cleanMarkdown(why, 180),
+      nextAction: cleanMarkdown(next, 180),
+    });
+  }
+
+  if (entries.length === 0) {
+    for (const doc of activeDocs.slice(0, 3)) {
+      entries.push({
+        title: doc.title,
+        source: `ψ/active/${doc.file}`,
+        date: doc.date,
+        insight: doc.summary,
+        whyItMatters: 'Active Oracle memory is available to guide the next autonomous step.',
+        nextAction: 'Review and convert this active note into a dashboard signal or scheduled report.',
+      });
+    }
+  }
+  return entries.slice(0, 5);
+}
+
+function deriveOpportunityRadar() {
+  const radarPath = join(MOSHE_ROOT, 'outbox/one-person-business/business-radar-mike-2026-05-06.md');
+  const altPath = join(MOSHE_ROOT, 'outbox/one-person-business/business-radar-2026-05-06.md');
+  const text = readMarkdownFile(radarPath) || readMarkdownFile(altPath);
+  if (!text) return [];
+  const items = [];
+  const re = /^###\s+(\d+)\.\s+(.+?)\s+—\s+\*\*(\d+)\/100\*\*([\s\S]*?)(?=^###\s+\d+\.\s+|\Z)/gm;
+  let match;
+  while ((match = re.exec(text)) && items.length < 5) {
+    const rank = Number(match[1]);
+    const title = match[2].trim();
+    const score = Number(match[3]);
+    const body = match[4] || '';
+    const concept = body.match(/-\s+\*\*Concept:\*\*\s*([^\n]+)/i)?.[1] || 'Opportunity identified from Mike-specific business radar.';
+    const pricing = body.match(/-\s+\*\*Pricing hypothesis:\*\*\s*([^\n]+)/i)?.[1] || 'Pricing not set yet.';
+    const validation = body.match(/-\s+\*\*Validate before build:\*\*\s*([^\n]+)/i)?.[1] || 'Validate with a small manual pilot before building.';
+    items.push({
+      rank,
+      title,
+      score,
+      fit: score >= 90 ? 'excellent' : score >= 80 ? 'strong' : 'watch',
+      thesis: cleanMarkdown(concept, 220),
+      pricing: cleanMarkdown(pricing, 160),
+      validationStep: cleanMarkdown(validation, 180),
+      source: 'outbox/one-person-business/business-radar-mike-2026-05-06.md',
+    });
+  }
+  return items;
+}
+
+function deriveApprovalQueue(opportunityRadar) {
+  const outreachPath = join(MOSHE_ROOT, 'outbox/one-person-business/ai-booking-assistant-first-outreach-pack.md');
+  const landingPath = join(MOSHE_ROOT, 'outbox/one-person-business/ai-booking-assistant-landing-page-copy.md');
+  const hasOutreach = Boolean(readMarkdownFile(outreachPath));
+  const hasLanding = Boolean(readMarkdownFile(landingPath));
+  const top = opportunityRadar[0];
+  const queue = [
+    {
+      title: 'Build internal Wiro-style demo pack',
+      category: 'safe',
+      risk: 'low',
+      reason: 'Uses synthetic/Wiro-style examples only and does not contact external leads.',
+      proposedAction: 'Create 5 sample inquiries and AI draft replies for the top offer.',
+      source: top?.source || 'Oracle intelligence layer',
+    },
+    {
+      title: 'Review top opportunity direction',
+      category: 'approval-required',
+      risk: 'medium',
+      reason: top ? `${top.title} is currently ranked ${top.score}/100.` : 'Opportunity radar needs Mike direction before public execution.',
+      proposedAction: top ? `Mike approves whether to validate: ${top.title}.` : 'Mike chooses the first niche to validate.',
+      source: top?.source || 'Oracle intelligence layer',
+    },
+    {
+      title: 'Send first outreach batch',
+      category: 'approval-required',
+      risk: 'medium',
+      reason: hasOutreach ? 'Outreach pack exists, but messages must not be sent without Mike approval.' : 'Outreach requires approved copy and lead list first.',
+      proposedAction: 'Approve target niche, message wording, and daily message limit before any sending.',
+      source: 'outbox/one-person-business/ai-booking-assistant-first-outreach-pack.md',
+    },
+    {
+      title: 'Publish landing page copy',
+      category: 'approval-required',
+      risk: 'medium',
+      reason: hasLanding ? 'Landing copy exists but public publishing affects brand and offer positioning.' : 'Landing copy can be drafted safely first.',
+      proposedAction: hasLanding ? 'Mike reviews copy, pricing, promise, and CTA before publish.' : 'Draft landing page copy as a safe artifact.',
+      source: 'outbox/one-person-business/ai-booking-assistant-landing-page-copy.md',
+    },
+  ];
+  return queue;
+}
+
+function deriveIntelligenceLayer(activeDocs) {
+  const selfLearningPath = join(PSI, 'active/oracle-self-learning-2026-05-06.md');
+  const selfLearningText = readMarkdownFile(selfLearningPath);
+  const opportunityRadar = deriveOpportunityRadar();
+  const todayLearnings = deriveSelfLearningItems(selfLearningText, activeDocs);
+  const approvalQueue = deriveApprovalQueue(opportunityRadar);
+  const top = opportunityRadar[0];
+  return {
+    updatedAt: new Date().toISOString(),
+    summary: top
+      ? `Oracle is learning from ψ and opportunity artifacts. Top money radar: ${top.title} (${top.score}/100).`
+      : 'Oracle is learning from ψ and recent active notes. Money radar will appear when opportunity artifacts are present.',
+    todayLearnings,
+    opportunityRadar,
+    approvalQueue,
+  };
+}
+
 async function checkWebsite(name, url) {
   const started = Date.now();
   try {
@@ -189,6 +345,26 @@ function repoStatus(name, path) {
 
 function envStatus(name, purpose) {
   return { name, configured: Boolean(process.env[name]), purpose };
+}
+
+function oracleTerminalPolicy() {
+  const sessionConfigured = Boolean(process.env.ORACLE_SESSION_SECRET);
+  const terminalEnabled = String(process.env.ORACLE_TERMINAL_ENABLED || '').toLowerCase() === 'true';
+  return {
+    enabled: terminalEnabled && sessionConfigured,
+    terminalEnabled,
+    sessionConfigured,
+    endpoint: '/api/oracle/terminal',
+    authMethod: sessionConfigured ? 'signed-session-cookie' : 'preview-only',
+    defaultCwd: '/Users/pasuthunjunkong/workspace/Moshe',
+    allowedCwdPrefixes: [
+      '/Users/pasuthunjunkong/workspace/Moshe',
+      '/Users/pasuthunjunkong/workspace',
+    ],
+    note: terminalEnabled
+      ? 'Terminal panel is armed for signed-session local/admin command execution.'
+      : 'Terminal panel is visible but execution is disabled until ORACLE_TERMINAL_ENABLED=true is set on a trusted runtime.',
+  };
 }
 
 function oracleAutomationPolicy() {
@@ -808,6 +984,7 @@ const credentialsConfig = [
 
 const generatedAt = new Date().toISOString();
 const automation = oracleAutomationPolicy();
+const terminal = oracleTerminalPolicy();
 const auditEntries = readOracleAuditEntries(automation.auditPath, 50);
 const auditLearnings = deriveOracleLearnings(auditEntries, learnings, 5);
 const recentLearnings = [...auditLearnings, ...learnings].slice(0, 5);
@@ -830,6 +1007,7 @@ const operationalReadiness = deriveOperationalReadiness({
   automation,
   incidents,
 });
+const intelligenceLayer = deriveIntelligenceLayer(active);
 
 const data = {
   generated: generatedAt,
@@ -887,11 +1065,15 @@ const data = {
   deployTimeline,
   automation,
   operationalReadiness,
+  intelligenceLayer,
+  terminal,
   nextActions: [
     'Set ORACLE_SESSION_SECRET to arm the Mike-only signed session gate.',
     'The Oracle now turns audit trail events into learnings before refreshing live data.',
     'Keep the browser read-only until a valid session cookie unlocks execute mode.',
     'Add execution handlers for GitHub and Vercel only after the audit trail is proven.',
+    'Use the Intelligence Layer panels to turn learnings into money radar and approval-ready actions.',
+    'Enable ORACLE_TERMINAL_ENABLED=true only on Mike local/admin runtime before using the Terminal tab.',
   ],
 };
 

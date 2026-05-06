@@ -197,6 +197,55 @@ export interface OracleOperationalReadiness {
   checks: OracleReadinessCheck[]
 }
 
+
+export interface OracleTodayLearning {
+  title: string
+  source: string
+  date: string
+  insight: string
+  whyItMatters: string
+  nextAction: string
+}
+
+export interface OracleOpportunityRadarItem {
+  rank: number
+  title: string
+  score: number
+  fit: 'excellent' | 'strong' | 'watch'
+  thesis: string
+  pricing: string
+  validationStep: string
+  source: string
+}
+
+export interface OracleApprovalQueueItem {
+  title: string
+  category: 'safe' | 'approval-required'
+  risk: 'low' | 'medium' | 'high'
+  reason: string
+  proposedAction: string
+  source: string
+}
+
+export interface OracleTerminalPolicy {
+  enabled: boolean
+  terminalEnabled: boolean
+  sessionConfigured: boolean
+  endpoint: string
+  authMethod: 'preview-only' | 'signed-session-cookie'
+  defaultCwd: string
+  allowedCwdPrefixes: string[]
+  note: string
+}
+
+export interface OracleIntelligenceLayer {
+  updatedAt: string
+  summary: string
+  todayLearnings: OracleTodayLearning[]
+  opportunityRadar: OracleOpportunityRadarItem[]
+  approvalQueue: OracleApprovalQueueItem[]
+}
+
 // ── Root data contract ──────────────────────────────────────────────────────
 
 export interface OracleData {
@@ -228,6 +277,8 @@ export interface OracleData {
   deployTimeline?: OracleDeployEvent[]
   automation?: OracleAutomationPolicy | null
   operationalReadiness?: OracleOperationalReadiness
+  intelligenceLayer?: OracleIntelligenceLayer
+  terminal?: OracleTerminalPolicy
   nextActions: string[]
 }
 
@@ -326,6 +377,23 @@ export const ORACLE_FALLBACK_DATA: OracleData = {
     status: 'watch',
     summary: 'Waiting for the first live Oracle readiness snapshot.',
     checks: [],
+  },
+  intelligenceLayer: {
+    updatedAt: new Date(0).toISOString(),
+    summary: 'Waiting for the first Oracle intelligence snapshot.',
+    todayLearnings: [],
+    opportunityRadar: [],
+    approvalQueue: [],
+  },
+  terminal: {
+    enabled: false,
+    terminalEnabled: false,
+    sessionConfigured: false,
+    endpoint: '/api/oracle/terminal',
+    authMethod: 'preview-only',
+    defaultCwd: '/Users/pasuthunjunkong/workspace/Moshe',
+    allowedCwdPrefixes: ['/Users/pasuthunjunkong/workspace/Moshe'],
+    note: 'Terminal execution is disabled until the local/admin runtime explicitly enables it.',
   },
   nextActions: [
     'Run node scripts/generateOracleData.mjs',
