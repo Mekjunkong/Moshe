@@ -481,6 +481,9 @@ function repoStatus(name, path) {
   const changed = safeExec('git', ['status', '--short'], path, '')
     .split('\n')
     .filter(Boolean);
+  const untrackedFiles = changed.filter((line) => line.startsWith('??')).length;
+  const modifiedFiles = changed.length - untrackedFiles;
+  const protectedTouched = changed.some((line) => /(^|\s)(\.env|\.vercel\/.*env|.*secret.*|.*credential.*|package-lock\.json|pnpm-lock\.yaml|yarn\.lock)/i.test(line));
   const remote = safeExec('git', ['remote', 'get-url', 'origin'], path, '');
   const github = githubSlugFromRemote(remote);
   return {
@@ -492,6 +495,9 @@ function repoStatus(name, path) {
     commitSubject: safeExec('git', ['log', '-1', '--pretty=%s'], path),
     dirty: changed.length > 0,
     changedFiles: changed.length,
+    modifiedFiles,
+    untrackedFiles,
+    protectedTouched,
     lastCommitAt: safeExec('git', ['log', '-1', '--pretty=%cI'], path),
     github: github ? `${github.owner}/${github.repo}` : undefined,
     remoteHost: github ? 'github.com' : undefined,
@@ -1027,6 +1033,181 @@ function deriveDeployTimeline(deployments, repos) {
   return events.slice(0, 10);
 }
 
+function signalFreshness(timestamp, now = Date.now()) {
+  const t = new Date(timestamp || 0).getTime();
+  if (!Number.isFinite(t) || t <= 0) return 'unknown';
+  return now - t <= 36 * 60 * 60 * 1000 ? 'fresh' : 'stale';
+}
+
+function deriveFeedbackLedger({ auditEntries, activeCrons, recommendations, intelligenceLayer, generatedAt }) {
+  const signals = [];
+  for (const entry of auditEntries.slice(0, 5)) {
+    signals.push({
+      id: `audit-${String(entry.requestId || entry.at || signals.length).replace(/[^a-z0-9_-]/gi, '').slice(0, 40)}`,
+      source: `audit:${entry.actionId || 'oracle-action'}`,
+      businessArea: entry.actionId === 'dispatch-wiro-ci' ? 'deploy_reliability' : 'oracle_os',
+      actionability: entry.outcome === 'allowed' ? 'high' : entry.outcome === 'denied' ? 'medium' : 'low',
+      freshness: signalFreshness(entry.at || entry.requestedAt, new Date(generatedAt).getTime()),
+      riskLevel: entry.outcome === 'allowed' ? 'medium' : 'low',
+      approvalRequired: /approval|required|confirm/i.test(String(entry.detail || '')),
+      mikeFeedback: 'unrated',
+      valueSignal: String(entry.detail || entry.outcome || 'Oracle action event recorded.').slice(0, 180),
+    });
+  }
+  for (const rec of recommendations.slice(0, 4)) {
+    signals.push({
+      id: `rec-${String(rec.project || 'oracle').replace(/[^a-z0-9_-]/gi, '').toLowerCase()}-${signals.length}`,
+      source: `recommendation:${rec.project}`,
+      businessArea: rec.project === 'Wiro4x4' ? 'wiro_growth' : rec.risk === 'high' ? 'deploy_reliability' : 'decision_load_reduction',
+      actionability: rec.priority === 'high' ? 'high' : rec.priority === 'medium' ? 'medium' : 'low',
+      freshness: 'fresh',
+      riskLevel: rec.risk,
+      approvalRequired: rec.risk !== 'low',
+      mikeFeedback: 'unrated',
+      valueSignal: String(rec.suggestedAction || rec.reason).slice(0, 180),
+    });
+  }
+  for (const cron of activeCrons.slice(0, 4)) {
+    signals.push({
+      id: `cron-${String(cron.name || 'job').replace(/[^a-z0-9_-]/gi, '').toLowerCase()}-${signals.length}`,
+      source: `cron:${cron.name}`,
+      businessArea: /wiro/i.test(cron.name) ? 'wiro_growth' : /brief|report/i.test(cron.name) ? 'decision_load_reduction' : 'memory_continuity',
+      actionability: /ok|active|running/i.test(cron.status || '') ? 'medium' : 'low',
+      freshness: 'fresh',
+      riskLevel: 'low',
+      approvalRequired: false,
+      mikeFeedback: 'unrated',
+      valueSignal: `${cron.schedule || 'scheduled'} · next ${cron.nextRun || 'unknown'}`.slice(0, 180),
+    });
+  }
+  for (const decision of (intelligenceLayer?.autonomyRouter?.decisions || []).slice(0, 4)) {
+    signals.push({
+      id: `router-${decision.id}`,
+      source: `autonomy-router:${decision.source}`,
+      businessArea: decision.businessArea === 'customer_or_public' ? 'business_opportunity' : decision.businessArea,
+      actionability: decision.autonomyLevel === 'safe_now' ? 'high' : 'medium',
+      freshness: 'fresh',
+      riskLevel: decision.risk,
+      approvalRequired: decision.autonomyLevel === 'approval_required',
+      mikeFeedback: 'unrated',
+      valueSignal: decision.nextSafeStep,
+    });
+  }
+  const deduped = [];
+  const seen = new Set();
+  for (const signal of signals) {
+    if (seen.has(signal.id)) continue;
+    seen.add(signal.id);
+    deduped.push(signal);
+  }
+  const finalSignals = deduped.slice(0, 12);
+  const counts = {
+    useful: finalSignals.filter((s) => s.mikeFeedback === 'useful').length,
+    noisy: finalSignals.filter((s) => s.mikeFeedback === 'noisy').length,
+    unrated: finalSignals.filter((s) => s.mikeFeedback === 'unrated').length,
+    highActionability: finalSignals.filter((s) => s.actionability === 'high').length,
+    approvalRequired: finalSignals.filter((s) => s.approvalRequired).length,
+  };
+  return {
+    updatedAt: generatedAt,
+    summary: `${finalSignals.length} signals tracked; ${counts.highActionability} high-actionability; ${counts.approvalRequired} need approval.`,
+    signals: finalSignals,
+    counts,
+    nextLearningStep: 'Capture Mike feedback as useful/noisy/missing-context, then prioritize future reports by value signal.',
+  };
+}
+
+function deriveRepoHygiene(repos, generatedAt) {
+  const items = repos.map((repo) => {
+    const verdict = repo.protectedTouched || repo.changedFiles >= 20
+      ? 'blocked'
+      : repo.changedFiles > 0
+        ? 'review'
+        : 'clean';
+    return {
+      repo: repo.name,
+      branch: repo.branch,
+      changedFiles: repo.changedFiles,
+      untrackedFiles: repo.untrackedFiles || 0,
+      protectedTouched: Boolean(repo.protectedTouched),
+      verdict,
+      recommendation: verdict === 'clean'
+        ? 'Clean for read-only monitoring.'
+        : verdict === 'blocked'
+          ? 'Do not recommend ship/deploy until protected or large dirty state is reviewed.'
+          : 'Review scope before commit/deploy; keep unrelated files uncommitted.',
+    };
+  });
+  const blocked = items.filter((item) => item.verdict === 'blocked').length;
+  const review = items.filter((item) => item.verdict === 'review').length;
+  const verdict = blocked ? 'blocked' : review ? 'review' : 'clean';
+  return {
+    updatedAt: generatedAt,
+    verdict,
+    summary: verdict === 'clean'
+      ? 'Tracked repos are clean enough for deploy recommendations.'
+      : verdict === 'blocked'
+        ? `${blocked} repo(s) blocked by protected/large dirty state.`
+        : `${review} repo(s) need review before ship/deploy recommendations.`,
+    items,
+  };
+}
+
+function deriveDeploymentFreshnessGap({ deployTimeline, repos, generatedAt, repoHygiene }) {
+  const latestDeploy = deployTimeline.find((event) => event.event === 'deploy') || null;
+  const sourceRepo = latestDeploy?.sourceRepo ? repos.find((repo) => repo.name === latestDeploy.sourceRepo) : repos.find((repo) => repo.name === 'Moshe');
+  const generatedTime = new Date(generatedAt).getTime();
+  const snapshotAgeMinutes = Math.max(0, Math.round((Date.now() - generatedTime) / 60000));
+  const dirtyRepoCount = repos.filter((repo) => repo.dirty).length;
+  const worktreeDirty = Boolean(sourceRepo?.dirty || dirtyRepoCount > 0);
+  let verdict = 'unknown';
+  if (latestDeploy?.syncState === 'in-sync' && !worktreeDirty && snapshotAgeMinutes <= 60) verdict = 'in_sync';
+  else if (latestDeploy?.syncState === 'behind' || worktreeDirty || repoHygiene.verdict !== 'clean') verdict = 'review_before_ship';
+  else if (latestDeploy?.syncState === 'ahead') verdict = 'approval_required';
+  const summary = latestDeploy
+    ? `${latestDeploy.project}: live ${latestDeploy.deployedCommitSha ? latestDeploy.deployedCommitSha.slice(0, 7) : 'unknown'} vs local ${sourceRepo?.commit || 'unknown'} · ${latestDeploy.syncState || 'unknown'}`
+    : 'No live deployment metadata available for freshness comparison.';
+  return {
+    updatedAt: generatedAt,
+    verdict,
+    summary,
+    liveProject: latestDeploy?.project || 'unknown',
+    liveCommit: latestDeploy?.deployedCommitSha ? latestDeploy.deployedCommitSha.slice(0, 12) : undefined,
+    localCommit: sourceRepo?.commitFull ? sourceRepo.commitFull.slice(0, 12) : sourceRepo?.commit,
+    snapshotAgeMinutes,
+    worktreeDirty,
+    dirtyRepoCount,
+    recommendation: verdict === 'in_sync'
+      ? 'Live and local state look aligned; continue monitoring.'
+      : verdict === 'review_before_ship'
+        ? 'Review repo hygiene and deployment evidence before recommending ship/deploy.'
+        : verdict === 'approval_required'
+          ? 'Live appears ahead of local or ambiguous; require Mike approval before deploy action.'
+          : 'Collect deployment metadata before making deploy decisions.',
+  };
+}
+
+function derivePhase5A({ auditEntries, activeCrons, recommendations, intelligenceLayer, deployTimeline, repos, generatedAt }) {
+  const repoHygiene = deriveRepoHygiene(repos, generatedAt);
+  const feedbackLedger = deriveFeedbackLedger({ auditEntries, activeCrons, recommendations, intelligenceLayer, generatedAt });
+  const deploymentFreshnessGap = deriveDeploymentFreshnessGap({ deployTimeline, repos, generatedAt, repoHygiene });
+  return {
+    updatedAt: generatedAt,
+    phase: 'phase_5a',
+    summary: 'Phase 5A active: Oracle now has closed-loop signal quality, repo hygiene, and deployment freshness sensors before safe execution.',
+    feedbackLedger,
+    repoHygiene,
+    deploymentFreshnessGap,
+    phase5BRequirements: [
+      'Persist Mike feedback choices from the dashboard/Telegram into the ledger.',
+      'Convert evidence chains from retrospectives into structured deploy proof.',
+      'Create a safe executor queue for safe_now actions with rollback notes.',
+      'Add approval inbox state: approved, rejected, deferred, expired.',
+      'Score autonomous work by business value and suppress repeated noise.',
+    ],
+  };
+}
+
 function deriveOperationalReadiness({ websites, repos, github, credentials, deployments, deployTimeline, automation, incidents }) {
   const criticalIncidents = incidents.filter((i) => i.severity === 'critical').length;
   const dirtyRepos = repos.filter((r) => r.dirty).length;
@@ -1153,6 +1334,7 @@ const generatedAt = new Date().toISOString();
 const automation = oracleAutomationPolicy();
 const terminal = oracleTerminalPolicy();
 const auditEntries = readOracleAuditEntries(automation.auditPath, 50);
+const activeCronsSnapshot = cronJobs();
 const auditLearnings = deriveOracleLearnings(auditEntries, learnings, 5);
 const recentLearnings = [...auditLearnings, ...learnings].slice(0, 5);
 const learningFeedPath = join(PSI, 'memory/learnings/oracle-action-feedback.md');
@@ -1175,11 +1357,20 @@ const operationalReadiness = deriveOperationalReadiness({
   incidents,
 });
 const intelligenceLayer = deriveIntelligenceLayer(active);
+const phase5A = derivePhase5A({
+  auditEntries,
+  activeCrons: activeCronsSnapshot,
+  recommendations,
+  intelligenceLayer,
+  deployTimeline,
+  repos,
+  generatedAt,
+});
 
 const data = {
   generated: generatedAt,
   born: '2026-04-18',
-  level3Phase: 'Phase 4: Autonomy Router — every recommendation classified into safe_now, draft_only, or approval_required before action',
+  level3Phase: 'Phase 5A: Closed-loop sensors — feedback ledger, repo hygiene, and deployment freshness before safe execution',
   stats: {
     learnings: learnings.length,
     retrospectives: retrospectives.length,
@@ -1191,13 +1382,13 @@ const data = {
   recentLearnings: recentLearnings.slice(0, 5),
   retrospectivesCount: retrospectives.length,
   retrospectivesRecent: retrospectives.slice(0, 5).map((r) => `${r.date} — ${r.title}`),
-  activeCrons: cronJobs(),
+  activeCrons: activeCronsSnapshot,
   projects: [
     {
       name: 'Moshe Oracle OS',
       url: process.env.ORACLE_DASHBOARD_URL || '',
       status: 'Building',
-      note: 'Phase 4 active: autonomy router classifies recommendations before action; Phase 5 needs feedback ledger, freshness sensors, and safe executor loops.',
+      note: 'Phase 5A active: closed-loop feedback ledger, repo hygiene, and deployment freshness sensors now gate safe-executor decisions.',
       accent: 'orange',
     },
     {
@@ -1234,12 +1425,14 @@ const data = {
   operationalReadiness,
   intelligenceLayer,
   terminal,
+  phase5A,
   nextActions: [
     'Set ORACLE_SESSION_SECRET to arm the Mike-only signed session gate.',
     'The Oracle now turns audit trail events into learnings before refreshing live data.',
     'Keep the browser read-only until a valid session cookie unlocks execute mode.',
     'Add execution handlers for GitHub and Vercel only after the audit trail is proven.',
     'Use the Intelligence Layer panels to turn learnings into money radar and approval-ready actions.',
+    'Use Phase 5A feedback/repo/deploy sensors before recommending safe executor actions.',
     'Enable ORACLE_TERMINAL_ENABLED=true only on Mike local/admin runtime before using the Terminal tab.',
   ],
 };

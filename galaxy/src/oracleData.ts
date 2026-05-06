@@ -197,6 +197,71 @@ export interface OracleOperationalReadiness {
   checks: OracleReadinessCheck[]
 }
 
+export interface OracleFeedbackSignal {
+  id: string
+  source: string
+  businessArea: 'oracle_os' | 'wiro_growth' | 'deploy_reliability' | 'business_opportunity' | 'memory_continuity' | 'decision_load_reduction'
+  actionability: 'high' | 'medium' | 'low'
+  freshness: 'fresh' | 'stale' | 'unknown'
+  riskLevel: 'low' | 'medium' | 'high'
+  approvalRequired: boolean
+  mikeFeedback: 'useful' | 'noisy' | 'missing-context' | 'unrated'
+  valueSignal: string
+}
+
+export interface OracleFeedbackLedger {
+  updatedAt: string
+  summary: string
+  signals: OracleFeedbackSignal[]
+  counts: {
+    useful: number
+    noisy: number
+    unrated: number
+    highActionability: number
+    approvalRequired: number
+  }
+  nextLearningStep: string
+}
+
+export interface OracleRepoHygieneItem {
+  repo: string
+  branch: string
+  changedFiles: number
+  untrackedFiles: number
+  protectedTouched: boolean
+  verdict: 'clean' | 'review' | 'blocked'
+  recommendation: string
+}
+
+export interface OracleRepoHygiene {
+  updatedAt: string
+  verdict: 'clean' | 'review' | 'blocked'
+  summary: string
+  items: OracleRepoHygieneItem[]
+}
+
+export interface OracleDeploymentFreshnessGap {
+  updatedAt: string
+  verdict: 'in_sync' | 'review_before_ship' | 'approval_required' | 'unknown'
+  summary: string
+  liveProject: string
+  liveCommit?: string
+  localCommit?: string
+  snapshotAgeMinutes: number
+  worktreeDirty: boolean
+  dirtyRepoCount: number
+  recommendation: string
+}
+
+export interface OraclePhase5ALayer {
+  updatedAt: string
+  phase: 'phase_5a'
+  summary: string
+  feedbackLedger: OracleFeedbackLedger
+  repoHygiene: OracleRepoHygiene
+  deploymentFreshnessGap: OracleDeploymentFreshnessGap
+  phase5BRequirements: string[]
+}
 
 export interface OracleTodayLearning {
   title: string
@@ -320,6 +385,7 @@ export interface OracleData {
   operationalReadiness?: OracleOperationalReadiness
   intelligenceLayer?: OracleIntelligenceLayer
   terminal?: OracleTerminalPolicy
+  phase5A?: OraclePhase5ALayer
   nextActions: string[]
 }
 
@@ -444,6 +510,35 @@ export const ORACLE_FALLBACK_DATA: OracleData = {
     defaultCwd: '/Users/pasuthunjunkong/workspace/Moshe',
     allowedCwdPrefixes: ['/Users/pasuthunjunkong/workspace/Moshe'],
     note: 'Terminal execution is disabled until the local/admin runtime explicitly enables it.',
+  },
+  phase5A: {
+    updatedAt: new Date(0).toISOString(),
+    phase: 'phase_5a',
+    summary: 'Waiting for Phase 5A closed-loop sensors.',
+    feedbackLedger: {
+      updatedAt: new Date(0).toISOString(),
+      summary: 'No signal quality ledger generated yet.',
+      signals: [],
+      counts: { useful: 0, noisy: 0, unrated: 0, highActionability: 0, approvalRequired: 0 },
+      nextLearningStep: 'Generate oracleLive.json to collect feedback signals.',
+    },
+    repoHygiene: {
+      updatedAt: new Date(0).toISOString(),
+      verdict: 'review',
+      summary: 'No repo hygiene snapshot generated yet.',
+      items: [],
+    },
+    deploymentFreshnessGap: {
+      updatedAt: new Date(0).toISOString(),
+      verdict: 'unknown',
+      summary: 'No deployment freshness gap snapshot generated yet.',
+      liveProject: 'unknown',
+      snapshotAgeMinutes: 0,
+      worktreeDirty: false,
+      dirtyRepoCount: 0,
+      recommendation: 'Generate oracleLive.json to compare live deploy and local state.',
+    },
+    phase5BRequirements: [],
   },
   nextActions: [
     'Run node scripts/generateOracleData.mjs',

@@ -178,6 +178,36 @@ export default function OracleCommandCenter({ data }: Props) {
   const feedbackLoopNote =
     oracle.nextActions.find((item) => item.toLowerCase().includes('audit trail events into learnings'))
     ?? 'Audit trail events are being converted into reusable learnings.'
+  const phase5A = oracle.phase5A ?? {
+    updatedAt: oracle.generated,
+    phase: 'phase_5a' as const,
+    summary: 'Phase 5A sensors are waiting for a live snapshot.',
+    feedbackLedger: {
+      updatedAt: oracle.generated,
+      summary: 'No feedback ledger yet.',
+      signals: [],
+      counts: { useful: 0, noisy: 0, unrated: 0, highActionability: 0, approvalRequired: 0 },
+      nextLearningStep: 'Generate a fresh Oracle snapshot.',
+    },
+    repoHygiene: {
+      updatedAt: oracle.generated,
+      verdict: 'review' as const,
+      summary: 'No repo hygiene snapshot yet.',
+      items: [],
+    },
+    deploymentFreshnessGap: {
+      updatedAt: oracle.generated,
+      verdict: 'unknown' as const,
+      summary: 'No deployment freshness gap snapshot yet.',
+      liveProject: 'unknown',
+      snapshotAgeMinutes: 0,
+      worktreeDirty: false,
+      dirtyRepoCount: 0,
+      recommendation: 'Generate a fresh Oracle snapshot.',
+    },
+    phase5BRequirements: [],
+  }
+  const phase5Badge = (value: string) => value === 'clean' || value === 'in_sync' ? 'low' : value === 'blocked' || value === 'approval_required' ? 'high' : 'medium'
 
   useEffect(() => {
     const controller = new AbortController()
@@ -1425,6 +1455,56 @@ export default function OracleCommandCenter({ data }: Props) {
               </article>
             ))}
           </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>PHASE 5A CLOSED LOOP</p>
+            <span>{phase5A.phase}</span>
+          </div>
+          <div className="oracle-intelligence-grid">
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Feedback ledger</strong>
+                <span>{phase5A.feedbackLedger.signals.length} signals</span>
+              </div>
+              <p>{phase5A.feedbackLedger.summary}</p>
+              <small>{phase5A.feedbackLedger.counts.highActionability} high actionability · {phase5A.feedbackLedger.counts.approvalRequired} approval required · {phase5A.feedbackLedger.counts.unrated} unrated</small>
+              {phase5A.feedbackLedger.signals.slice(0, 3).map((signal) => (
+                <div className="oracle-intel-line" key={signal.id}>
+                  <strong>{signal.source}</strong>
+                  <p>{signal.valueSignal}</p>
+                  <small>{signal.businessArea} · {signal.actionability} · {signal.mikeFeedback}</small>
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Repo hygiene</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5A.repoHygiene.verdict)}`}>{phase5A.repoHygiene.verdict}</span>
+              </div>
+              <p>{phase5A.repoHygiene.summary}</p>
+              {phase5A.repoHygiene.items.slice(0, 4).map((item) => (
+                <div className="oracle-intel-line" key={item.repo}>
+                  <strong>{item.repo} · {item.branch}</strong>
+                  <p>{item.recommendation}</p>
+                  <small>{item.changedFiles} changed · {item.untrackedFiles} untracked · protected {item.protectedTouched ? 'yes' : 'no'}</small>
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card money">
+              <div className="oracle-status-head">
+                <strong>Deployment freshness gap</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5A.deploymentFreshnessGap.verdict)}`}>{phase5A.deploymentFreshnessGap.verdict}</span>
+              </div>
+              <p>{phase5A.deploymentFreshnessGap.summary}</p>
+              <small>Live {phase5A.deploymentFreshnessGap.liveCommit ?? 'unknown'} · local {phase5A.deploymentFreshnessGap.localCommit ?? 'unknown'} · snapshot {phase5A.deploymentFreshnessGap.snapshotAgeMinutes}m</small>
+              <small>{phase5A.deploymentFreshnessGap.recommendation}</small>
+            </article>
+          </div>
+          {phase5A.phase5BRequirements.length > 0 && (
+            <div className="oracle-router-guardrails">
+              {phase5A.phase5BRequirements.map((item) => <span key={item}>Phase 5B: {item}</span>)}
+            </div>
+          )}
 
           <div className="oracle-section-head" style={{ marginTop: 16 }}>
             <p>IMPROVEMENT BACKLOG</p>
