@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, test } from 'node:test'
 import oracleActionsHandler from './actions.js'
 import oracleSessionHandler from './session.js'
 import oracleTerminalHandler from './terminal.js'
+import oracleFeedbackHandler from './feedback.js'
 import { createSessionToken, SESSION_COOKIE_NAME, verifySessionToken } from './auth.js'
 
 function createReq({ method = 'POST', headers = {}, body = {} } = {}) {
@@ -38,6 +39,7 @@ function readJson(res) {
 const ORIGINAL_ENV = {
   ORACLE_SESSION_SECRET: process.env.ORACLE_SESSION_SECRET,
   ORACLE_ACTION_AUDIT_PATH: process.env.ORACLE_ACTION_AUDIT_PATH,
+  ORACLE_FEEDBACK_LEDGER_PATH: process.env.ORACLE_FEEDBACK_LEDGER_PATH,
   ORACLE_WIRO_CI_DISPATCHER: process.env.ORACLE_WIRO_CI_DISPATCHER,
   ORACLE_TERMINAL_ENABLED: process.env.ORACLE_TERMINAL_ENABLED,
 }
@@ -45,6 +47,7 @@ const ORIGINAL_ENV = {
 beforeEach(() => {
   process.env.ORACLE_SESSION_SECRET = 'test-session-secret'
   process.env.ORACLE_ACTION_AUDIT_PATH = '/tmp/oracle-action-audit-test.jsonl'
+  process.env.ORACLE_FEEDBACK_LEDGER_PATH = `/tmp/oracle-feedback-ledger-test-${process.pid}.jsonl`
   process.env.ORACLE_WIRO_CI_DISPATCHER = 'true'
   process.env.ORACLE_TERMINAL_ENABLED = 'true'
 })
@@ -52,6 +55,7 @@ beforeEach(() => {
 afterEach(() => {
   process.env.ORACLE_SESSION_SECRET = ORIGINAL_ENV.ORACLE_SESSION_SECRET
   process.env.ORACLE_ACTION_AUDIT_PATH = ORIGINAL_ENV.ORACLE_ACTION_AUDIT_PATH
+  process.env.ORACLE_FEEDBACK_LEDGER_PATH = ORIGINAL_ENV.ORACLE_FEEDBACK_LEDGER_PATH
   process.env.ORACLE_WIRO_CI_DISPATCHER = ORIGINAL_ENV.ORACLE_WIRO_CI_DISPATCHER
   process.env.ORACLE_TERMINAL_ENABLED = ORIGINAL_ENV.ORACLE_TERMINAL_ENABLED
 })
@@ -212,6 +216,53 @@ describe('oracle action gate', () => {
     assert.equal(res.statusCode, 202)
     assert.equal(payload.decision, 'queued')
     assert.equal(payload.repo, 'Mekjunkong/Wiro4x4')
+  })
+})
+
+
+describe('oracle feedback ledger gate', () => {
+  test('GET returns feedback policy and entries without writing', async () => {
+    const res = createRes()
+    await oracleFeedbackHandler(createReq({ method: 'GET' }), res)
+    const payload = readJson(res)
+    assert.equal(res.statusCode, 200)
+    assert.equal(payload.ok, true)
+    assert.equal(payload.policy.endpoint, '/api/oracle/feedback')
+    assert.ok(Array.isArray(payload.entries))
+  })
+
+  test('POST rejects feedback writes without a signed session', async () => {
+    const res = createRes()
+    await oracleFeedbackHandler(
+      createReq({ body: { signalId: 'rec-oracle-1', rating: 'useful', note: 'good' } }),
+      res,
+    )
+    const payload = readJson(res)
+    assert.equal(res.statusCode, 401)
+    assert.equal(payload.error, 'unauthorized')
+  })
+
+  test('POST persists feedback with same-origin signed Mike session', async () => {
+    const token = createSessionToken('test-session-secret', 'Mike', 60_000)
+    const res = createRes()
+    await oracleFeedbackHandler(
+      createReq({
+        headers: { cookie: `${SESSION_COOKIE_NAME}=${token}` },
+        body: { signalId: 'rec-oracle-1', rating: 'useful', note: 'keep this signal', source: 'dashboard' },
+      }),
+      res,
+    )
+    const payload = readJson(res)
+    assert.equal(res.statusCode, 201)
+    assert.equal(payload.ok, true)
+    assert.equal(payload.entry.signalId, 'rec-oracle-1')
+    assert.equal(payload.entry.rating, 'useful')
+
+    const listRes = createRes()
+    await oracleFeedbackHandler(createReq({ method: 'GET' }), listRes)
+    const listPayload = readJson(listRes)
+    assert.equal(listPayload.entries[0].signalId, 'rec-oracle-1')
+    assert.equal(listPayload.counts.useful, 1)
   })
 })
 

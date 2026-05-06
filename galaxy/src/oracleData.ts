@@ -263,6 +263,84 @@ export interface OraclePhase5ALayer {
   phase5BRequirements: string[]
 }
 
+
+export interface OracleMikeFeedbackEntry {
+  id: string
+  signalId: string
+  rating: 'useful' | 'noisy' | 'missing-context' | 'action-taken' | 'ignored'
+  note: string
+  source: 'dashboard' | 'telegram' | 'api' | 'imported'
+  actor: string
+  createdAt: string
+}
+
+export interface OracleEvidenceChain {
+  id: string
+  target: string
+  status: 'complete' | 'partial' | 'missing'
+  summary: string
+  proofs: string[]
+  missing: string[]
+  rollbackNote: string
+}
+
+export interface OracleSafeExecutorQueueItem {
+  id: string
+  title: string
+  autonomyLevel: 'safe_now'
+  status: 'ready' | 'blocked' | 'running' | 'completed'
+  businessArea: string
+  evidenceChainId: string
+  rollbackNote: string
+  guardrail: string
+  nextStep: string
+}
+
+export interface OracleApprovalInboxItem {
+  id: string
+  title: string
+  state: 'pending' | 'approved' | 'rejected' | 'deferred' | 'expired'
+  risk: 'low' | 'medium' | 'high'
+  requestedAction: string
+  approvalTrigger: string
+  evidenceChainId?: string
+  expiresAt?: string
+}
+
+export interface OracleBusinessValueScore {
+  area: string
+  score: number
+  verdict: 'promote' | 'watch' | 'suppress'
+  reason: string
+  noisePenalty: number
+}
+
+export interface OraclePhase5BLayer {
+  updatedAt: string
+  phase: 'phase_5b'
+  summary: string
+  feedbackPersistence: {
+    endpoint: string
+    configured: boolean
+    pathLabel: string
+    entries: OracleMikeFeedbackEntry[]
+    counts: {
+      useful: number
+      noisy: number
+      missingContext: number
+      actionTaken: number
+      ignored: number
+    }
+    nextLearningStep: string
+  }
+  evidenceChains: OracleEvidenceChain[]
+  safeExecutorQueue: OracleSafeExecutorQueueItem[]
+  approvalInbox: OracleApprovalInboxItem[]
+  businessValueScores: OracleBusinessValueScore[]
+  guardrails: string[]
+  phase5CRequirements: string[]
+}
+
 export interface OracleTodayLearning {
   title: string
   source: string
@@ -386,6 +464,7 @@ export interface OracleData {
   intelligenceLayer?: OracleIntelligenceLayer
   terminal?: OracleTerminalPolicy
   phase5A?: OraclePhase5ALayer
+  phase5B?: OraclePhase5BLayer
   nextActions: string[]
 }
 
@@ -539,6 +618,25 @@ export const ORACLE_FALLBACK_DATA: OracleData = {
       recommendation: 'Generate oracleLive.json to compare live deploy and local state.',
     },
     phase5BRequirements: [],
+  },
+  phase5B: {
+    updatedAt: new Date(0).toISOString(),
+    phase: 'phase_5b',
+    summary: 'Waiting for Phase 5B feedback persistence and safe-executor queue.',
+    feedbackPersistence: {
+      endpoint: '/api/oracle/feedback',
+      configured: false,
+      pathLabel: 'not configured',
+      entries: [],
+      counts: { useful: 0, noisy: 0, missingContext: 0, actionTaken: 0, ignored: 0 },
+      nextLearningStep: 'Unlock the Mike session gate and record feedback on a signal.',
+    },
+    evidenceChains: [],
+    safeExecutorQueue: [],
+    approvalInbox: [],
+    businessValueScores: [],
+    guardrails: [],
+    phase5CRequirements: [],
   },
   nextActions: [
     'Run node scripts/generateOracleData.mjs',

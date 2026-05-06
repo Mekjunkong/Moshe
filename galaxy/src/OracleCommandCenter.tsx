@@ -207,7 +207,26 @@ export default function OracleCommandCenter({ data }: Props) {
     },
     phase5BRequirements: [],
   }
-  const phase5Badge = (value: string) => value === 'clean' || value === 'in_sync' ? 'low' : value === 'blocked' || value === 'approval_required' ? 'high' : 'medium'
+  const phase5B = oracle.phase5B ?? {
+    updatedAt: oracle.generated,
+    phase: 'phase_5b' as const,
+    summary: 'Phase 5B feedback persistence and safe executor queue are waiting for a live snapshot.',
+    feedbackPersistence: {
+      endpoint: '/api/oracle/feedback',
+      configured: false,
+      pathLabel: 'not configured',
+      entries: [],
+      counts: { useful: 0, noisy: 0, missingContext: 0, actionTaken: 0, ignored: 0 },
+      nextLearningStep: 'Generate a fresh Oracle snapshot.',
+    },
+    evidenceChains: [],
+    safeExecutorQueue: [],
+    approvalInbox: [],
+    businessValueScores: [],
+    guardrails: [],
+    phase5CRequirements: [],
+  }
+  const phase5Badge = (value: string) => value === 'clean' || value === 'in_sync' || value === 'complete' || value === 'ready' || value === 'promote' ? 'low' : value === 'blocked' || value === 'approval_required' || value === 'missing' || value === 'suppress' ? 'high' : 'medium'
 
   useEffect(() => {
     const controller = new AbortController()
@@ -473,9 +492,13 @@ export default function OracleCommandCenter({ data }: Props) {
   const configuredCreds = oracle.credentials.filter((c) => c.configured).length
   const githubOk = oracle.github.filter((g) => g.apiStatus === 'ok').length
   const criticalIncidents = (oracle.incidents ?? []).filter((i) => i.severity === 'critical').length
-  const oracleModeLabel = oracle.automation?.sessionConfigured
-    ? 'PHASE 3B · SESSION-GATED ACTIONS'
-    : 'PHASE 2A · READ ONLY'
+  const oracleModeLabel = oracle.phase5B
+    ? 'PHASE 5B · FEEDBACK + EXECUTOR LOOP'
+    : oracle.phase5A
+      ? 'PHASE 5A · CLOSED-LOOP SENSORS'
+      : oracle.automation?.sessionConfigured
+        ? 'PHASE 3B · SESSION-GATED ACTIONS'
+        : 'PHASE 2A · READ ONLY'
   const wiroSite = oracle.websites.find((site) => site.name.toLowerCase().includes('wiro'))
   const wiroGithub = oracle.github.find((repo) => repo.repo.toLowerCase().includes('wiro'))
   const highPriorityRecommendations = (oracle.recommendations ?? []).slice(0, 5)
@@ -1503,6 +1526,88 @@ export default function OracleCommandCenter({ data }: Props) {
           {phase5A.phase5BRequirements.length > 0 && (
             <div className="oracle-router-guardrails">
               {phase5A.phase5BRequirements.map((item) => <span key={item}>Phase 5B: {item}</span>)}
+            </div>
+          )}
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>PHASE 5B EXECUTION LOOP</p>
+            <span>{phase5B.phase}</span>
+          </div>
+          <div className="oracle-intelligence-grid">
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Persistent feedback</strong>
+                <span>{phase5B.feedbackPersistence.entries.length} saved</span>
+              </div>
+              <p>{phase5B.feedbackPersistence.nextLearningStep}</p>
+              <small>{phase5B.feedbackPersistence.endpoint} · {phase5B.feedbackPersistence.configured ? 'session gated' : 'preview until session secret'}</small>
+              <small>{phase5B.feedbackPersistence.counts.useful} useful · {phase5B.feedbackPersistence.counts.noisy} noisy · {phase5B.feedbackPersistence.counts.missingContext} missing context · {phase5B.feedbackPersistence.counts.actionTaken} action taken</small>
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Evidence chains</strong>
+                <span>{phase5B.evidenceChains.length} chains</span>
+              </div>
+              {phase5B.evidenceChains.slice(0, 3).map((chain) => (
+                <div className="oracle-intel-line" key={chain.id}>
+                  <strong>{chain.target}</strong>
+                  <p>{chain.summary}</p>
+                  <small>{chain.status} · {chain.proofs.length} proofs · {chain.missing.length} missing</small>
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card money">
+              <div className="oracle-status-head">
+                <strong>Safe executor queue</strong>
+                <span>{phase5B.safeExecutorQueue.length} items</span>
+              </div>
+              {phase5B.safeExecutorQueue.slice(0, 3).map((item) => (
+                <div className="oracle-intel-line" key={item.id}>
+                  <strong>{item.title}</strong>
+                  <p>{item.nextStep}</p>
+                  <small>{item.status} · {item.guardrail}</small>
+                </div>
+              ))}
+            </article>
+          </div>
+          <div className="oracle-intelligence-grid" style={{ marginTop: 12 }}>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Approval inbox</strong>
+                <span>{phase5B.approvalInbox.length} pending scopes</span>
+              </div>
+              {phase5B.approvalInbox.slice(0, 3).map((item) => (
+                <div className="oracle-intel-line" key={item.id}>
+                  <strong>{item.title}</strong>
+                  <p>{item.requestedAction}</p>
+                  <small>{item.state} · {item.risk} · {item.approvalTrigger}</small>
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Business value / noise scoring</strong>
+                <span>{phase5B.businessValueScores.length} areas</span>
+              </div>
+              {phase5B.businessValueScores.slice(0, 4).map((score) => (
+                <div className="oracle-intel-line" key={score.area}>
+                  <strong>{score.area} · {score.score}</strong>
+                  <p>{score.reason}</p>
+                  <small>{score.verdict} · noise penalty {score.noisePenalty}</small>
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Phase 5C gates</strong>
+                <span>{phase5B.phase5CRequirements.length} next</span>
+              </div>
+              {phase5B.phase5CRequirements.slice(0, 5).map((item) => <small key={item}>• {item}</small>)}
+            </article>
+          </div>
+          {phase5B.guardrails.length > 0 && (
+            <div className="oracle-router-guardrails">
+              {phase5B.guardrails.map((item) => <span key={item}>5B guardrail: {item}</span>)}
             </div>
           )}
 

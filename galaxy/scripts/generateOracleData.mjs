@@ -1208,6 +1208,246 @@ function derivePhase5A({ auditEntries, activeCrons, recommendations, intelligenc
   };
 }
 
+
+
+function feedbackLedgerPath() {
+  return process.env.ORACLE_FEEDBACK_LEDGER_PATH || '/tmp/oracle-feedback-ledger.jsonl';
+}
+
+function readMikeFeedbackEntries(path = feedbackLedgerPath(), limit = 50) {
+  if (!existsSync(path)) return [];
+  try {
+    return readFileSync(path, 'utf8')
+      .split('\n')
+      .filter(Boolean)
+      .slice(-limit)
+      .reverse()
+      .map((line, index) => {
+        try {
+          const parsed = JSON.parse(line);
+          return {
+            id: String(parsed.id || `feedback-${index}`),
+            signalId: String(parsed.signalId || 'unknown'),
+            rating: ['useful', 'noisy', 'missing-context', 'action-taken', 'ignored'].includes(parsed.rating) ? parsed.rating : 'missing-context',
+            note: String(parsed.note || '').slice(0, 500),
+            source: ['dashboard', 'telegram', 'api', 'imported'].includes(parsed.source) ? parsed.source : 'api',
+            actor: String(parsed.actor || 'Mike'),
+            createdAt: String(parsed.createdAt || parsed.at || new Date(0).toISOString()),
+          };
+        } catch {
+          return {
+            id: `feedback-${index}`,
+            signalId: 'parse-error',
+            rating: 'missing-context',
+            note: 'A feedback ledger line could not be parsed.',
+            source: 'imported',
+            actor: 'unknown',
+            createdAt: new Date(0).toISOString(),
+          };
+        }
+      });
+  } catch {
+    return [];
+  }
+}
+
+function feedbackCounts(entries) {
+  return {
+    useful: entries.filter((entry) => entry.rating === 'useful').length,
+    noisy: entries.filter((entry) => entry.rating === 'noisy').length,
+    missingContext: entries.filter((entry) => entry.rating === 'missing-context').length,
+    actionTaken: entries.filter((entry) => entry.rating === 'action-taken').length,
+    ignored: entries.filter((entry) => entry.rating === 'ignored').length,
+  };
+}
+
+function deriveEvidenceChains({ generatedAt, repos, deployTimeline, phase5A, operationalReadiness }) {
+  const mosheRepo = repos.find((repo) => repo.name === 'Moshe') || repos[0];
+  const latestDeploy = deployTimeline.find((event) => event.event === 'deploy') || null;
+  const repoClean = phase5A.repoHygiene.verdict === 'clean';
+  const deployFresh = phase5A.deploymentFreshnessGap.verdict === 'in_sync';
+  const readinessOk = ['excellent', 'steady'].includes(operationalReadiness.status);
+  return [
+    {
+      id: 'oracle-snapshot-refresh-evidence',
+      target: 'refresh-oracle-snapshot',
+      status: mosheRepo ? 'complete' : 'partial',
+      summary: 'Evidence for regenerating the local Oracle snapshot without external side effects.',
+      proofs: [
+        `snapshot generated ${generatedAt}`,
+        mosheRepo ? `Moshe repo HEAD ${mosheRepo.commit}` : 'Moshe repo unavailable',
+        `readiness ${operationalReadiness.status} (${operationalReadiness.score})`,
+      ],
+      missing: mosheRepo ? [] : ['local Moshe repo metadata'],
+      rollbackNote: 'Re-run the previous committed oracleLive.json or discard the generated JSON diff before commit/deploy.',
+    },
+    {
+      id: 'oracle-deploy-evidence',
+      target: 'vercel-redeploy',
+      status: repoClean && deployFresh && readinessOk ? 'complete' : 'partial',
+      summary: 'Evidence chain required before any production dashboard redeploy request.',
+      proofs: [
+        latestDeploy ? `latest deploy ${latestDeploy.project}: ${latestDeploy.syncState}` : 'no latest deploy metadata',
+        `repo hygiene ${phase5A.repoHygiene.verdict}`,
+        `deployment freshness ${phase5A.deploymentFreshnessGap.verdict}`,
+      ],
+      missing: [
+        repoClean ? null : 'clean repo hygiene verdict',
+        deployFresh ? null : 'in-sync deployment freshness verdict',
+        readinessOk ? null : 'steady/excellent operational readiness',
+      ].filter(Boolean),
+      rollbackNote: 'Keep previous Vercel deployment URL available and alias back if a production smoke check fails.',
+    },
+    {
+      id: 'wiro-ci-evidence',
+      target: 'dispatch-wiro-ci',
+      status: 'partial',
+      summary: 'Evidence chain for external GitHub CI dispatch remains approval-gated.',
+      proofs: [`tracked repos ${repos.length}`, `feedback signals ${phase5A.feedbackLedger.signals.length}`],
+      missing: ['Mike approval for external GitHub event', 'CI workflow dispatch response'],
+      rollbackNote: 'No rollback needed for preview; if dispatched, cancel GitHub run if it was accidental.',
+    },
+  ];
+}
+
+function deriveSafeExecutorQueue({ phase5A, evidenceChains, intelligenceLayer }) {
+  const snapshotEvidence = evidenceChains.find((chain) => chain.id === 'oracle-snapshot-refresh-evidence');
+  const blockedByRepo = phase5A.repoHygiene.verdict === 'blocked';
+  const safeDecisions = (intelligenceLayer?.autonomyRouter?.decisions || []).filter((decision) => decision.autonomyLevel === 'safe_now');
+  const queue = [
+    {
+      id: 'queue-refresh-oracle-snapshot',
+      title: 'Refresh Oracle snapshot',
+      autonomyLevel: 'safe_now',
+      status: blockedByRepo ? 'blocked' : 'ready',
+      businessArea: 'oracle_os',
+      evidenceChainId: snapshotEvidence?.id || 'oracle-snapshot-refresh-evidence',
+      rollbackNote: snapshotEvidence?.rollbackNote || 'Discard generated JSON diff before commit/deploy.',
+      guardrail: 'local read-only generation only; no push, deploy, delete, spend, or customer contact',
+      nextStep: blockedByRepo ? 'Review repo hygiene before queue execution.' : 'Execute only in signed/admin runtime and append audit entry.',
+    },
+  ];
+  for (const decision of safeDecisions.slice(0, 3)) {
+    queue.push({
+      id: `queue-${decision.id}`,
+      title: decision.title,
+      autonomyLevel: 'safe_now',
+      status: blockedByRepo ? 'blocked' : 'ready',
+      businessArea: decision.businessArea,
+      evidenceChainId: snapshotEvidence?.id || 'oracle-snapshot-refresh-evidence',
+      rollbackNote: 'Stop after draft/read-only output; do not publish or deploy without a separate approval lane.',
+      guardrail: decision.riskReason,
+      nextStep: decision.nextSafeStep,
+    });
+  }
+  const seen = new Set();
+  return queue.filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  }).slice(0, 4);
+}
+
+function deriveApprovalInbox({ intelligenceLayer, automation, evidenceChains, generatedAt }) {
+  const approvalDecisions = (intelligenceLayer?.autonomyRouter?.decisions || []).filter((decision) => decision.autonomyLevel === 'approval_required');
+  const actionItems = (automation?.actions || []).filter((action) => action.autonomyLevel === 'approval_required');
+  const expiresAt = new Date(new Date(generatedAt).getTime() + 24 * 60 * 60 * 1000).toISOString();
+  const inbox = [];
+  for (const decision of approvalDecisions.slice(0, 4)) {
+    inbox.push({
+      id: `approval-${decision.id}`,
+      title: decision.title,
+      state: 'pending',
+      risk: decision.risk,
+      requestedAction: decision.nextSafeStep,
+      approvalTrigger: decision.approvalTrigger,
+      evidenceChainId: evidenceChains.find((chain) => chain.target === decision.id)?.id,
+      expiresAt,
+    });
+  }
+  for (const action of actionItems.slice(0, 3)) {
+    inbox.push({
+      id: `approval-action-${action.id}`,
+      title: action.title,
+      state: 'pending',
+      risk: action.risk,
+      requestedAction: action.nextSafeStep || action.description,
+      approvalTrigger: action.riskReason || 'External/production action requires Mike approval.',
+      evidenceChainId: evidenceChains.find((chain) => chain.target === action.id)?.id,
+      expiresAt,
+    });
+  }
+  const seen = new Set();
+  return inbox.filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  }).slice(0, 6);
+}
+
+function deriveBusinessValueScores({ phase5A, feedbackEntries }) {
+  const areas = ['oracle_os', 'wiro_growth', 'deploy_reliability', 'decision_load_reduction', 'memory_continuity'];
+  return areas.map((area) => {
+    const signals = phase5A.feedbackLedger.signals.filter((signal) => signal.businessArea === area);
+    const feedbackHits = feedbackEntries.filter((entry) => signals.some((signal) => signal.id === entry.signalId));
+    const useful = feedbackHits.filter((entry) => ['useful', 'action-taken'].includes(entry.rating)).length;
+    const noisy = feedbackHits.filter((entry) => ['noisy', 'ignored'].includes(entry.rating)).length;
+    const high = signals.filter((signal) => signal.actionability === 'high').length;
+    const approvalPenalty = signals.filter((signal) => signal.approvalRequired).length * 5;
+    const noisePenalty = noisy * 15;
+    const score = Math.max(0, Math.min(100, 35 + signals.length * 6 + high * 15 + useful * 20 - noisePenalty - approvalPenalty));
+    return {
+      area,
+      score,
+      verdict: score >= 70 ? 'promote' : score >= 45 ? 'watch' : 'suppress',
+      reason: `${signals.length} signals, ${high} high-actionability, ${useful} useful/action-taken feedback, ${noisy} noisy/ignored feedback.`,
+      noisePenalty,
+    };
+  }).sort((a, b) => b.score - a.score);
+}
+
+function derivePhase5B({ generatedAt, phase5A, repos, deployTimeline, operationalReadiness, intelligenceLayer, automation }) {
+  const feedbackPath = feedbackLedgerPath();
+  const feedbackEntries = readMikeFeedbackEntries(feedbackPath, 50);
+  const evidenceChains = deriveEvidenceChains({ generatedAt, repos, deployTimeline, phase5A, operationalReadiness });
+  const safeExecutorQueue = deriveSafeExecutorQueue({ phase5A, evidenceChains, intelligenceLayer });
+  const approvalInbox = deriveApprovalInbox({ intelligenceLayer, automation, evidenceChains, generatedAt });
+  const businessValueScores = deriveBusinessValueScores({ phase5A, feedbackEntries });
+  return {
+    updatedAt: generatedAt,
+    phase: 'phase_5b',
+    summary: 'Phase 5B active: feedback now has a signed-session persistence endpoint, evidence chains, safe executor queue, approval inbox states, and value/noise scoring.',
+    feedbackPersistence: {
+      endpoint: '/api/oracle/feedback',
+      configured: Boolean(process.env.ORACLE_SESSION_SECRET),
+      pathLabel: feedbackPath.replace(/^.*\//, ''),
+      entries: feedbackEntries.slice(0, 12),
+      counts: feedbackCounts(feedbackEntries),
+      nextLearningStep: feedbackEntries.length
+        ? 'Use feedback ratings to promote high-value Oracle loops and suppress noisy repeats.'
+        : 'Record Mike feedback from dashboard/Telegram after each useful/noisy signal.',
+    },
+    evidenceChains,
+    safeExecutorQueue,
+    approvalInbox,
+    businessValueScores,
+    guardrails: [
+      'Feedback POST requires same-origin request plus valid Mike signed session.',
+      'safe_now queue remains bounded to internal/read-only/reversible work.',
+      'approval_required items stay pending until Mike explicitly approves a scope.',
+      'Evidence chains must include rollback notes before deploy recommendations.',
+      'Business value scoring can suppress repeated low-value/noisy signals.',
+    ],
+    phase5CRequirements: [
+      'Wire dashboard feedback buttons to the signed feedback endpoint.',
+      'Persist safe executor run results with started/completed/failed states.',
+      'Promote only high-value safe_now items into autonomous cron execution.',
+      'Add Telegram approval inbox actions with expiry-aware state updates.',
+      'Deploy Phase 5B only after live endpoint smoke tests pass.',
+    ],
+  };
+}
+
 function deriveOperationalReadiness({ websites, repos, github, credentials, deployments, deployTimeline, automation, incidents }) {
   const criticalIncidents = incidents.filter((i) => i.severity === 'critical').length;
   const dirtyRepos = repos.filter((r) => r.dirty).length;
@@ -1366,11 +1606,20 @@ const phase5A = derivePhase5A({
   repos,
   generatedAt,
 });
+const phase5B = derivePhase5B({
+  generatedAt,
+  phase5A,
+  repos,
+  deployTimeline,
+  operationalReadiness,
+  intelligenceLayer,
+  automation,
+});
 
 const data = {
   generated: generatedAt,
   born: '2026-04-18',
-  level3Phase: 'Phase 5A: Closed-loop sensors — feedback ledger, repo hygiene, and deployment freshness before safe execution',
+  level3Phase: 'Phase 5B: Feedback persistence, evidence chains, safe executor queue, approval inbox, and value scoring',
   stats: {
     learnings: learnings.length,
     retrospectives: retrospectives.length,
@@ -1388,7 +1637,7 @@ const data = {
       name: 'Moshe Oracle OS',
       url: process.env.ORACLE_DASHBOARD_URL || '',
       status: 'Building',
-      note: 'Phase 5A active: closed-loop feedback ledger, repo hygiene, and deployment freshness sensors now gate safe-executor decisions.',
+      note: 'Phase 5B active: persistent feedback, evidence chains, safe executor queue, approval inbox, and business-value scoring now shape autonomy.',
       accent: 'orange',
     },
     {
@@ -1426,6 +1675,7 @@ const data = {
   intelligenceLayer,
   terminal,
   phase5A,
+  phase5B,
   nextActions: [
     'Set ORACLE_SESSION_SECRET to arm the Mike-only signed session gate.',
     'The Oracle now turns audit trail events into learnings before refreshing live data.',
@@ -1433,6 +1683,7 @@ const data = {
     'Add execution handlers for GitHub and Vercel only after the audit trail is proven.',
     'Use the Intelligence Layer panels to turn learnings into money radar and approval-ready actions.',
     'Use Phase 5A feedback/repo/deploy sensors before recommending safe executor actions.',
+    'Use Phase 5B feedback persistence, evidence chains, approval inbox, and value scoring before promoting autonomous safe_now work.',
     'Enable ORACLE_TERMINAL_ENABLED=true only on Mike local/admin runtime before using the Terminal tab.',
   ],
 };
