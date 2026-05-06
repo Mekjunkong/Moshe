@@ -183,11 +183,46 @@ function deriveSelfLearningItems(selfLearningText, activeDocs) {
   return entries.slice(0, 5);
 }
 
+function fallbackOpportunityRadar() {
+  return [
+    {
+      rank: 1,
+      title: 'AI Inquiry and Quote Copilot for Tour Operators',
+      score: 95,
+      fit: 'excellent',
+      thesis: 'AI assistant that reads WhatsApp/LINE/email inquiries, asks missing questions, drafts Thai/English replies, creates trip options, estimates price, and schedules follow-up.',
+      pricing: '12,000–35,000 THB setup + 3,000–12,000 THB/month support, depending on volume and integrations.',
+      validationStep: 'Create 5 realistic inquiry examples from Wiro patterns; show before/after response drafts and quote generation; ask operators if they would pay for a pilot.',
+      source: 'committed Oracle fallback radar',
+    },
+    {
+      rank: 2,
+      title: 'Wiro Internal Booking/Itinerary OS → Micro-SaaS',
+      score: 90,
+      fit: 'excellent',
+      thesis: 'Lightweight booking OS: inquiry capture, customer profile, itinerary builder, quote calculator, deposit/payment status, prep checklist, guide notes, and follow-up reminders.',
+      pricing: '2,500–9,000 THB/month SaaS or 25,000–75,000 THB setup + monthly maintenance.',
+      validationStep: 'Build only the Wiro version first, then show screens to 10 similar operators and ask which part they would pay for.',
+      source: 'committed Oracle fallback radar',
+    },
+    {
+      rank: 3,
+      title: 'Review/Reputation Autopilot for Tours and Local Services',
+      score: 87,
+      fit: 'strong',
+      thesis: 'Automated review request system with Google/Tripadvisor links, negative-feedback interception, testimonials, owner reply drafts, and monthly reputation report.',
+      pricing: '5,000–15,000 THB setup + 2,000–8,000 THB/month.',
+      validationStep: 'Mock one monthly report and 3 message flows. Offer a manual pilot using Google Sheets plus scheduled messages.',
+      source: 'committed Oracle fallback radar',
+    },
+  ];
+}
+
 function deriveOpportunityRadar() {
   const radarPath = join(MOSHE_ROOT, 'outbox/one-person-business/business-radar-mike-2026-05-06.md');
   const altPath = join(MOSHE_ROOT, 'outbox/one-person-business/business-radar-2026-05-06.md');
   const text = readMarkdownFile(radarPath) || readMarkdownFile(altPath);
-  if (!text) return [];
+  if (!text) return fallbackOpportunityRadar();
   const items = [];
   const re = /^###\s+(\d+)\.\s+(.+?)\s+—\s+\*\*(\d+)\/100\*\*([\s\S]*?)(?=^###\s+\d+\.\s+|\Z)/gm;
   let match;

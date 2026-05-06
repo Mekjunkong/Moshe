@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-06T05:51:07.726Z",
+  "generated": "2026-05-06T06:05:24.383Z",
   "born": "2026-04-18",
   "level3Phase": "Phase 3B: Feedback loop — audit-derived learnings, auth, allowlist, audit log, preview mode",
   "stats": {
@@ -115,7 +115,7 @@
       "ok": true,
       "status": 200,
       "responseMs": null,
-      "checkedAt": "2026-05-06T05:50:56.921Z",
+      "checkedAt": "2026-05-06T06:05:13.588Z",
       "note": "local build target; set ORACLE_DASHBOARD_URL after deploy for public uptime checks"
     },
     {
@@ -123,8 +123,8 @@
       "url": "https://aum-hippie-young.vercel.app/",
       "ok": true,
       "status": 200,
-      "responseMs": 208,
-      "checkedAt": "2026-05-06T05:50:57.129Z",
+      "responseMs": 196,
+      "checkedAt": "2026-05-06T06:05:13.784Z",
       "note": "reachable"
     },
     {
@@ -132,8 +132,8 @@
       "url": "https://www.wiro4x4indochina.com/",
       "ok": true,
       "status": 200,
-      "responseMs": 216,
-      "checkedAt": "2026-05-06T05:50:57.158Z",
+      "responseMs": 197,
+      "checkedAt": "2026-05-06T06:05:13.806Z",
       "note": "reachable"
     }
   ],
@@ -142,12 +142,12 @@
       "name": "Moshe",
       "path": "/Users/pasuthunjunkong/workspace/Moshe",
       "branch": "main",
-      "commit": "a53ab9c",
-      "commitFull": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
-      "commitSubject": "oracle: log readiness deployment",
+      "commit": "c4c98f2",
+      "commitFull": "c4c98f25d08e6152745f57187faca76066b4e9cc",
+      "commitSubject": "oracle: add intelligence layer and terminal bridge",
       "dirty": true,
-      "changedFiles": 40,
-      "lastCommitAt": "2026-05-06T11:11:14+07:00",
+      "changedFiles": 31,
+      "lastCommitAt": "2026-05-06T12:51:18+07:00",
       "github": "Mekjunkong/Moshe",
       "remoteHost": "github.com"
     },
@@ -224,7 +224,7 @@
       "apiStatus": "ok",
       "private": false,
       "defaultBranch": "main",
-      "pushedAt": "2026-05-06T04:11:16Z",
+      "pushedAt": "2026-05-06T05:51:19Z",
       "openIssues": 0,
       "openPullRequests": 0,
       "latestWorkflow": null,
@@ -298,9 +298,9 @@
       "severity": "warning",
       "category": "repo-dirty",
       "project": "Moshe",
-      "title": "Moshe: 40 uncommitted changes",
-      "detail": "Branch main · last commit: \"oracle: log readiness deployment\"",
-      "detectedAt": "2026-05-06T11:11:14+07:00"
+      "title": "Moshe: 31 uncommitted changes",
+      "detail": "Branch main · last commit: \"oracle: add intelligence layer and terminal bridge\"",
+      "detectedAt": "2026-05-06T12:51:18+07:00"
     },
     {
       "id": "repo-dirty-wiro4x4",
@@ -318,14 +318,14 @@
       "project": "Oracle OS",
       "title": "5 credential(s) not configured",
       "detail": "VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_PROJECT_NAME, VERCEL_TEAM_ID, GITHUB_TOKEN",
-      "detectedAt": "2026-05-06T05:51:07.726Z"
+      "detectedAt": "2026-05-06T06:05:24.383Z"
     }
   ],
   "recommendations": [
     {
       "project": "Moshe",
       "priority": "medium",
-      "reason": "Moshe: 40 uncommitted changes",
+      "reason": "Moshe: 31 uncommitted changes",
       "risk": "medium",
       "suggestedAction": "Review staged changes in Moshe and commit or stash to keep the branch clean."
     },
@@ -358,6 +358,17 @@
   },
   "deployTimeline": [
     {
+      "provider": "git",
+      "project": "Moshe",
+      "event": "commit",
+      "state": "uncommitted-changes",
+      "timestamp": "2026-05-06T12:51:18+07:00",
+      "sourceRepo": "Moshe",
+      "sourceCommitSha": "c4c98f25d08e6152745f57187faca76066b4e9cc",
+      "syncState": "behind",
+      "note": "oracle: add intelligence layer and terminal bridge"
+    },
+    {
       "provider": "vercel",
       "project": "galaxy",
       "event": "deploy",
@@ -367,20 +378,9 @@
       "deployedCommitSha": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
       "deployedCommitMessage": "oracle: log readiness deployment",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
-      "syncState": "in-sync",
-      "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "git",
-      "project": "Moshe",
-      "event": "commit",
-      "state": "uncommitted-changes",
-      "timestamp": "2026-05-06T11:11:14+07:00",
-      "sourceRepo": "Moshe",
-      "sourceCommitSha": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
+      "sourceCommitSha": "c4c98f25d08e6152745f57187faca76066b4e9cc",
       "syncState": "behind",
-      "note": "oracle: log readiness deployment"
+      "note": "read via Vercel CLI auth; no token value exposed"
     },
     {
       "provider": "vercel",
@@ -392,7 +392,7 @@
       "deployedCommitSha": "d56b570b20cdc87de0abe5f9499aadc943461cb3",
       "deployedCommitMessage": "oracle: refresh readiness snapshot",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
+      "sourceCommitSha": "c4c98f25d08e6152745f57187faca76066b4e9cc",
       "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
@@ -406,7 +406,7 @@
       "deployedCommitSha": "d56b570b20cdc87de0abe5f9499aadc943461cb3",
       "deployedCommitMessage": "oracle: refresh readiness snapshot",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
+      "sourceCommitSha": "c4c98f25d08e6152745f57187faca76066b4e9cc",
       "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
@@ -473,9 +473,9 @@
     ]
   },
   "operationalReadiness": {
-    "score": 86,
-    "status": "steady",
-    "summary": "2 watch item(s). Oracle is usable, but not fully verified.",
+    "score": 68,
+    "status": "watch",
+    "summary": "1 failing check(s), 2 watch item(s). Fix failures before relying on autonomy.",
     "checks": [
       {
         "label": "Sites online",
@@ -497,8 +497,8 @@
       },
       {
         "label": "Live deploy freshness",
-        "status": "pass",
-        "detail": "galaxy: in-sync",
+        "status": "fail",
+        "detail": "galaxy: behind",
         "weight": 20
       },
       {
@@ -522,7 +522,7 @@
     ]
   },
   "intelligenceLayer": {
-    "updatedAt": "2026-05-06T05:51:07.735Z",
+    "updatedAt": "2026-05-06T06:05:24.393Z",
     "summary": "Oracle is learning from ψ and opportunity artifacts. Top money radar: AI Inquiry and Quote Copilot for Tour Operators (95/100).",
     "todayLearnings": [
       {
