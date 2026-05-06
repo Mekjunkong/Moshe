@@ -451,11 +451,24 @@ export default function OracleCommandCenter({ data }: Props) {
   const mosheRepo = oracle.repos.find((repo) => repo.name.toLowerCase().includes('moshe'))
   const deployedShort = latestDeploy?.deployedCommitSha?.slice(0, 7) ?? oracle.deployments[0]?.gitCommitSha?.slice(0, 7) ?? 'unknown'
   const repoShort = mosheRepo?.commit ?? 'unknown'
-  const deploySync = latestDeploy?.syncState ?? (deployedShort !== 'unknown' && repoShort !== 'unknown' && deployedShort === repoShort ? 'in-sync' : 'unknown')
+  const deployMetadataLagging = Boolean(
+    latestDeploy?.timestamp
+    && Number.isFinite(Date.parse(latestDeploy.timestamp))
+    && Number.isFinite(Date.parse(oracle.generated))
+    && Date.parse(latestDeploy.timestamp) < Date.parse(oracle.generated)
+    && latestDeploy.syncState !== 'in-sync',
+  )
+  const deploySync = deployedShort !== 'unknown' && repoShort !== 'unknown' && deployedShort === repoShort
+    ? 'in-sync'
+    : deployMetadataLagging
+      ? 'unknown'
+      : latestDeploy?.syncState ?? 'unknown'
   const deploymentFreshness = {
     label: deploySync === 'in-sync' ? 'LIVE MATCHES REPO' : deploySync === 'behind' ? 'LIVE BEHIND REPO' : deploySync === 'ahead' ? 'LIVE AHEAD OF REPO' : 'VERIFY LIVE COMMIT',
     badge: deploySync === 'in-sync' ? 'low' : deploySync === 'unknown' ? 'medium' : 'high',
-    detail: latestDeploy?.note ?? 'Oracle compares Vercel deployment metadata with the current Moshe repo snapshot.',
+    detail: deployMetadataLagging
+      ? 'Vercel metadata can lag during fresh deploys. Oracle will verify again on the next snapshot.'
+      : latestDeploy?.note ?? 'Oracle compares Vercel deployment metadata with the current Moshe repo snapshot.',
     deployed: deployedShort,
     repo: repoShort,
     message: latestDeploy?.deployedCommitMessage ?? oracle.deployments[0]?.gitCommitMessage ?? mosheRepo?.commitSubject ?? 'No deployment message available.',
