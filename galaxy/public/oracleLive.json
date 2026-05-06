@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-06T00:11:55.760Z",
+  "generated": "2026-05-06T00:13:09.773Z",
   "born": "2026-04-18",
   "level3Phase": "Phase 3B: Feedback loop — audit-derived learnings, auth, allowlist, audit log, preview mode",
   "stats": {
@@ -30,7 +30,7 @@
       "title": "Oracle action feedback loop",
       "file": "oracle-action-feedback.md",
       "date": "2026-05-06",
-      "summary": "updated: 2026-05-06T00:10:11.636Z  Oracle action feedback loop The Oracle now turns session and action audit events into reusable learnings."
+      "summary": "updated: 2026-05-06T00:11:55.760Z  Oracle action feedback loop The Oracle now turns session and action audit events into reusable learnings."
     },
     {
       "title": "Oracle Action Layer + Wiro Visibility Split",
@@ -115,7 +115,7 @@
       "ok": true,
       "status": 200,
       "responseMs": null,
-      "checkedAt": "2026-05-06T00:11:37.997Z",
+      "checkedAt": "2026-05-06T00:12:58.160Z",
       "note": "local build target; set ORACLE_DASHBOARD_URL after deploy for public uptime checks"
     },
     {
@@ -123,8 +123,8 @@
       "url": "https://aum-hippie-young.vercel.app/",
       "ok": true,
       "status": 200,
-      "responseMs": 362,
-      "checkedAt": "2026-05-06T00:11:38.359Z",
+      "responseMs": 169,
+      "checkedAt": "2026-05-06T00:12:58.329Z",
       "note": "reachable"
     },
     {
@@ -132,8 +132,8 @@
       "url": "https://www.wiro4x4indochina.com/",
       "ok": true,
       "status": 200,
-      "responseMs": 668,
-      "checkedAt": "2026-05-06T00:11:38.690Z",
+      "responseMs": 170,
+      "checkedAt": "2026-05-06T00:12:58.354Z",
       "note": "reachable"
     }
   ],
@@ -142,12 +142,12 @@
       "name": "Moshe",
       "path": "/Users/pasuthunjunkong/workspace/Moshe",
       "branch": "main",
-      "commit": "971539b",
-      "commitFull": "971539be4c185cf3caebef4b646bd4a286b31cce",
-      "commitSubject": "oracle: sync live session-gated status",
+      "commit": "9953151",
+      "commitFull": "99531515d0bfdd9da6cfa6067272bde2a874cc19",
+      "commitSubject": "oracle: build daily command center actions",
       "dirty": true,
-      "changedFiles": 28,
-      "lastCommitAt": "2026-05-06T01:42:24+07:00",
+      "changedFiles": 23,
+      "lastCommitAt": "2026-05-06T07:12:40+07:00",
       "github": "Mekjunkong/Moshe",
       "remoteHost": "github.com"
     },
@@ -224,7 +224,7 @@
       "apiStatus": "ok",
       "private": false,
       "defaultBranch": "main",
-      "pushedAt": "2026-05-05T18:42:31Z",
+      "pushedAt": "2026-05-06T00:12:47Z",
       "openIssues": 0,
       "openPullRequests": 0,
       "latestWorkflow": null,
@@ -298,9 +298,9 @@
       "severity": "warning",
       "category": "repo-dirty",
       "project": "Moshe",
-      "title": "Moshe: 28 uncommitted changes",
-      "detail": "Branch main · last commit: \"oracle: sync live session-gated status\"",
-      "detectedAt": "2026-05-06T01:42:24+07:00"
+      "title": "Moshe: 23 uncommitted changes",
+      "detail": "Branch main · last commit: \"oracle: build daily command center actions\"",
+      "detectedAt": "2026-05-06T07:12:40+07:00"
     },
     {
       "id": "repo-dirty-wiro4x4",
@@ -318,14 +318,14 @@
       "project": "Oracle OS",
       "title": "5 credential(s) not configured",
       "detail": "VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_PROJECT_NAME, VERCEL_TEAM_ID, GITHUB_TOKEN",
-      "detectedAt": "2026-05-06T00:11:55.760Z"
+      "detectedAt": "2026-05-06T00:13:09.773Z"
     }
   ],
   "recommendations": [
     {
       "project": "Moshe",
       "priority": "medium",
-      "reason": "Moshe: 28 uncommitted changes",
+      "reason": "Moshe: 23 uncommitted changes",
       "risk": "medium",
       "suggestedAction": "Review staged changes in Moshe and commit or stash to keep the branch clean."
     },
@@ -358,6 +358,17 @@
   },
   "deployTimeline": [
     {
+      "provider": "git",
+      "project": "Moshe",
+      "event": "commit",
+      "state": "uncommitted-changes",
+      "timestamp": "2026-05-06T07:12:40+07:00",
+      "sourceRepo": "Moshe",
+      "sourceCommitSha": "99531515d0bfdd9da6cfa6067272bde2a874cc19",
+      "syncState": "behind",
+      "note": "oracle: build daily command center actions"
+    },
+    {
       "provider": "vercel",
       "project": "galaxy",
       "event": "deploy",
@@ -367,8 +378,8 @@
       "deployedCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
       "deployedCommitMessage": "oracle: sync live session-gated status",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
-      "syncState": "in-sync",
+      "sourceCommitSha": "99531515d0bfdd9da6cfa6067272bde2a874cc19",
+      "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
     {
@@ -381,8 +392,8 @@
       "deployedCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
       "deployedCommitMessage": "oracle: sync live session-gated status",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
-      "syncState": "in-sync",
+      "sourceCommitSha": "99531515d0bfdd9da6cfa6067272bde2a874cc19",
+      "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
     {
@@ -395,20 +406,9 @@
       "deployedCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
       "deployedCommitMessage": "oracle: sync live session-gated status",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
-      "syncState": "in-sync",
-      "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "git",
-      "project": "Moshe",
-      "event": "commit",
-      "state": "uncommitted-changes",
-      "timestamp": "2026-05-06T01:42:24+07:00",
-      "sourceRepo": "Moshe",
-      "sourceCommitSha": "971539be4c185cf3caebef4b646bd4a286b31cce",
+      "sourceCommitSha": "99531515d0bfdd9da6cfa6067272bde2a874cc19",
       "syncState": "behind",
-      "note": "oracle: sync live session-gated status"
+      "note": "read via Vercel CLI auth; no token value exposed"
     },
     {
       "provider": "git",
