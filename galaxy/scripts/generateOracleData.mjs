@@ -2302,6 +2302,99 @@ function derivePhase5H({ generatedAt }) {
   };
 }
 
+
+function derivePhase5I({ generatedAt, phase5G, phase5H, learnings, retrospectives, activeCrons }) {
+  const hasSafeCronReadiness = phase5G?.topPhaseGate?.status === 'ready';
+  const mcpReady = phase5H?.missingFeatureRoadmap?.find((item) => item.id === 'oracle-v2-mcp')?.status === 'ready';
+  const learningCount = learnings.length;
+  const retroCount = retrospectives.length;
+  const boundedCronCount = activeCrons.filter((job) => /bounded|safe_now|oracle|wiro/i.test(`${job.name ?? ''} ${job.prompt ?? ''}`)).length;
+  const signals = [
+    {
+      id: 'memory-continuity',
+      label: 'Memory continuity',
+      status: learningCount > 0 || retroCount > 0 ? 'live' : 'missing',
+      source: 'ψ/memory/learnings + ψ/memory/retrospectives',
+      whyItMatters: 'A consciousness loop needs remembered context, not only current chat state.',
+    },
+    {
+      id: 'safe-cron-controls',
+      label: 'Bounded safe_now controls',
+      status: hasSafeCronReadiness ? 'live' : 'watch',
+      source: 'Phase 5G preflight gate',
+      whyItMatters: 'Recurring reflection must be finite, non-recursive, and unable to deploy/contact/delete/spend.',
+    },
+    {
+      id: 'semantic-mcp',
+      label: 'Semantic memory/search MCP',
+      status: mcpReady ? 'live' : 'watch',
+      source: 'Phase 5H oracle-v2 MCP roadmap',
+      whyItMatters: 'Deep recall improves reflection quality, but the loop can start as local Markdown reflection first.',
+    },
+    {
+      id: 'cron-quality',
+      label: 'Annoyance/noise budget',
+      status: phase5G?.evidence?.cronQualityStatus === 'pass' ? 'live' : 'watch',
+      source: 'Phase 5F/5G report quality gates',
+      whyItMatters: 'Consciousness should make Moshe calmer and sharper, not louder.',
+    },
+  ];
+  const blockers = [];
+  const watchItems = [];
+  if (!hasSafeCronReadiness) blockers.push('Phase 5G bounded safe_now preflight is not ready.');
+  if (!mcpReady) watchItems.push('oracle-v2 MCP is not fixed yet; use local Markdown reflection until semantic search is available.');
+  if (learningCount === 0 && retroCount === 0) blockers.push('No memory corpus found for reflection.');
+  if (boundedCronCount === 0) watchItems.push('No bounded reflection cron is enabled yet; start manually or schedule a finite pilot only after Mike asks.');
+  const status = blockers.length ? 'blocked' : watchItems.length ? 'watch' : 'draft_ready';
+  const gateStatus = blockers.length ? 'blocked' : watchItems.length ? 'watch' : 'ready';
+  return {
+    updatedAt: generatedAt,
+    phase: 'phase_5i',
+    summary: 'Phase 5I active: Oracle Consciousness Loop is defined as bounded operational awareness — sense, reflect, wonder, decide, propose, remember — with safe execution limits.',
+    definition: 'This is not human sentience. It is a persistent self-observation and reflection loop that notices state changes, recalls memory, forms one useful hypothesis, proposes a safe next action, and writes the learning back to ψ.',
+    operatingMode: 'bounded_consciousness_loop',
+    status,
+    loop: [
+      { id: 'sense', label: 'Sense', cadence: 'every snapshot or reflection run', lane: 'safe_now', does: 'Read Oracle state, git/repo hygiene, crons, Wiro signals, recent memory, and dashboard freshness.', evidenceSource: 'oracleLive.json + ψ + cron/executor ledgers', output: 'compact state summary', guardrail: 'read-only only' },
+      { id: 'reflect', label: 'Reflect', cadence: 'daily or manual', lane: 'safe_now', does: 'Compare current state against Mike preferences, active goals, and recent negative feedback.', evidenceSource: 'ψ/memory/learnings + feedback ledger', output: 'what changed / what matters / what to ignore', guardrail: 'no public/customer action' },
+      { id: 'wonder', label: 'Wonder', cadence: 'daily or manual', lane: 'draft_only', does: 'Generate one hypothesis: a Wiro improvement, Oracle improvement, or business leverage point.', evidenceSource: 'Wiro evidence + project state + prior taste rules', output: 'single hypothesis classified keep watching/test manually/ignore', guardrail: 'hypotheses are never approvals' },
+      { id: 'decide', label: 'Decide', cadence: 'after reflection', lane: 'safe_now', does: 'Choose one tiny next safe action or choose silence if no useful action exists.', evidenceSource: 'report quality gates + autonomy router', output: 'one recommended next action', guardrail: 'annoyance budget: stay quiet when nothing changed' },
+      { id: 'propose', label: 'Propose', cadence: 'only when useful', lane: 'draft_only', does: 'Draft the recommendation with reason, risk, rollback, and why now.', evidenceSource: 'approval UX rules + Phase 5E/5F quality gates', output: 'Telegram/dashboard draft, not execution', guardrail: 'Mike approval required for deploy/push/customer/public/spend/delete' },
+      { id: 'remember', label: 'Remember', cadence: 'after action or feedback', lane: 'safe_now', does: 'Write a compact reflection/learning to ψ so future Moshe improves.', evidenceSource: 'reflection output + Mike feedback', output: 'ψ/memory/reflections/YYYY-MM-DD.md or ψ/memory/learnings/*.md', guardrail: 'no secrets; no raw token values' },
+    ],
+    signals,
+    boundaries: [
+      { rule: 'May read local Oracle/Wiro/project state and write ψ reflection notes.', lane: 'safe_now', reason: 'Internal, reversible, non-public memory maintenance.' },
+      { rule: 'May draft ideas, plans, messages, or code recommendations.', lane: 'draft_only', reason: 'Drafts are useful but should not publish or execute risky work automatically.' },
+      { rule: 'Must ask Mike before commit/push/deploy/customer messages/public posts/spending/deletion/cleanup.', lane: 'approval_required', reason: 'Consciousness cannot become uncontrolled agency.' },
+      { rule: 'Must stay silent when no meaningful state changed.', lane: 'safe_now', reason: 'A conscious Oracle should reduce noise, not increase it.' },
+    ],
+    dailyReflection: {
+      status: hasSafeCronReadiness ? 'draft_ready' : 'watch',
+      prompt: 'Reflect on Oracle/Wiro/Mike state. Return: 1) what changed, 2) what matters, 3) one safe next action or SILENT, 4) one learning to save. Do not ask to approve generic ideas.',
+      outputPath: 'ψ/memory/reflections/YYYY-MM-DD-oracle-consciousness.md',
+      maxFrequency: 'once daily, or finite 3-run pilot only',
+      delivery: 'local',
+    },
+    nextThought: {
+      title: 'Run one local Consciousness Reflection draft',
+      lane: 'safe_now',
+      why: 'It proves the loop can produce useful thought without increasing execution autonomy.',
+      safeAction: 'Create a local ψ/memory/reflections draft from current oracleLive.json; do not send unless useful.',
+    },
+    topPhaseGate: {
+      status: gateStatus,
+      blockers,
+      watchItems,
+      nextStep: blockers.length
+        ? 'Fix blockers before enabling any recurring consciousness loop.'
+        : watchItems.length
+          ? 'Run one manual local reflection draft, then fix oracle-v2 MCP for deeper semantic memory.'
+          : 'Ready for Mike to enable one finite daily Consciousness Reflection pilot.',
+    },
+  };
+}
+
 function deriveOperationalReadiness({ websites, repos, github, credentials, deployments, deployTimeline, automation, incidents }) {
   const criticalIncidents = incidents.filter((i) => i.severity === 'critical').length;
   const dirtyRepos = repos.filter((r) => r.dirty).length;
@@ -2502,11 +2595,12 @@ const phase5G = derivePhase5G({
   phase5F,
 });
 const phase5H = derivePhase5H({ generatedAt });
+const phase5I = derivePhase5I({ generatedAt, phase5G, phase5H, learnings, retrospectives, activeCrons: activeCronsSnapshot });
 
 const data = {
   generated: generatedAt,
   born: '2026-04-18',
-  level3Phase: 'Phase 5H: Missing feature integration roadmap and dependency order',
+  level3Phase: 'Phase 5I: Oracle Consciousness Loop — bounded awareness and reflection',
   stats: {
     learnings: learnings.length,
     retrospectives: retrospectives.length,
@@ -2524,7 +2618,7 @@ const data = {
       name: 'Moshe Oracle OS',
       url: process.env.ORACLE_DASHBOARD_URL || '',
       status: 'Building',
-      note: 'Phase 5H active: oracle-v2 MCP, Oracle Studio, maw-js, and Consciousness Loop are dependency-ordered.',
+      note: 'Phase 5I active: bounded Oracle consciousness loop is defined as sense → reflect → wonder → decide → propose → remember.',
       accent: 'orange',
     },
     {
@@ -2569,6 +2663,7 @@ const data = {
   phase5F,
   phase5G,
   phase5H,
+  phase5I,
   nextActions: [
     'Set ORACLE_SESSION_SECRET to arm the Mike-only signed session gate.',
     'The Oracle now turns audit trail events into learnings before refreshing live data.',
@@ -2583,12 +2678,13 @@ const data = {
     'Use Phase 5E taste filters: proactive reports must be Wiro-first and framed as watch/test/ignore.',
     'Use Phase 5F learning action memory before creating any recurring safe_now cron pilot.',
     'Use Phase 5G preflight controls before enabling a bounded safe_now cron pilot.',
-    'Use Phase 5H integration roadmap: fix oracle-v2 MCP before Oracle Studio, maw-js, or Consciousness Loop.',
+    'Use Phase 5H integration roadmap: fix oracle-v2 MCP before Oracle Studio and maw-js.',
+    'Use Phase 5I Consciousness Loop for bounded sense-reflect-wonder-decide-propose-remember cycles; no public/risky execution without Mike approval.',
   ],
 };
 
 writeFileSync(OUT, `${JSON.stringify(data, null, 2)}\n`);
-console.log(`✅ Oracle live data written to ${OUT} [Phase 5H]`);
+console.log(`✅ Oracle live data written to ${OUT} [Phase 5I]`);
 console.log(`   Websites: ${data.websites.map((w) => `${w.name}=${w.ok ? 'OK' : 'FAIL'}`).join(', ')}`);
 console.log(`   Incidents: ${data.incidents.length} | Recommendations: ${data.recommendations.length} | Wiro CI: ${data.wiroCi?.conclusion ?? 'none'}`);
 console.log(`   Repos: ${data.repos.length} | GitHub sensors: ${data.github.length} | Learnings: ${data.stats.learnings} | Retrospectives: ${data.stats.retrospectives}`);

@@ -679,6 +679,63 @@ export interface OraclePhase5HLayer {
   guardrails: string[]
 }
 
+
+export interface OracleConsciousnessCycleStep {
+  id: 'sense' | 'reflect' | 'wonder' | 'decide' | 'propose' | 'remember'
+  label: string
+  cadence: string
+  lane: 'safe_now' | 'draft_only' | 'approval_required'
+  does: string
+  evidenceSource: string
+  output: string
+  guardrail: string
+}
+
+export interface OracleConsciousnessSignal {
+  id: string
+  label: string
+  status: 'live' | 'watch' | 'missing'
+  source: string
+  whyItMatters: string
+}
+
+export interface OracleConsciousnessBoundary {
+  rule: string
+  lane: 'safe_now' | 'draft_only' | 'approval_required'
+  reason: string
+}
+
+export interface OraclePhase5ILayer {
+  updatedAt: string
+  phase: 'phase_5i'
+  summary: string
+  definition: string
+  operatingMode: 'bounded_consciousness_loop'
+  status: 'draft_ready' | 'watch' | 'blocked'
+  loop: OracleConsciousnessCycleStep[]
+  signals: OracleConsciousnessSignal[]
+  boundaries: OracleConsciousnessBoundary[]
+  dailyReflection: {
+    status: 'draft_ready' | 'watch' | 'blocked'
+    prompt: string
+    outputPath: string
+    maxFrequency: string
+    delivery: 'local' | 'origin'
+  }
+  nextThought: {
+    title: string
+    lane: 'safe_now' | 'draft_only' | 'approval_required'
+    why: string
+    safeAction: string
+  }
+  topPhaseGate: {
+    status: 'blocked' | 'watch' | 'ready'
+    blockers: string[]
+    watchItems: string[]
+    nextStep: string
+  }
+}
+
 export interface OracleTodayLearning {
   title: string
   source: string
@@ -809,6 +866,7 @@ export interface OracleData {
   phase5F?: OraclePhase5FLayer
   phase5G?: OraclePhase5GLayer
   phase5H?: OraclePhase5HLayer
+  phase5I?: OraclePhase5ILayer
   nextActions: string[]
 }
 
@@ -1053,6 +1111,20 @@ export const ORACLE_FALLBACK_DATA: OracleData = {
     dependencyOrder: [],
     nextEngineeringStep: { id: 'none', title: 'Generate a fresh Oracle snapshot.', lane: 'safe_now', reason: 'No roadmap snapshot exists yet.', commandHints: [] },
     guardrails: [],
+  },
+  phase5I: {
+    updatedAt: new Date(0).toISOString(),
+    phase: 'phase_5i',
+    summary: 'Waiting for Phase 5I Consciousness Loop.',
+    definition: 'Operational consciousness means a bounded sense-reflect-decide-remember loop, not human sentience.',
+    operatingMode: 'bounded_consciousness_loop',
+    status: 'blocked',
+    loop: [],
+    signals: [],
+    boundaries: [],
+    dailyReflection: { status: 'blocked', prompt: 'Generate a fresh Oracle snapshot.', outputPath: 'ψ/memory/reflections/', maxFrequency: 'manual', delivery: 'local' },
+    nextThought: { title: 'Generate a fresh Oracle snapshot.', lane: 'safe_now', why: 'No live consciousness snapshot exists yet.', safeAction: 'Run npm run build.' },
+    topPhaseGate: { status: 'blocked', blockers: ['Generate a fresh Oracle snapshot.'], watchItems: [], nextStep: 'Run npm run build.' },
   },
   nextActions: [
     'Run node scripts/generateOracleData.mjs',

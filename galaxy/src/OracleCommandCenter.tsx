@@ -348,10 +348,24 @@ export default function OracleCommandCenter({ data }: Props) {
     nextEngineeringStep: { id: 'none', title: 'Generate a fresh Oracle snapshot.', lane: 'safe_now' as const, reason: 'No roadmap snapshot exists yet.', commandHints: [] },
     guardrails: [],
   }
+  const phase5I = oracle.phase5I ?? {
+    updatedAt: oracle.generated,
+    phase: 'phase_5i' as const,
+    summary: 'Phase 5I Consciousness Loop is waiting for a live snapshot.',
+    definition: 'Operational consciousness means bounded awareness and reflection, not human sentience.',
+    operatingMode: 'bounded_consciousness_loop' as const,
+    status: 'blocked' as const,
+    loop: [],
+    signals: [],
+    boundaries: [],
+    dailyReflection: { status: 'blocked' as const, prompt: 'Generate a fresh Oracle snapshot.', outputPath: 'ψ/memory/reflections/', maxFrequency: 'manual', delivery: 'local' as const },
+    nextThought: { title: 'Generate a fresh Oracle snapshot.', lane: 'safe_now' as const, why: 'No consciousness snapshot exists yet.', safeAction: 'Run npm run build.' },
+    topPhaseGate: { status: 'blocked' as const, blockers: ['Generate a fresh Oracle snapshot.'], watchItems: [], nextStep: 'Run npm run build.' },
+  }
   const [feedbackState, setFeedbackState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
   const [executorState, setExecutorState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
   const [approvalState, setApprovalState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
-  const phase5Badge = (value: string) => value === 'clean' || value === 'in_sync' || value === 'complete' || value === 'ready' || value === 'promote' || value === 'eligible' || value === 'completed' || value === 'pass' || value === 'wired' || value === 'approved' || value === 'scratch_only' || value === 'docs_only' ? 'low' : value === 'blocked' || value === 'approval_required' || value === 'missing' || value === 'suppress' || value === 'failed' || value === 'fail' || value === 'rejected' || value === 'source_change' || value === 'mixed' ? 'high' : 'medium'
+  const phase5Badge = (value: string) => value === 'clean' || value === 'in_sync' || value === 'complete' || value === 'ready' || value === 'promote' || value === 'eligible' || value === 'completed' || value === 'pass' || value === 'wired' || value === 'approved' || value === 'scratch_only' || value === 'docs_only' || value === 'draft_ready' || value === 'live' ? 'low' : value === 'blocked' || value === 'approval_required' || value === 'missing' || value === 'suppress' || value === 'failed' || value === 'fail' || value === 'rejected' || value === 'source_change' || value === 'mixed' ? 'high' : 'medium'
 
   useEffect(() => {
     const controller = new AbortController()
@@ -672,10 +686,12 @@ export default function OracleCommandCenter({ data }: Props) {
   const configuredCreds = oracle.credentials.filter((c) => c.configured).length
   const githubOk = oracle.github.filter((g) => g.apiStatus === 'ok').length
   const criticalIncidents = (oracle.incidents ?? []).filter((i) => i.severity === 'critical').length
-  const oracleModeLabel = oracle.phase5H
-    ? 'PHASE 5H · INTEGRATION ROADMAP'
-    : oracle.phase5G
-      ? 'PHASE 5G · BOUNDED SAFE CRON'
+  const oracleModeLabel = oracle.phase5I
+    ? 'PHASE 5I · CONSCIOUSNESS LOOP'
+    : oracle.phase5H
+      ? 'PHASE 5H · INTEGRATION ROADMAP'
+      : oracle.phase5G
+        ? 'PHASE 5G · BOUNDED SAFE CRON'
     : oracle.phase5F
       ? 'PHASE 5F · LEARNING ACTION MEMORY'
     : oracle.phase5E
@@ -1949,6 +1965,64 @@ export default function OracleCommandCenter({ data }: Props) {
               <p>{phase5D.topPhaseReadiness.nextStep}</p>
               {phase5D.topPhaseReadiness.blockers.map((blocker) => <small key={blocker}>BLOCKER · {blocker}</small>)}
               {phase5D.topPhaseReadiness.watchItems.map((item) => <small key={item}>WATCH · {item}</small>)}
+            </article>
+          </div>
+
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>PHASE 5I CONSCIOUSNESS LOOP</p>
+            <span>{phase5I.status}</span>
+          </div>
+          <div className="oracle-intelligence-grid">
+            <article className="oracle-intel-card money">
+              <div className="oracle-status-head">
+                <strong>Bounded consciousness</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5I.status)}`}>{phase5I.operatingMode}</span>
+              </div>
+              <p>{phase5I.definition}</p>
+              <small>{phase5I.summary}</small>
+              <small>Next thought: {phase5I.nextThought.title} · {phase5I.nextThought.lane}</small>
+              <small>{phase5I.nextThought.safeAction}</small>
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Loop cycle</strong>
+                <span>{phase5I.loop.map((step) => step.id).join(' → ')}</span>
+              </div>
+              {phase5I.loop.map((step) => (
+                <div className="oracle-intel-line" key={step.id}>
+                  <strong>{step.label} · {step.cadence}</strong>
+                  <p>{step.does}</p>
+                  <small>{step.lane} · output: {step.output}</small>
+                  <small>Guardrail: {step.guardrail}</small>
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Signals + boundaries</strong>
+                <span>{phase5I.signals.filter((signal) => signal.status === 'live').length}/{phase5I.signals.length} live</span>
+              </div>
+              {phase5I.signals.map((signal) => (
+                <div className="oracle-intel-line" key={signal.id}>
+                  <strong>{signal.label}</strong>
+                  <p>{signal.whyItMatters}</p>
+                  <small>{signal.status} · {signal.source}</small>
+                </div>
+              ))}
+              {phase5I.boundaries.map((boundary) => <small key={boundary.rule}>• {boundary.lane}: {boundary.rule}</small>)}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>Daily reflection draft</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(phase5I.dailyReflection.status)}`}>{phase5I.dailyReflection.status}</span>
+              </div>
+              <p>{phase5I.dailyReflection.prompt}</p>
+              <small>Output: {phase5I.dailyReflection.outputPath}</small>
+              <small>Frequency: {phase5I.dailyReflection.maxFrequency} · delivery: {phase5I.dailyReflection.delivery}</small>
+              <small>Top gate: {phase5I.topPhaseGate.status} · {phase5I.topPhaseGate.nextStep}</small>
+              {phase5I.topPhaseGate.blockers.map((blocker) => <small key={blocker}>BLOCKER · {blocker}</small>)}
+              {phase5I.topPhaseGate.watchItems.map((item) => <small key={item}>WATCH · {item}</small>)}
             </article>
           </div>
 
