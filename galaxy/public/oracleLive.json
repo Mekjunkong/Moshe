@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-06T10:21:42.694Z",
+  "generated": "2026-05-06T10:23:55.699Z",
   "born": "2026-04-18",
   "level3Phase": "Phase 5B: Feedback persistence, evidence chains, safe executor queue, approval inbox, and value scoring",
   "stats": {
@@ -115,7 +115,7 @@
       "ok": true,
       "status": 200,
       "responseMs": null,
-      "checkedAt": "2026-05-06T10:21:31.731Z",
+      "checkedAt": "2026-05-06T10:23:45.274Z",
       "note": "local build target; set ORACLE_DASHBOARD_URL after deploy for public uptime checks"
     },
     {
@@ -123,8 +123,8 @@
       "url": "https://aum-hippie-young.vercel.app/",
       "ok": true,
       "status": 200,
-      "responseMs": 181,
-      "checkedAt": "2026-05-06T10:21:31.912Z",
+      "responseMs": 179,
+      "checkedAt": "2026-05-06T10:23:45.453Z",
       "note": "reachable"
     },
     {
@@ -132,8 +132,8 @@
       "url": "https://www.wiro4x4indochina.com/",
       "ok": true,
       "status": 200,
-      "responseMs": 195,
-      "checkedAt": "2026-05-06T10:21:31.947Z",
+      "responseMs": 189,
+      "checkedAt": "2026-05-06T10:23:45.484Z",
       "note": "reachable"
     }
   ],
@@ -142,15 +142,15 @@
       "name": "Moshe",
       "path": "/Users/pasuthunjunkong/workspace/Moshe",
       "branch": "oracle-phase-5b-feedback-executor",
-      "commit": "d8ee721",
-      "commitFull": "d8ee7219bee910f164deb14e7aea144ae2f099fd",
-      "commitSubject": "feat: add Oracle phase 5A closed-loop sensors",
+      "commit": "57f86b8",
+      "commitFull": "57f86b887ace54ab24bce6b86e6622bd341988f6",
+      "commitSubject": "feat: add Oracle phase 5B feedback executor loop",
       "dirty": true,
-      "changedFiles": 52,
-      "modifiedFiles": 6,
-      "untrackedFiles": 46,
+      "changedFiles": 44,
+      "modifiedFiles": 0,
+      "untrackedFiles": 44,
       "protectedTouched": false,
-      "lastCommitAt": "2026-05-06T16:10:45+07:00",
+      "lastCommitAt": "2026-05-06T17:23:34+07:00",
       "github": "Mekjunkong/Moshe",
       "remoteHost": "github.com"
     },
@@ -233,7 +233,7 @@
       "apiStatus": "ok",
       "private": false,
       "defaultBranch": "main",
-      "pushedAt": "2026-05-06T09:10:46Z",
+      "pushedAt": "2026-05-06T10:23:36Z",
       "openIssues": 0,
       "openPullRequests": 0,
       "latestWorkflow": null,
@@ -307,9 +307,9 @@
       "severity": "warning",
       "category": "repo-dirty",
       "project": "Moshe",
-      "title": "Moshe: 52 uncommitted changes",
-      "detail": "Branch oracle-phase-5b-feedback-executor · last commit: \"feat: add Oracle phase 5A closed-loop sensors\"",
-      "detectedAt": "2026-05-06T16:10:45+07:00"
+      "title": "Moshe: 44 uncommitted changes",
+      "detail": "Branch oracle-phase-5b-feedback-executor · last commit: \"feat: add Oracle phase 5B feedback executor loop\"",
+      "detectedAt": "2026-05-06T17:23:34+07:00"
     },
     {
       "id": "creds-missing",
@@ -318,14 +318,14 @@
       "project": "Oracle OS",
       "title": "5 credential(s) not configured",
       "detail": "VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_PROJECT_NAME, VERCEL_TEAM_ID, GITHUB_TOKEN",
-      "detectedAt": "2026-05-06T10:21:42.694Z"
+      "detectedAt": "2026-05-06T10:23:55.699Z"
     }
   ],
   "recommendations": [
     {
       "project": "Moshe",
       "priority": "medium",
-      "reason": "Moshe: 52 uncommitted changes",
+      "reason": "Moshe: 44 uncommitted changes",
       "risk": "medium",
       "suggestedAction": "Review staged changes in Moshe and commit or stash to keep the branch clean."
     },
@@ -355,11 +355,11 @@
       "project": "Moshe",
       "event": "commit",
       "state": "uncommitted-changes",
-      "timestamp": "2026-05-06T16:10:45+07:00",
+      "timestamp": "2026-05-06T17:23:34+07:00",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "d8ee7219bee910f164deb14e7aea144ae2f099fd",
+      "sourceCommitSha": "57f86b887ace54ab24bce6b86e6622bd341988f6",
       "syncState": "behind",
-      "note": "feat: add Oracle phase 5A closed-loop sensors"
+      "note": "feat: add Oracle phase 5B feedback executor loop"
     },
     {
       "provider": "git",
@@ -382,7 +382,7 @@
       "deployedCommitSha": "27cd254c574d5cdc389155fe93a9dd16bfcae81a",
       "deployedCommitMessage": "oracle: add autonomy router lanes",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "d8ee7219bee910f164deb14e7aea144ae2f099fd",
+      "sourceCommitSha": "57f86b887ace54ab24bce6b86e6622bd341988f6",
       "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
@@ -396,7 +396,7 @@
       "deployedCommitSha": "06f96325f2305145359192ea6fc0b201a4cabb1b",
       "deployedCommitMessage": "oracle: keep intelligence radar populated in production",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "d8ee7219bee910f164deb14e7aea144ae2f099fd",
+      "sourceCommitSha": "57f86b887ace54ab24bce6b86e6622bd341988f6",
       "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
@@ -410,7 +410,7 @@
       "deployedCommitSha": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
       "deployedCommitMessage": "oracle: log readiness deployment",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "d8ee7219bee910f164deb14e7aea144ae2f099fd",
+      "sourceCommitSha": "57f86b887ace54ab24bce6b86e6622bd341988f6",
       "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
@@ -527,7 +527,7 @@
     ]
   },
   "intelligenceLayer": {
-    "updatedAt": "2026-05-06T10:21:42.941Z",
+    "updatedAt": "2026-05-06T10:23:55.951Z",
     "summary": "Oracle is learning from ψ and opportunity artifacts. Top money radar: AI Inquiry and Quote Copilot for Tour Operators (95/100).",
     "todayLearnings": [
       {
@@ -672,7 +672,7 @@
       }
     ],
     "autonomyRouter": {
-      "updatedAt": "2026-05-06T10:21:42.941Z",
+      "updatedAt": "2026-05-06T10:23:55.951Z",
       "phase": "phase_4",
       "summary": "Phase 4 is active: Oracle classifies every recommendation before action and keeps execution behind safe/draft/approval lanes.",
       "lanes": [
@@ -840,13 +840,24 @@
     "note": "Terminal panel is visible but execution is disabled until ORACLE_TERMINAL_ENABLED=true is set on a trusted runtime."
   },
   "phase5A": {
-    "updatedAt": "2026-05-06T10:21:42.694Z",
+    "updatedAt": "2026-05-06T10:23:55.699Z",
     "phase": "phase_5a",
     "summary": "Phase 5A active: Oracle now has closed-loop signal quality, repo hygiene, and deployment freshness sensors before safe execution.",
     "feedbackLedger": {
-      "updatedAt": "2026-05-06T10:21:42.694Z",
+      "updatedAt": "2026-05-06T10:23:55.699Z",
       "summary": "12 signals tracked; 1 high-actionability; 1 need approval.",
       "signals": [
+        {
+          "id": "audit-e6b8cf76-c77d-4556-b961-c37bf115cd08",
+          "source": "audit:oracle-session",
+          "businessArea": "oracle_os",
+          "actionability": "low",
+          "freshness": "fresh",
+          "riskLevel": "low",
+          "approvalRequired": false,
+          "mikeFeedback": "unrated",
+          "valueSignal": "Mike-only signed session cookie issued."
+        },
         {
           "id": "audit-573c1684-6410-4d0e-b5ad-5cebdc9e0453",
           "source": "audit:oracle-session",
@@ -882,17 +893,6 @@
         },
         {
           "id": "audit-95d1e4fe-5164-40ba-8d8e-89d5f54923ce",
-          "source": "audit:oracle-session",
-          "businessArea": "oracle_os",
-          "actionability": "low",
-          "freshness": "fresh",
-          "riskLevel": "low",
-          "approvalRequired": false,
-          "mikeFeedback": "unrated",
-          "valueSignal": "Mike-only signed session cookie issued."
-        },
-        {
-          "id": "audit-8d897fc5-024f-404e-9145-7105845edd44",
           "source": "audit:oracle-session",
           "businessArea": "oracle_os",
           "actionability": "low",
@@ -990,15 +990,15 @@
       "nextLearningStep": "Capture Mike feedback as useful/noisy/missing-context, then prioritize future reports by value signal."
     },
     "repoHygiene": {
-      "updatedAt": "2026-05-06T10:21:42.694Z",
+      "updatedAt": "2026-05-06T10:23:55.699Z",
       "verdict": "blocked",
       "summary": "1 repo(s) blocked by protected/large dirty state.",
       "items": [
         {
           "repo": "Moshe",
           "branch": "oracle-phase-5b-feedback-executor",
-          "changedFiles": 52,
-          "untrackedFiles": 46,
+          "changedFiles": 44,
+          "untrackedFiles": 44,
           "protectedTouched": false,
           "verdict": "blocked",
           "recommendation": "Do not recommend ship/deploy until protected or large dirty state is reviewed."
@@ -1024,12 +1024,12 @@
       ]
     },
     "deploymentFreshnessGap": {
-      "updatedAt": "2026-05-06T10:21:42.694Z",
+      "updatedAt": "2026-05-06T10:23:55.699Z",
       "verdict": "review_before_ship",
-      "summary": "galaxy: live 27cd254 vs local d8ee721 · behind",
+      "summary": "galaxy: live 27cd254 vs local 57f86b8 · behind",
       "liveProject": "galaxy",
       "liveCommit": "27cd254c574d",
-      "localCommit": "d8ee7219bee9",
+      "localCommit": "57f86b887ace",
       "snapshotAgeMinutes": 0,
       "worktreeDirty": true,
       "dirtyRepoCount": 2,
@@ -1044,7 +1044,7 @@
     ]
   },
   "phase5B": {
-    "updatedAt": "2026-05-06T10:21:42.694Z",
+    "updatedAt": "2026-05-06T10:23:55.699Z",
     "phase": "phase_5b",
     "summary": "Phase 5B active: feedback now has a signed-session persistence endpoint, evidence chains, safe executor queue, approval inbox states, and value/noise scoring.",
     "feedbackPersistence": {
@@ -1068,8 +1068,8 @@
         "status": "complete",
         "summary": "Evidence for regenerating the local Oracle snapshot without external side effects.",
         "proofs": [
-          "snapshot generated 2026-05-06T10:21:42.694Z",
-          "Moshe repo HEAD d8ee721",
+          "snapshot generated 2026-05-06T10:23:55.699Z",
+          "Moshe repo HEAD 57f86b8",
           "readiness watch (64)"
         ],
         "missing": [],
@@ -1140,7 +1140,7 @@
         "risk": "medium",
         "requestedAction": "Prepare options and evidence for Mike, but do not contact prospects.",
         "approvalTrigger": "Mike approval required before execution.",
-        "expiresAt": "2026-05-07T10:21:42.694Z"
+        "expiresAt": "2026-05-07T10:23:55.699Z"
       },
       {
         "id": "approval-approval-outreach-send",
@@ -1149,7 +1149,7 @@
         "risk": "medium",
         "requestedAction": "Keep outreach as a draft and wait for explicit Mike approval.",
         "approvalTrigger": "Mike approval required before execution.",
-        "expiresAt": "2026-05-07T10:21:42.694Z"
+        "expiresAt": "2026-05-07T10:23:55.699Z"
       },
       {
         "id": "approval-approval-publish-landing",
@@ -1158,7 +1158,7 @@
         "risk": "medium",
         "requestedAction": "Prepare review checklist for Mike.",
         "approvalTrigger": "Mike approval required before execution.",
-        "expiresAt": "2026-05-07T10:21:42.694Z"
+        "expiresAt": "2026-05-07T10:23:55.699Z"
       },
       {
         "id": "approval-action-dispatch-wiro-ci",
@@ -1168,7 +1168,7 @@
         "requestedAction": "Preview the workflow request and wait for Mike approval before dispatch.",
         "approvalTrigger": "Creates an external GitHub event and consumes CI minutes.",
         "evidenceChainId": "wiro-ci-evidence",
-        "expiresAt": "2026-05-07T10:21:42.694Z"
+        "expiresAt": "2026-05-07T10:23:55.699Z"
       },
       {
         "id": "approval-action-vercel-redeploy",
@@ -1178,7 +1178,7 @@
         "requestedAction": "Prepare deployment evidence and wait for Mike approval.",
         "approvalTrigger": "Changes live production surface and must be tied to verified commits/artifacts.",
         "evidenceChainId": "oracle-deploy-evidence",
-        "expiresAt": "2026-05-07T10:21:42.694Z"
+        "expiresAt": "2026-05-07T10:23:55.699Z"
       }
     ],
     "businessValueScores": [
