@@ -220,11 +220,27 @@ export interface OracleOpportunityRadarItem {
 
 export interface OracleApprovalQueueItem {
   title: string
-  category: 'safe' | 'approval-required'
+  category: 'safe' | 'draft-only' | 'approval-required'
   risk: 'low' | 'medium' | 'high'
   reason: string
   proposedAction: string
   source: string
+}
+
+export interface OracleAutonomyRouterLane {
+  id: 'safe_now' | 'draft_only' | 'approval_required'
+  label: string
+  status: 'active' | 'guarded' | 'locked'
+  summary: string
+  examples: string[]
+  count: number
+}
+
+export interface OracleAutonomyRouter {
+  updatedAt: string
+  summary: string
+  lanes: OracleAutonomyRouterLane[]
+  guardrails: string[]
 }
 
 export interface OracleTerminalPolicy {
@@ -244,6 +260,7 @@ export interface OracleIntelligenceLayer {
   todayLearnings: OracleTodayLearning[]
   opportunityRadar: OracleOpportunityRadarItem[]
   approvalQueue: OracleApprovalQueueItem[]
+  autonomyRouter: OracleAutonomyRouter
 }
 
 // ── Root data contract ──────────────────────────────────────────────────────
@@ -384,6 +401,12 @@ export const ORACLE_FALLBACK_DATA: OracleData = {
     todayLearnings: [],
     opportunityRadar: [],
     approvalQueue: [],
+    autonomyRouter: {
+      updatedAt: new Date(0).toISOString(),
+      summary: 'Waiting for the first autonomy router snapshot.',
+      lanes: [],
+      guardrails: [],
+    },
   },
   terminal: {
     enabled: false,

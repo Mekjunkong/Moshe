@@ -2127,3 +2127,107 @@
   font-size: 10px;
   line-height: 1.4;
 }
+
+/* ── Autonomy Router v2 ─────────────────────────────────────────────────── */
+.oracle-autonomy-router {
+  border: 1px solid rgba(251, 146, 60, 0.32);
+  border-radius: 22px;
+  padding: 16px;
+  margin-top: 14px;
+  background:
+    radial-gradient(circle at top left, rgba(251, 146, 60, 0.2), transparent 36%),
+    rgba(15, 23, 42, 0.76);
+  box-shadow: 0 20px 48px rgba(2, 6, 23, 0.28);
+}
+
+.oracle-autonomy-router p {
+  margin: 4px 0 0;
+  color: rgba(226, 232, 240, 0.72);
+  line-height: 1.45;
+}
+
+.oracle-autonomy-lanes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.oracle-autonomy-lanes.improve {
+  margin-top: 0;
+}
+
+.oracle-autonomy-lane {
+  border-radius: 18px;
+  padding: 13px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(15, 23, 42, 0.62);
+}
+
+.oracle-autonomy-lane.active {
+  border-color: rgba(34, 197, 94, 0.5);
+  background: linear-gradient(145deg, rgba(20, 83, 45, 0.28), rgba(15, 23, 42, 0.72));
+}
+
+.oracle-autonomy-lane.guarded {
+  border-color: rgba(250, 204, 21, 0.5);
+  background: linear-gradient(145deg, rgba(113, 63, 18, 0.28), rgba(15, 23, 42, 0.72));
+}
+
+.oracle-autonomy-lane.locked {
+  border-color: rgba(248, 113, 113, 0.48);
+  background: linear-gradient(145deg, rgba(127, 29, 29, 0.24), rgba(15, 23, 42, 0.72));
+}
+
+.oracle-autonomy-lane strong {
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.oracle-autonomy-lane p {
+  color: rgba(226, 232, 240, 0.74);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.oracle-autonomy-lane small {
+  display: block;
+  margin-top: 8px;
+  color: rgba(125, 211, 252, 0.84);
+}
+
+.oracle-autonomy-lane ul {
+  margin: 10px 0 0;
+  padding-left: 17px;
+  color: rgba(226, 232, 240, 0.72);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.oracle-router-guardrails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.oracle-router-guardrails span {
+  border: 1px solid rgba(248, 113, 113, 0.28);
+  color: rgba(254, 202, 202, 0.88);
+  background: rgba(127, 29, 29, 0.22);
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-size: 0.72rem;
+}
+
+.oracle-approval-card.draft {
+  border-color: rgba(250, 204, 21, 0.38);
+  background: linear-gradient(145deg, rgba(113, 63, 18, 0.22), rgba(15, 23, 42, 0.76));
+}
+
+@media (max-width: 960px) {
+  .oracle-autonomy-lanes {
+    grid-template-columns: 1fr;
+  }
+}

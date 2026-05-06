@@ -558,9 +558,16 @@ export default function OracleCommandCenter({ data }: Props) {
     todayLearnings: [],
     opportunityRadar: [],
     approvalQueue: [],
+    autonomyRouter: {
+      updatedAt: oracle.generated,
+      summary: 'Autonomy router is waiting for the next generated snapshot.',
+      lanes: [],
+      guardrails: [],
+    },
   }
   const topMoneyOpportunity = intelligence.opportunityRadar[0] ?? null
   const safeApprovalItems = intelligence.approvalQueue.filter((item) => item.category === 'safe')
+  const draftApprovalItems = intelligence.approvalQueue.filter((item) => item.category === 'draft-only')
   const gatedApprovalItems = intelligence.approvalQueue.filter((item) => item.category === 'approval-required')
   const terminalPolicy = terminalLivePolicy ?? oracle.terminal ?? {
     enabled: false,
@@ -669,6 +676,28 @@ export default function OracleCommandCenter({ data }: Props) {
             </span>
           </div>
 
+          <div className="oracle-autonomy-router" aria-label="Oracle autonomy router">
+            <div className="oracle-status-head">
+              <div>
+                <strong>Autonomy Router</strong>
+                <p>{intelligence.autonomyRouter.summary}</p>
+              </div>
+              <span className="oracle-risk-badge low">3 LANES</span>
+            </div>
+            <div className="oracle-autonomy-lanes">
+              {intelligence.autonomyRouter.lanes.map((lane) => (
+                <article className={`oracle-autonomy-lane ${lane.status}`} key={lane.id}>
+                  <div className="oracle-status-head">
+                    <strong>{lane.label}</strong>
+                    <span>{lane.count}</span>
+                  </div>
+                  <p>{lane.summary}</p>
+                  <small>{lane.examples.slice(0, 3).join(' · ')}</small>
+                </article>
+              ))}
+            </div>
+          </div>
+
           <div className="oracle-intelligence-grid">
             <article className="oracle-intel-card">
               <div className="oracle-status-head">
@@ -705,15 +734,15 @@ export default function OracleCommandCenter({ data }: Props) {
 
           <div className="oracle-section-head" style={{ marginTop: 16 }}>
             <p>APPROVAL QUEUE</p>
-            <span>{safeApprovalItems.length} safe · {gatedApprovalItems.length} need Mike</span>
+            <span>{safeApprovalItems.length} safe · {draftApprovalItems.length} draft · {gatedApprovalItems.length} need Mike</span>
           </div>
           <div className="oracle-approval-grid">
             {intelligence.approvalQueue.map((item) => (
-              <article className={`oracle-approval-card ${item.category === 'safe' ? 'safe' : 'gated'}`} key={item.title}>
+              <article className={`oracle-approval-card ${item.category === 'safe' ? 'safe' : item.category === 'draft-only' ? 'draft' : 'gated'}`} key={item.title}>
                 <div className="oracle-status-head">
                   <strong>{item.title}</strong>
-                  <span className={`oracle-risk-badge ${item.category === 'safe' ? 'low' : item.risk}`}>
-                    {item.category === 'safe' ? 'CAN PREP' : 'APPROVAL'}
+                  <span className={`oracle-risk-badge ${item.category === 'safe' ? 'low' : item.category === 'draft-only' ? 'medium' : item.risk}`}>
+                    {item.category === 'safe' ? 'SAFE NOW' : item.category === 'draft-only' ? 'DRAFT ONLY' : 'APPROVAL'}
                   </span>
                 </div>
                 <p>{item.reason}</p>
@@ -1354,6 +1383,28 @@ export default function OracleCommandCenter({ data }: Props) {
               <small>{deploymentFreshness.message} · updated {timeAgo(deploymentFreshness.updated)}</small>
             </div>
           </article>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>AUTONOMY ROUTER</p>
+            <span>{intelligence.autonomyRouter.lanes.length} execution lanes</span>
+          </div>
+          <div className="oracle-autonomy-lanes improve">
+            {intelligence.autonomyRouter.lanes.map((lane) => (
+              <article className={`oracle-autonomy-lane ${lane.status}`} key={lane.id}>
+                <div className="oracle-status-head">
+                  <strong>{lane.label}</strong>
+                  <span>{lane.status.toUpperCase()}</span>
+                </div>
+                <p>{lane.summary}</p>
+                <ul>
+                  {lane.examples.map((example) => <li key={example}>{example}</li>)}
+                </ul>
+              </article>
+            ))}
+          </div>
+          <div className="oracle-router-guardrails">
+            {intelligence.autonomyRouter.guardrails.map((guardrail) => <span key={guardrail}>{guardrail}</span>)}
+          </div>
 
           <div className="oracle-section-head" style={{ marginTop: 16 }}>
             <p>READINESS CHECKS</p>

@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-06T06:05:24.383Z",
+  "generated": "2026-05-06T06:40:34.875Z",
   "born": "2026-04-18",
   "level3Phase": "Phase 3B: Feedback loop — audit-derived learnings, auth, allowlist, audit log, preview mode",
   "stats": {
@@ -115,7 +115,7 @@
       "ok": true,
       "status": 200,
       "responseMs": null,
-      "checkedAt": "2026-05-06T06:05:13.588Z",
+      "checkedAt": "2026-05-06T06:40:24.320Z",
       "note": "local build target; set ORACLE_DASHBOARD_URL after deploy for public uptime checks"
     },
     {
@@ -123,8 +123,8 @@
       "url": "https://aum-hippie-young.vercel.app/",
       "ok": true,
       "status": 200,
-      "responseMs": 196,
-      "checkedAt": "2026-05-06T06:05:13.784Z",
+      "responseMs": 206,
+      "checkedAt": "2026-05-06T06:40:24.526Z",
       "note": "reachable"
     },
     {
@@ -132,8 +132,8 @@
       "url": "https://www.wiro4x4indochina.com/",
       "ok": true,
       "status": 200,
-      "responseMs": 197,
-      "checkedAt": "2026-05-06T06:05:13.806Z",
+      "responseMs": 187,
+      "checkedAt": "2026-05-06T06:40:24.529Z",
       "note": "reachable"
     }
   ],
@@ -142,12 +142,12 @@
       "name": "Moshe",
       "path": "/Users/pasuthunjunkong/workspace/Moshe",
       "branch": "main",
-      "commit": "c4c98f2",
-      "commitFull": "c4c98f25d08e6152745f57187faca76066b4e9cc",
-      "commitSubject": "oracle: add intelligence layer and terminal bridge",
+      "commit": "06f9632",
+      "commitFull": "06f96325f2305145359192ea6fc0b201a4cabb1b",
+      "commitSubject": "oracle: keep intelligence radar populated in production",
       "dirty": true,
-      "changedFiles": 31,
-      "lastCommitAt": "2026-05-06T12:51:18+07:00",
+      "changedFiles": 35,
+      "lastCommitAt": "2026-05-06T13:05:33+07:00",
       "github": "Mekjunkong/Moshe",
       "remoteHost": "github.com"
     },
@@ -183,6 +183,18 @@
       "provider": "vercel",
       "project": "galaxy",
       "state": "READY",
+      "url": "https://galaxy-7drrt5ut0-pasuthun-junkongs-projects.vercel.app",
+      "createdAt": "2026-05-06T06:05:46.503Z",
+      "gitCommitSha": "06f96325f2305145359192ea6fc0b201a4cabb1b",
+      "gitCommitMessage": "oracle: keep intelligence radar populated in production",
+      "gitCommitRef": "main",
+      "gitDirty": true,
+      "note": "read via Vercel CLI auth; no token value exposed"
+    },
+    {
+      "provider": "vercel",
+      "project": "galaxy",
+      "state": "READY",
       "url": "https://galaxy-dghf32dkr-pasuthun-junkongs-projects.vercel.app",
       "createdAt": "2026-05-06T05:30:33.682Z",
       "gitCommitSha": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
@@ -202,18 +214,6 @@
       "gitCommitRef": "main",
       "gitDirty": true,
       "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "vercel",
-      "project": "galaxy",
-      "state": "READY",
-      "url": "https://galaxy-213e9766j-pasuthun-junkongs-projects.vercel.app",
-      "createdAt": "2026-05-06T03:13:31.077Z",
-      "gitCommitSha": "d56b570b20cdc87de0abe5f9499aadc943461cb3",
-      "gitCommitMessage": "oracle: refresh readiness snapshot",
-      "gitCommitRef": "main",
-      "gitDirty": true,
-      "note": "read via Vercel CLI auth; no token value exposed"
     }
   ],
   "github": [
@@ -224,7 +224,7 @@
       "apiStatus": "ok",
       "private": false,
       "defaultBranch": "main",
-      "pushedAt": "2026-05-06T05:51:19Z",
+      "pushedAt": "2026-05-06T06:05:35Z",
       "openIssues": 0,
       "openPullRequests": 0,
       "latestWorkflow": null,
@@ -298,9 +298,9 @@
       "severity": "warning",
       "category": "repo-dirty",
       "project": "Moshe",
-      "title": "Moshe: 31 uncommitted changes",
-      "detail": "Branch main · last commit: \"oracle: add intelligence layer and terminal bridge\"",
-      "detectedAt": "2026-05-06T12:51:18+07:00"
+      "title": "Moshe: 35 uncommitted changes",
+      "detail": "Branch main · last commit: \"oracle: keep intelligence radar populated in production\"",
+      "detectedAt": "2026-05-06T13:05:33+07:00"
     },
     {
       "id": "repo-dirty-wiro4x4",
@@ -318,14 +318,14 @@
       "project": "Oracle OS",
       "title": "5 credential(s) not configured",
       "detail": "VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_PROJECT_NAME, VERCEL_TEAM_ID, GITHUB_TOKEN",
-      "detectedAt": "2026-05-06T06:05:24.383Z"
+      "detectedAt": "2026-05-06T06:40:34.875Z"
     }
   ],
   "recommendations": [
     {
       "project": "Moshe",
       "priority": "medium",
-      "reason": "Moshe: 31 uncommitted changes",
+      "reason": "Moshe: 35 uncommitted changes",
       "risk": "medium",
       "suggestedAction": "Review staged changes in Moshe and commit or stash to keep the branch clean."
     },
@@ -358,15 +358,29 @@
   },
   "deployTimeline": [
     {
+      "provider": "vercel",
+      "project": "galaxy",
+      "event": "deploy",
+      "state": "READY",
+      "url": "https://galaxy-7drrt5ut0-pasuthun-junkongs-projects.vercel.app",
+      "timestamp": "2026-05-06T06:05:46.503Z",
+      "deployedCommitSha": "06f96325f2305145359192ea6fc0b201a4cabb1b",
+      "deployedCommitMessage": "oracle: keep intelligence radar populated in production",
+      "sourceRepo": "Moshe",
+      "sourceCommitSha": "06f96325f2305145359192ea6fc0b201a4cabb1b",
+      "syncState": "in-sync",
+      "note": "read via Vercel CLI auth; no token value exposed"
+    },
+    {
       "provider": "git",
       "project": "Moshe",
       "event": "commit",
       "state": "uncommitted-changes",
-      "timestamp": "2026-05-06T12:51:18+07:00",
+      "timestamp": "2026-05-06T13:05:33+07:00",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "c4c98f25d08e6152745f57187faca76066b4e9cc",
+      "sourceCommitSha": "06f96325f2305145359192ea6fc0b201a4cabb1b",
       "syncState": "behind",
-      "note": "oracle: add intelligence layer and terminal bridge"
+      "note": "oracle: keep intelligence radar populated in production"
     },
     {
       "provider": "vercel",
@@ -378,7 +392,7 @@
       "deployedCommitSha": "a53ab9cee3905a2ed7999b6edf22c4dea7697014",
       "deployedCommitMessage": "oracle: log readiness deployment",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "c4c98f25d08e6152745f57187faca76066b4e9cc",
+      "sourceCommitSha": "06f96325f2305145359192ea6fc0b201a4cabb1b",
       "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
@@ -392,21 +406,7 @@
       "deployedCommitSha": "d56b570b20cdc87de0abe5f9499aadc943461cb3",
       "deployedCommitMessage": "oracle: refresh readiness snapshot",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "c4c98f25d08e6152745f57187faca76066b4e9cc",
-      "syncState": "behind",
-      "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "vercel",
-      "project": "galaxy",
-      "event": "deploy",
-      "state": "READY",
-      "url": "https://galaxy-213e9766j-pasuthun-junkongs-projects.vercel.app",
-      "timestamp": "2026-05-06T03:13:31.077Z",
-      "deployedCommitSha": "d56b570b20cdc87de0abe5f9499aadc943461cb3",
-      "deployedCommitMessage": "oracle: refresh readiness snapshot",
-      "sourceRepo": "Moshe",
-      "sourceCommitSha": "c4c98f25d08e6152745f57187faca76066b4e9cc",
+      "sourceCommitSha": "06f96325f2305145359192ea6fc0b201a4cabb1b",
       "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
@@ -473,9 +473,9 @@
     ]
   },
   "operationalReadiness": {
-    "score": 68,
-    "status": "watch",
-    "summary": "1 failing check(s), 2 watch item(s). Fix failures before relying on autonomy.",
+    "score": 86,
+    "status": "steady",
+    "summary": "2 watch item(s). Oracle is usable, but not fully verified.",
     "checks": [
       {
         "label": "Sites online",
@@ -497,8 +497,8 @@
       },
       {
         "label": "Live deploy freshness",
-        "status": "fail",
-        "detail": "galaxy: behind",
+        "status": "pass",
+        "detail": "galaxy: in-sync",
         "weight": 20
       },
       {
@@ -522,7 +522,7 @@
     ]
   },
   "intelligenceLayer": {
-    "updatedAt": "2026-05-06T06:05:24.393Z",
+    "updatedAt": "2026-05-06T06:40:34.886Z",
     "summary": "Oracle is learning from ψ and opportunity artifacts. Top money radar: AI Inquiry and Quote Copilot for Tour Operators (95/100).",
     "todayLearnings": [
       {
@@ -604,6 +604,14 @@
         "source": "outbox/one-person-business/business-radar-mike-2026-05-06.md"
       },
       {
+        "title": "Prepare landing page and ROI calculator drafts",
+        "category": "draft-only",
+        "risk": "low",
+        "reason": "Draft artifacts increase speed to validation but do not publish or contact customers.",
+        "proposedAction": "Review the existing landing copy and improve the offer proof stack.",
+        "source": "outbox/one-person-business/ai-booking-assistant-landing-page-copy.md"
+      },
+      {
         "title": "Review top opportunity direction",
         "category": "approval-required",
         "risk": "medium",
@@ -627,7 +635,59 @@
         "proposedAction": "Mike reviews copy, pricing, promise, and CTA before publish.",
         "source": "outbox/one-person-business/ai-booking-assistant-landing-page-copy.md"
       }
-    ]
+    ],
+    "autonomyRouter": {
+      "updatedAt": "2026-05-06T06:40:34.885Z",
+      "summary": "Oracle routes every autonomous idea into safe_now, draft_only, or approval_required before execution.",
+      "lanes": [
+        {
+          "id": "safe_now",
+          "label": "safe_now",
+          "status": "active",
+          "summary": "Moshe can execute without interrupting Mike when the work is read-only, reversible, internal, or draft-generation only with no external side effect.",
+          "examples": [
+            "read-only research",
+            "local verification",
+            "internal demo artifacts",
+            "dashboard copy/UI improvements"
+          ],
+          "count": 1
+        },
+        {
+          "id": "draft_only",
+          "label": "draft_only",
+          "status": "guarded",
+          "summary": "Moshe may prepare the asset but must not publish, send, spend, deploy risky changes, or contact anyone.",
+          "examples": [
+            "landing page draft",
+            "outreach message draft",
+            "ROI calculator draft",
+            "lead list draft"
+          ],
+          "count": 1
+        },
+        {
+          "id": "approval_required",
+          "label": "approval_required",
+          "status": "locked",
+          "summary": "Mike approval is required before anything customer-facing, public, paid, destructive, cleanup/delete, commit/push, deploy, or outbound.",
+          "examples": [
+            "send outreach",
+            "publish page",
+            "spend money",
+            "commit/push/deploy",
+            "delete/cleanup files"
+          ],
+          "count": 3
+        }
+      ],
+      "guardrails": [
+        "Never send customer-facing messages without Mike approval.",
+        "Never spend money, subscribe, or publish publicly without Mike approval.",
+        "Never delete/cleanup unknown files or force push.",
+        "Never expose secrets; show configured/missing only."
+      ]
+    }
   },
   "terminal": {
     "enabled": false,

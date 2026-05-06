@@ -264,6 +264,14 @@ function deriveApprovalQueue(opportunityRadar) {
       source: top?.source || 'Oracle intelligence layer',
     },
     {
+      title: 'Prepare landing page and ROI calculator drafts',
+      category: 'draft-only',
+      risk: 'low',
+      reason: 'Draft artifacts increase speed to validation but do not publish or contact customers.',
+      proposedAction: hasLanding ? 'Review the existing landing copy and improve the offer proof stack.' : 'Draft landing page copy, ROI calculator, and demo script for Mike review.',
+      source: hasLanding ? 'outbox/one-person-business/ai-booking-assistant-landing-page-copy.md' : 'Oracle intelligence layer',
+    },
+    {
       title: 'Review top opportunity direction',
       category: 'approval-required',
       risk: 'medium',
@@ -291,12 +299,53 @@ function deriveApprovalQueue(opportunityRadar) {
   return queue;
 }
 
+function deriveAutonomyRouter(approvalQueue) {
+  const count = (category) => approvalQueue.filter((item) => item.category === category).length;
+  return {
+    updatedAt: new Date().toISOString(),
+    summary: 'Oracle routes every autonomous idea into safe_now, draft_only, or approval_required before execution.',
+    lanes: [
+      {
+        id: 'safe_now',
+        label: 'safe_now',
+        status: 'active',
+        summary: 'Moshe can execute without interrupting Mike when the work is read-only, reversible, internal, or draft-generation only with no external side effect.',
+        examples: ['read-only research', 'local verification', 'internal demo artifacts', 'dashboard copy/UI improvements'],
+        count: count('safe'),
+      },
+      {
+        id: 'draft_only',
+        label: 'draft_only',
+        status: 'guarded',
+        summary: 'Moshe may prepare the asset but must not publish, send, spend, deploy risky changes, or contact anyone.',
+        examples: ['landing page draft', 'outreach message draft', 'ROI calculator draft', 'lead list draft'],
+        count: count('draft-only'),
+      },
+      {
+        id: 'approval_required',
+        label: 'approval_required',
+        status: 'locked',
+        summary: 'Mike approval is required before anything customer-facing, public, paid, destructive, cleanup/delete, commit/push, deploy, or outbound.',
+        examples: ['send outreach', 'publish page', 'spend money', 'commit/push/deploy', 'delete/cleanup files'],
+        count: count('approval-required'),
+      },
+    ],
+    guardrails: [
+      'Never send customer-facing messages without Mike approval.',
+      'Never spend money, subscribe, or publish publicly without Mike approval.',
+      'Never delete/cleanup unknown files or force push.',
+      'Never expose secrets; show configured/missing only.',
+    ],
+  };
+}
+
 function deriveIntelligenceLayer(activeDocs) {
   const selfLearningPath = join(PSI, 'active/oracle-self-learning-2026-05-06.md');
   const selfLearningText = readMarkdownFile(selfLearningPath);
   const opportunityRadar = deriveOpportunityRadar();
   const todayLearnings = deriveSelfLearningItems(selfLearningText, activeDocs);
   const approvalQueue = deriveApprovalQueue(opportunityRadar);
+  const autonomyRouter = deriveAutonomyRouter(approvalQueue);
   const top = opportunityRadar[0];
   return {
     updatedAt: new Date().toISOString(),
@@ -306,6 +355,7 @@ function deriveIntelligenceLayer(activeDocs) {
     todayLearnings,
     opportunityRadar,
     approvalQueue,
+    autonomyRouter,
   };
 }
 
