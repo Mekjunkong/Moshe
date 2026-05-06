@@ -103,6 +103,23 @@ interface OracleExecutorResponse {
   }
 }
 
+
+interface OracleApprovalResponse {
+  ok: boolean
+  requestId?: string
+  message?: string
+  error?: string
+  decision?: {
+    id: string
+    approvalInboxId: string
+    decision: string
+    actor: string
+    source: string
+    note: string
+    createdAt: string
+  }
+}
+
 interface OracleSessionState {
   status: 'loading' | 'ready' | 'authenticated' | 'error'
   message: string
@@ -276,9 +293,26 @@ export default function OracleCommandCenter({ data }: Props) {
     liveSmokeReadiness: { status: 'watch' as const, checks: [], nextStep: 'Generate a fresh Oracle snapshot.' },
     topPhaseRequirements: [],
   }
+  const phase5D = oracle.phase5D ?? {
+    updatedAt: oracle.generated,
+    phase: 'phase_5d' as const,
+    summary: 'Phase 5D approval callback and cron-promotion gates are waiting for a live snapshot.',
+    approvalCallbacks: {
+      endpoint: '/api/oracle/approval',
+      configured: false,
+      pathLabel: 'not configured',
+      decisions: [],
+      counts: { approved: 0, rejected: 0, deferred: 0, expired: 0 },
+    },
+    cronPromotionPlans: [],
+    repoHygieneClassifications: [],
+    deploySmokeGates: [],
+    topPhaseReadiness: { status: 'blocked' as const, blockers: [], nextStep: 'Generate a fresh Oracle snapshot.' },
+  }
   const [feedbackState, setFeedbackState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
   const [executorState, setExecutorState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
-  const phase5Badge = (value: string) => value === 'clean' || value === 'in_sync' || value === 'complete' || value === 'ready' || value === 'promote' || value === 'eligible' || value === 'completed' || value === 'pass' || value === 'wired' ? 'low' : value === 'blocked' || value === 'approval_required' || value === 'missing' || value === 'suppress' || value === 'failed' || value === 'fail' ? 'high' : 'medium'
+  const [approvalState, setApprovalState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; message: string }>({ status: 'idle', message: '' })
+  const phase5Badge = (value: string) => value === 'clean' || value === 'in_sync' || value === 'complete' || value === 'ready' || value === 'promote' || value === 'eligible' || value === 'completed' || value === 'pass' || value === 'wired' || value === 'approved' || value === 'scratch_only' ? 'low' : value === 'blocked' || value === 'approval_required' || value === 'missing' || value === 'suppress' || value === 'failed' || value === 'fail' || value === 'rejected' || value === 'source_change' || value === 'mixed' ? 'high' : 'medium'
 
   useEffect(() => {
     const controller = new AbortController()
@@ -570,6 +604,25 @@ export default function OracleCommandCenter({ data }: Props) {
     }
   }
 
+
+  const submitApprovalDecision = async (approvalInboxId: string, decision: string) => {
+    setApprovalState({ status: 'loading', message: `Recording ${decision}…` })
+    try {
+      const response = await fetch(phase5D.approvalCallbacks.endpoint, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approvalInboxId, decision, source: 'dashboard', note: `Dashboard approval callback: ${decision}` }),
+      })
+      const payload = await response.json() as OracleApprovalResponse
+      if (!response.ok || !payload.ok) throw new Error(payload.message ?? payload.error ?? 'Approval callback failed.')
+      setApprovalState({ status: 'ready', message: payload.message ?? `Recorded ${decision}.` })
+      setOracleRefreshNonce((value) => value + 1)
+    } catch (error) {
+      setApprovalState({ status: 'error', message: error instanceof Error ? error.message : 'Approval callback failed.' })
+    }
+  }
+
   const previewAction = previewState.result?.action ?? oracle.automation?.actions[0] ?? null
   const projectNodes = data.documents.filter((d) => d.clusterId === 'projects').length
   const memoryNodes = data.documents.filter((d) => d.clusterId === 'memory').length
@@ -580,15 +633,17 @@ export default function OracleCommandCenter({ data }: Props) {
   const configuredCreds = oracle.credentials.filter((c) => c.configured).length
   const githubOk = oracle.github.filter((g) => g.apiStatus === 'ok').length
   const criticalIncidents = (oracle.incidents ?? []).filter((i) => i.severity === 'critical').length
-  const oracleModeLabel = oracle.phase5C
-    ? 'PHASE 5C · RUN-STATE AUTONOMY LOOP'
-    : oracle.phase5B
-      ? 'PHASE 5B · FEEDBACK + EXECUTOR LOOP'
-      : oracle.phase5A
-        ? 'PHASE 5A · CLOSED-LOOP SENSORS'
-        : oracle.automation?.sessionConfigured
-          ? 'PHASE 3B · SESSION-GATED ACTIONS'
-          : 'PHASE 2A · READ ONLY'
+  const oracleModeLabel = oracle.phase5D
+    ? 'PHASE 5D · APPROVAL + CRON GATES'
+    : oracle.phase5C
+      ? 'PHASE 5C · RUN-STATE AUTONOMY LOOP'
+      : oracle.phase5B
+        ? 'PHASE 5B · FEEDBACK + EXECUTOR LOOP'
+        : oracle.phase5A
+          ? 'PHASE 5A · CLOSED-LOOP SENSORS'
+          : oracle.automation?.sessionConfigured
+            ? 'PHASE 3B · SESSION-GATED ACTIONS'
+            : 'PHASE 2A · READ ONLY'
   const wiroSite = oracle.websites.find((site) => site.name.toLowerCase().includes('wiro'))
   const wiroGithub = oracle.github.find((repo) => repo.repo.toLowerCase().includes('wiro'))
   const highPriorityRecommendations = (oracle.recommendations ?? []).slice(0, 5)

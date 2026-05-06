@@ -5,6 +5,7 @@ import oracleSessionHandler from './session.js'
 import oracleTerminalHandler from './terminal.js'
 import oracleFeedbackHandler from './feedback.js'
 import oracleExecutorHandler from './executor.js'
+import oracleApprovalHandler from './approval.js'
 import { createSessionToken, SESSION_COOKIE_NAME, verifySessionToken } from './auth.js'
 
 function createReq({ method = 'POST', headers = {}, body = {} } = {}) {
@@ -42,6 +43,7 @@ const ORIGINAL_ENV = {
   ORACLE_ACTION_AUDIT_PATH: process.env.ORACLE_ACTION_AUDIT_PATH,
   ORACLE_FEEDBACK_LEDGER_PATH: process.env.ORACLE_FEEDBACK_LEDGER_PATH,
   ORACLE_EXECUTOR_LEDGER_PATH: process.env.ORACLE_EXECUTOR_LEDGER_PATH,
+  ORACLE_APPROVAL_LEDGER_PATH: process.env.ORACLE_APPROVAL_LEDGER_PATH,
   ORACLE_WIRO_CI_DISPATCHER: process.env.ORACLE_WIRO_CI_DISPATCHER,
   ORACLE_TERMINAL_ENABLED: process.env.ORACLE_TERMINAL_ENABLED,
 }
@@ -51,6 +53,7 @@ beforeEach(() => {
   process.env.ORACLE_ACTION_AUDIT_PATH = '/tmp/oracle-action-audit-test.jsonl'
   process.env.ORACLE_FEEDBACK_LEDGER_PATH = `/tmp/oracle-feedback-ledger-test-${process.pid}.jsonl`
   process.env.ORACLE_EXECUTOR_LEDGER_PATH = `/tmp/oracle-executor-runs-test-${process.pid}.jsonl`
+  process.env.ORACLE_APPROVAL_LEDGER_PATH = `/tmp/oracle-approval-decisions-test-${process.pid}.jsonl`
   process.env.ORACLE_WIRO_CI_DISPATCHER = 'true'
   process.env.ORACLE_TERMINAL_ENABLED = 'true'
 })
@@ -60,6 +63,7 @@ afterEach(() => {
   process.env.ORACLE_ACTION_AUDIT_PATH = ORIGINAL_ENV.ORACLE_ACTION_AUDIT_PATH
   process.env.ORACLE_FEEDBACK_LEDGER_PATH = ORIGINAL_ENV.ORACLE_FEEDBACK_LEDGER_PATH
   process.env.ORACLE_EXECUTOR_LEDGER_PATH = ORIGINAL_ENV.ORACLE_EXECUTOR_LEDGER_PATH
+  process.env.ORACLE_APPROVAL_LEDGER_PATH = ORIGINAL_ENV.ORACLE_APPROVAL_LEDGER_PATH
   process.env.ORACLE_WIRO_CI_DISPATCHER = ORIGINAL_ENV.ORACLE_WIRO_CI_DISPATCHER
   process.env.ORACLE_TERMINAL_ENABLED = ORIGINAL_ENV.ORACLE_TERMINAL_ENABLED
 })
@@ -304,6 +308,50 @@ describe('oracle safe executor gate', () => {
     const payload = readJson(res)
     assert.equal(res.statusCode, 428)
     assert.equal(payload.error, 'confirmation_required')
+  })
+})
+
+
+describe('oracle approval callback gate', () => {
+  test('GET returns approval callback policy and decisions', async () => {
+    const res = createRes()
+    await oracleApprovalHandler(createReq({ method: 'GET' }), res)
+    const payload = readJson(res)
+    assert.equal(res.statusCode, 200)
+    assert.equal(payload.ok, true)
+    assert.equal(payload.policy.endpoint, '/api/oracle/approval')
+    assert.ok(Array.isArray(payload.decisions))
+  })
+
+  test('POST rejects approval decisions without a signed session', async () => {
+    const res = createRes()
+    await oracleApprovalHandler(createReq({ body: { approvalInboxId: 'approval-dispatch-wiro-ci', decision: 'approved' } }), res)
+    const payload = readJson(res)
+    assert.equal(res.statusCode, 401)
+    assert.equal(payload.error, 'unauthorized')
+  })
+
+  test('POST persists approval decisions with same-origin signed Mike session', async () => {
+    const token = createSessionToken('test-session-secret', 'Mike', 60_000)
+    const res = createRes()
+    await oracleApprovalHandler(
+      createReq({
+        headers: { cookie: `${SESSION_COOKIE_NAME}=${token}` },
+        body: { approvalInboxId: 'approval-dispatch-wiro-ci', decision: 'deferred', source: 'dashboard', note: 'wait until repo clean' },
+      }),
+      res,
+    )
+    const payload = readJson(res)
+    assert.equal(res.statusCode, 201)
+    assert.equal(payload.ok, true)
+    assert.equal(payload.decision.approvalInboxId, 'approval-dispatch-wiro-ci')
+    assert.equal(payload.decision.decision, 'deferred')
+
+    const listRes = createRes()
+    await oracleApprovalHandler(createReq({ method: 'GET' }), listRes)
+    const listPayload = readJson(listRes)
+    assert.equal(listPayload.decisions[0].approvalInboxId, 'approval-dispatch-wiro-ci')
+    assert.equal(listPayload.counts.deferred, 1)
   })
 })
 

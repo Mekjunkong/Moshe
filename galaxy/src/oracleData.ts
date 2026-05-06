@@ -411,6 +411,70 @@ export interface OraclePhase5CLayer {
   topPhaseRequirements: string[]
 }
 
+
+export interface OracleApprovalDecision {
+  id: string
+  approvalInboxId: string
+  decision: 'approved' | 'rejected' | 'deferred' | 'expired'
+  actor: string
+  source: 'dashboard' | 'telegram' | 'api'
+  note: string
+  createdAt: string
+}
+
+export interface OracleCronPromotionPlan {
+  id: string
+  queueItemId: string
+  status: 'drafted' | 'eligible' | 'blocked'
+  schedule: string
+  prompt: string
+  guardrails: string[]
+  reason: string
+}
+
+export interface OracleRepoHygieneClassification {
+  repo: string
+  verdict: 'source_change' | 'scratch_only' | 'mixed' | 'clean'
+  trackedChanges: number
+  scratchUntracked: number
+  sourceUntracked: number
+  note: string
+}
+
+export interface OracleDeploySmokeGate {
+  id: string
+  status: 'pass' | 'watch' | 'fail'
+  command: string
+  expected: string
+  lastObserved: string
+}
+
+export interface OraclePhase5DLayer {
+  updatedAt: string
+  phase: 'phase_5d'
+  summary: string
+  approvalCallbacks: {
+    endpoint: string
+    configured: boolean
+    pathLabel: string
+    decisions: OracleApprovalDecision[]
+    counts: {
+      approved: number
+      rejected: number
+      deferred: number
+      expired: number
+    }
+  }
+  cronPromotionPlans: OracleCronPromotionPlan[]
+  repoHygieneClassifications: OracleRepoHygieneClassification[]
+  deploySmokeGates: OracleDeploySmokeGate[]
+  topPhaseReadiness: {
+    status: 'blocked' | 'watch' | 'ready'
+    blockers: string[]
+    nextStep: string
+  }
+}
+
 export interface OracleTodayLearning {
   title: string
   source: string
@@ -536,6 +600,7 @@ export interface OracleData {
   phase5A?: OraclePhase5ALayer
   phase5B?: OraclePhase5BLayer
   phase5C?: OraclePhase5CLayer
+  phase5D?: OraclePhase5DLayer
   nextActions: string[]
 }
 
@@ -725,6 +790,22 @@ export const ORACLE_FALLBACK_DATA: OracleData = {
     telegramApprovalPayloads: [],
     liveSmokeReadiness: { status: 'watch', checks: [], nextStep: 'Generate a fresh Oracle snapshot.' },
     topPhaseRequirements: [],
+  },
+  phase5D: {
+    updatedAt: new Date(0).toISOString(),
+    phase: 'phase_5d',
+    summary: 'Waiting for Phase 5D approval callbacks and cron promotion gates.',
+    approvalCallbacks: {
+      endpoint: '/api/oracle/approval',
+      configured: false,
+      pathLabel: 'not configured',
+      decisions: [],
+      counts: { approved: 0, rejected: 0, deferred: 0, expired: 0 },
+    },
+    cronPromotionPlans: [],
+    repoHygieneClassifications: [],
+    deploySmokeGates: [],
+    topPhaseReadiness: { status: 'blocked', blockers: ['Generate a fresh Oracle snapshot.'], nextStep: 'Run npm run build.' },
   },
   nextActions: [
     'Run node scripts/generateOracleData.mjs',

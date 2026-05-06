@@ -1604,6 +1604,174 @@ function derivePhase5C({ generatedAt, phase5A, phase5B, websites }) {
   };
 }
 
+
+
+function approvalLedgerPath() {
+  return process.env.ORACLE_APPROVAL_LEDGER_PATH || '/tmp/oracle-approval-decisions.jsonl';
+}
+
+function readApprovalDecisions(path = approvalLedgerPath(), limit = 50) {
+  if (!existsSync(path)) return [];
+  try {
+    return readFileSync(path, 'utf8')
+      .split('\n')
+      .filter(Boolean)
+      .slice(-limit)
+      .reverse()
+      .map((line, index) => {
+        try {
+          const parsed = JSON.parse(line);
+          return {
+            id: String(parsed.id || `approval-${index}`),
+            approvalInboxId: String(parsed.approvalInboxId || 'unknown'),
+            decision: ['approved', 'rejected', 'deferred', 'expired'].includes(parsed.decision) ? parsed.decision : 'deferred',
+            actor: String(parsed.actor || 'Mike'),
+            source: ['dashboard', 'telegram', 'api'].includes(parsed.source) ? parsed.source : 'api',
+            note: String(parsed.note || '').slice(0, 500),
+            createdAt: String(parsed.createdAt || parsed.at || new Date(0).toISOString()),
+          };
+        } catch {
+          return {
+            id: `approval-${index}`,
+            approvalInboxId: 'parse-error',
+            decision: 'deferred',
+            actor: 'unknown',
+            source: 'api',
+            note: 'An approval ledger line could not be parsed.',
+            createdAt: new Date(0).toISOString(),
+          };
+        }
+      });
+  } catch {
+    return [];
+  }
+}
+
+function approvalDecisionCounts(decisions) {
+  return {
+    approved: decisions.filter((entry) => entry.decision === 'approved').length,
+    rejected: decisions.filter((entry) => entry.decision === 'rejected').length,
+    deferred: decisions.filter((entry) => entry.decision === 'deferred').length,
+    expired: decisions.filter((entry) => entry.decision === 'expired').length,
+  };
+}
+
+function classifyRepoHygiene(repos) {
+  const scratchPatterns = [/^\.superpowers\//, /^galaxy\/\.claude\//, /^galaxy\/\.hermes\//, /^outbox\//, /^wiro-business\//, /^ψ\/memory\//, /^ψ\/learn\//, /^ψ\/active\/one-person-business/, /^ψ\/active\/oracle-self-learning/];
+  return repos.map((repo) => {
+    const changed = existsSync(repo.path || '')
+      ? safeExec('git', ['status', '--short'], repo.path, '').split('\n').filter(Boolean)
+      : [];
+    const untracked = changed.filter((line) => line.startsWith('??')).map((line) => line.replace(/^\?\?\s+/, '').replace(/^"|"$/g, ''));
+    const trackedChanges = changed.length - untracked.length;
+    const scratchUntracked = untracked.filter((file) => scratchPatterns.some((pattern) => pattern.test(file))).length;
+    const sourceUntracked = untracked.length - scratchUntracked;
+    const verdict = changed.length === 0
+      ? 'clean'
+      : trackedChanges > 0 && sourceUntracked > 0
+        ? 'mixed'
+        : trackedChanges > 0
+          ? 'source_change'
+          : sourceUntracked > 0
+            ? 'mixed'
+            : 'scratch_only';
+    return {
+      repo: repo.name,
+      verdict,
+      trackedChanges,
+      scratchUntracked,
+      sourceUntracked,
+      note: verdict === 'scratch_only'
+        ? 'Only known scratch/local-memory paths are untracked; safe to ignore for source deploy decisions after review.'
+        : verdict === 'clean'
+          ? 'No local changes detected.'
+          : 'Source-affecting or mixed changes remain; keep deployment and cron promotion guarded.',
+    };
+  });
+}
+
+function deriveCronPromotionPlans({ phase5C }) {
+  return phase5C.promotionCandidates.map((candidate) => ({
+    id: `cron-plan-${candidate.queueItemId}`,
+    queueItemId: candidate.queueItemId,
+    status: candidate.status === 'eligible' ? 'eligible' : candidate.status === 'blocked' ? 'blocked' : 'drafted',
+    schedule: candidate.status === 'eligible' ? 'every 6h' : 'manual until gates clear',
+    prompt: `Run allowlisted safe_now queue item ${candidate.queueItemId}; record executor run state; stay silent unless failed or changed.`.slice(0, 500),
+    guardrails: [
+      'safe_now queue item only',
+      'no deploy, push, delete, spend, publish, or customer contact',
+      'write executor run state before and after execution',
+      'stay silent unless output changed or a failure occurs',
+    ],
+    reason: candidate.status === 'eligible'
+      ? 'All Phase 5C promotion gates are green; ready for Mike-approved bounded cron creation.'
+      : candidate.reason,
+  }));
+}
+
+function deriveDeploySmokeGates({ phase5C }) {
+  return [
+    {
+      id: 'smoke-oracle-live-json',
+      status: phase5C.liveSmokeReadiness.checks.some((check) => check.label === 'Feedback endpoint wired' && check.status === 'pass') ? 'pass' : 'watch',
+      command: 'curl -fsS https://mikewebstudio.com/oracleLive.json',
+      expected: 'JSON contains phase5D after prebuilt deploy.',
+      lastObserved: phase5C.liveSmokeReadiness.status,
+    },
+    {
+      id: 'smoke-session-api',
+      status: 'watch',
+      command: 'curl -fsS https://mikewebstudio.com/api/oracle/session',
+      expected: '200 JSON, configured/missing only, no secret values.',
+      lastObserved: 'local API smoke passed; production pending deploy.',
+    },
+    {
+      id: 'smoke-approval-api',
+      status: process.env.ORACLE_SESSION_SECRET ? 'watch' : 'fail',
+      command: 'curl -fsS https://mikewebstudio.com/api/oracle/approval',
+      expected: '200 JSON policy for approval callbacks.',
+      lastObserved: process.env.ORACLE_SESSION_SECRET ? 'session secret configured for build context' : 'session secret missing in build context',
+    },
+  ];
+}
+
+function derivePhase5D({ generatedAt, phase5A, phase5C, repos }) {
+  const decisions = readApprovalDecisions(approvalLedgerPath(), 50);
+  const classifications = classifyRepoHygiene(repos);
+  const cronPromotionPlans = deriveCronPromotionPlans({ phase5C });
+  const deploySmokeGates = deriveDeploySmokeGates({ phase5C });
+  const blockers = [];
+  if (classifications.some((item) => ['mixed', 'source_change'].includes(item.verdict))) blockers.push('Source-affecting repo hygiene still needs review.');
+  if (!phase5C.executorRuns.counts.completed) blockers.push('No successful persisted safe executor run yet.');
+  if (!decisions.length) blockers.push('No persisted approval callback decisions yet.');
+  if (deploySmokeGates.some((gate) => gate.status === 'fail')) blockers.push('Deploy smoke gate has failing prerequisite.');
+  const status = blockers.length ? 'blocked' : deploySmokeGates.some((gate) => gate.status === 'watch') || phase5A.deploymentFreshnessGap.verdict !== 'in_sync' ? 'watch' : 'ready';
+  return {
+    updatedAt: generatedAt,
+    phase: 'phase_5d',
+    summary: 'Phase 5D active: approval callback persistence, cron promotion drafts, repo hygiene classification, and deploy smoke gates are wired before top-phase automation.',
+    approvalCallbacks: {
+      endpoint: '/api/oracle/approval',
+      configured: Boolean(process.env.ORACLE_SESSION_SECRET),
+      pathLabel: approvalLedgerPath().replace(/^.*\//, ''),
+      decisions: decisions.slice(0, 12),
+      counts: approvalDecisionCounts(decisions),
+    },
+    cronPromotionPlans,
+    repoHygieneClassifications: classifications,
+    deploySmokeGates,
+    topPhaseReadiness: {
+      status,
+      blockers,
+      nextStep: blockers.length
+        ? 'Resolve blockers before scheduling autonomous safe_now cron or claiming top-phase.'
+        : status === 'watch'
+          ? 'Run production deploy smoke checks and review freshness before top-phase claim.'
+          : 'Ready for a bounded top-phase safe_now cron pilot.',
+    },
+  };
+}
+
 function deriveOperationalReadiness({ websites, repos, github, credentials, deployments, deployTimeline, automation, incidents }) {
   const criticalIncidents = incidents.filter((i) => i.severity === 'critical').length;
   const dirtyRepos = repos.filter((r) => r.dirty).length;
@@ -1777,11 +1945,17 @@ const phase5C = derivePhase5C({
   phase5B,
   websites,
 });
+const phase5D = derivePhase5D({
+  generatedAt,
+  phase5A,
+  phase5C,
+  repos,
+});
 
 const data = {
   generated: generatedAt,
   born: '2026-04-18',
-  level3Phase: 'Phase 5C: Dashboard feedback buttons, executor run states, promotion gates, Telegram approval payloads, and live smoke readiness',
+  level3Phase: 'Phase 5D: Approval callbacks, cron promotion drafts, repo hygiene classification, and deploy smoke gates',
   stats: {
     learnings: learnings.length,
     retrospectives: retrospectives.length,
@@ -1799,7 +1973,7 @@ const data = {
       name: 'Moshe Oracle OS',
       url: process.env.ORACLE_DASHBOARD_URL || '',
       status: 'Building',
-      note: 'Phase 5C active: dashboard feedback buttons, persistent executor run states, promotion gates, Telegram approval payloads, and live smoke readiness shape bounded autonomy.',
+      note: 'Phase 5D active: approval callbacks, cron promotion drafts, repo hygiene classification, and deploy smoke gates protect top-phase automation.',
       accent: 'orange',
     },
     {
@@ -1839,6 +2013,7 @@ const data = {
   phase5A,
   phase5B,
   phase5C,
+  phase5D,
   nextActions: [
     'Set ORACLE_SESSION_SECRET to arm the Mike-only signed session gate.',
     'The Oracle now turns audit trail events into learnings before refreshing live data.',
@@ -1848,12 +2023,13 @@ const data = {
     'Use Phase 5A feedback/repo/deploy sensors before recommending safe executor actions.',
     'Use Phase 5B feedback persistence, evidence chains, approval inbox, and value scoring before promoting autonomous safe_now work.',
     'Use Phase 5C run states and promotion gates before scheduling any safe_now autonomous execution.',
+    'Use Phase 5D approval callbacks, repo classifications, and deploy smoke gates before top-phase claims.',
     'Enable ORACLE_TERMINAL_ENABLED=true only on Mike local/admin runtime before using the Terminal tab.',
   ],
 };
 
 writeFileSync(OUT, `${JSON.stringify(data, null, 2)}\n`);
-console.log(`✅ Oracle live data written to ${OUT} [Phase 5C]`);
+console.log(`✅ Oracle live data written to ${OUT} [Phase 5D]`);
 console.log(`   Websites: ${data.websites.map((w) => `${w.name}=${w.ok ? 'OK' : 'FAIL'}`).join(', ')}`);
 console.log(`   Incidents: ${data.incidents.length} | Recommendations: ${data.recommendations.length} | Wiro CI: ${data.wiroCi?.conclusion ?? 'none'}`);
 console.log(`   Repos: ${data.repos.length} | GitHub sensors: ${data.github.length} | Learnings: ${data.stats.learnings} | Retrospectives: ${data.stats.retrospectives}`);

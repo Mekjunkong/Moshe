@@ -5,6 +5,7 @@ import oracleSessionHandler from './api/oracle/session.js'
 import oracleTerminalHandler from './api/oracle/terminal.js'
 import oracleFeedbackHandler from './api/oracle/feedback.js'
 import oracleExecutorHandler from './api/oracle/executor.js'
+import oracleApprovalHandler from './api/oracle/approval.js'
 
 const ORACLE_API_ROUTES = new Map([
   ['/api/oracle/actions', oracleActionsHandler],
@@ -12,6 +13,7 @@ const ORACLE_API_ROUTES = new Map([
   ['/api/oracle/terminal', oracleTerminalHandler],
   ['/api/oracle/feedback', oracleFeedbackHandler],
   ['/api/oracle/executor', oracleExecutorHandler],
+  ['/api/oracle/approval', oracleApprovalHandler],
 ])
 
 function oracleActionApiPlugin() {
