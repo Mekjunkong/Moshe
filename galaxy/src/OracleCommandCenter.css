@@ -1403,3 +1403,143 @@
     display: grid;
   }
 }
+
+
+.oracle-wiro-business-hero {
+  border: 1px solid rgba(251, 146, 60, 0.24);
+  border-radius: 22px;
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+  background:
+    radial-gradient(circle at top left, rgba(251, 146, 60, 0.22), transparent 38%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(67, 20, 7, 0.72));
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+}
+
+.oracle-wiro-business-hero p,
+.oracle-wiro-business-card span {
+  margin: 0;
+  color: #fdba74;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.oracle-wiro-business-hero h2 {
+  margin: 4px 0;
+  color: #fff7ed;
+  font-size: 1.55rem;
+}
+
+.oracle-wiro-business-hero small,
+.oracle-wiro-business-card p,
+.oracle-wiro-offer-card p,
+.oracle-wiro-ops-card p {
+  color: rgba(255, 237, 213, 0.76);
+}
+
+.oracle-wiro-business-grid,
+.oracle-wiro-offer-list,
+.oracle-wiro-ops-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.oracle-wiro-business-card,
+.oracle-wiro-offer-card,
+.oracle-wiro-ops-card {
+  border: 1px solid rgba(251, 146, 60, 0.18);
+  border-radius: 16px;
+  padding: 14px;
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.oracle-wiro-business-card strong {
+  display: block;
+  margin-top: 8px;
+  color: #fff7ed;
+  font-size: 1.35rem;
+}
+
+.oracle-wiro-business-card p,
+.oracle-wiro-offer-card p,
+.oracle-wiro-ops-card p {
+  margin: 8px 0 0;
+  line-height: 1.45;
+}
+
+.oracle-wiro-offer-card strong,
+.oracle-wiro-ops-card strong {
+  color: #ffedd5;
+}
+
+.oracle-wiro-offer-card small {
+  display: block;
+  margin-top: 4px;
+  color: rgba(253, 186, 116, 0.9);
+}
+
+.oracle-wiro-content-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.oracle-wiro-content-list li {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 10px;
+  align-items: start;
+  border: 1px solid rgba(34, 211, 238, 0.16);
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(8, 13, 25, 0.72);
+}
+
+.oracle-wiro-content-list span {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #082f49;
+  background: linear-gradient(135deg, #fdba74, #22d3ee);
+  font-weight: 800;
+}
+
+.oracle-wiro-content-list p {
+  margin: 0;
+  color: #e0f2fe;
+  line-height: 1.45;
+}
+
+.oracle-wiro-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.oracle-wiro-quick-actions a,
+.oracle-wiro-quick-actions button {
+  text-decoration: none;
+}
+
+@media (max-width: 720px) {
+  .oracle-wiro-business-hero,
+  .oracle-wiro-quick-actions {
+    flex-direction: column;
+  }
+
+  .oracle-wiro-business-grid,
+  .oracle-wiro-offer-list,
+  .oracle-wiro-ops-list {
+    grid-template-columns: 1fr;
+  }
+}

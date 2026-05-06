@@ -118,6 +118,7 @@ const tabs = [
   { id: 'today', label: 'Today', alert: true },
   { id: 'intel', label: 'Intel', alert: true },
   { id: 'overview', label: 'Overview' },
+  { id: 'wiro', label: 'Wiro' },
   { id: 'sites', label: 'Sites' },
   { id: 'repos', label: 'Repos' },
   { id: 'sensors', label: 'Sensors' },
@@ -127,7 +128,7 @@ const tabs = [
 export default function OracleCommandCenter({ data }: Props) {
   const [oracleRefreshNonce, setOracleRefreshNonce] = useState(0)
   const oracle = useOracleLiveData(oracleRefreshNonce)
-  const [tab, setTab] = useState<'today' | 'intel' | 'overview' | 'sites' | 'repos' | 'sensors' | 'learnings'>('today')
+  const [tab, setTab] = useState<'today' | 'intel' | 'overview' | 'wiro' | 'sites' | 'repos' | 'sensors' | 'learnings'>('today')
   const [previewReason, setPreviewReason] = useState('Refresh the Oracle snapshot before any future action.')
   const [previewState, setPreviewState] = useState<{
     status: 'idle' | 'loading' | 'ready' | 'error'
@@ -402,6 +403,29 @@ export default function OracleCommandCenter({ data }: Props) {
     { label: 'Morning command brief', cadence: 'Daily · 08:00', detail: 'Top actions, website health, Wiro CI, repo warnings.' },
     { label: 'Wiro business pulse', cadence: 'Daily · 18:00', detail: 'Guest leads, site status, quote/itinerary opportunities.' },
     { label: 'Weekly Oracle review', cadence: 'Monday · 09:00', detail: 'Projects, memory, deployments, learnings, next bets.' },
+  ]
+  const wiroBusinessMetrics = [
+    { label: 'Website', value: wiroSite?.ok ? 'Online' : 'Check', detail: wiroSite?.responseMs ? `${wiroSite.responseMs}ms response` : 'No response data' },
+    { label: 'CI', value: oracle.wiroCi?.conclusion ?? oracle.wiroCi?.status ?? 'No data', detail: oracle.wiroCi?.workflowName ?? 'Workflow sensor' },
+    { label: 'GitHub', value: wiroGithub?.apiStatus ?? 'No data', detail: `${wiroGithub?.openIssues ?? 0} issues · ${wiroGithub?.openPullRequests ?? 0} PRs` },
+    { label: 'Lead pipeline', value: 'Watch', detail: 'Use Telegram/Obsidian lead checks until CRM source is wired.' },
+  ]
+  const wiroOfferStack = [
+    { title: '1-day Chiang Mai 4x4 adventure', audience: 'Travelers with limited time', next: 'Use as fast WhatsApp quote starter.' },
+    { title: '3-day mountain journey', audience: 'Families and groups wanting real off-road', next: 'Bundle with kosher meals and private guide.' },
+    { title: '14-day Northern Thailand + Laos grand tour', audience: 'High-ticket Hebrew/English customers', next: 'Use for premium itinerary conversations.' },
+  ]
+  const wiroContentQueue = [
+    'Post the new vertical promo video as Reels/TikTok/Shorts with WhatsApp CTA.',
+    'Create Hebrew version of the promo for Israeli travelers.',
+    'Publish a “Kosher 4x4 Chiang Mai” explainer page/post.',
+    'Turn Wiro CI + website health into a daily confidence check before campaigns.',
+  ]
+  const wiroOpsChecklist = [
+    { label: 'Website booking path', status: wiroSite?.ok ? 'ready' : 'check', detail: wiroSite?.ok ? 'Main site reachable from Oracle snapshot.' : 'Website is not currently confirmed online.' },
+    { label: 'WhatsApp CTA', status: 'ready', detail: 'Keep WhatsApp as the primary conversion route.' },
+    { label: 'Kosher positioning', status: 'active', detail: 'Highlight Hebrew-speaking guide support, kosher meals, and Shabbat-friendly planning.' },
+    { label: 'Inquiry processing', status: 'scheduled', detail: 'Daily lead check cron monitors Wiro inquiries and returns action lists.' },
   ]
 
   return (
@@ -964,6 +988,88 @@ export default function OracleCommandCenter({ data }: Props) {
               <li key={s}>{s}</li>
             ))}
           </ol>
+        </section>
+      )}
+
+      {/* ── Wiro Business tab ── */}
+      {tab === 'wiro' && (
+        <section id="oracle-panel-wiro" role="tabpanel" aria-labelledby="oracle-tab-wiro" className="oracle-section oracle-scroll">
+          <div className="oracle-wiro-business-hero">
+            <div>
+              <p>WIRO 4X4 BUSINESS MODE</p>
+              <h2>Adventure cockpit</h2>
+              <small>Hebrew/English guests · kosher 4x4 adventures · Chiang Mai / Indochina</small>
+            </div>
+            <span className={`oracle-risk-badge ${wiroSite?.ok && oracle.wiroCi?.conclusion === 'success' ? 'low' : 'medium'}`}>
+              {wiroSite?.ok && oracle.wiroCi?.conclusion === 'success' ? 'SELL READY' : 'CHECK OPS'}
+            </span>
+          </div>
+
+          <div className="oracle-wiro-business-grid">
+            {wiroBusinessMetrics.map((metric) => (
+              <article className="oracle-wiro-business-card" key={metric.label}>
+                <span>{metric.label}</span>
+                <strong>{metric.value}</strong>
+                <p>{metric.detail}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>OFFER STACK</p>
+            <span>{wiroOfferStack.length} sellable routes</span>
+          </div>
+          <div className="oracle-wiro-offer-list">
+            {wiroOfferStack.map((offer) => (
+              <article className="oracle-wiro-offer-card" key={offer.title}>
+                <strong>{offer.title}</strong>
+                <small>{offer.audience}</small>
+                <p>{offer.next}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>CONTENT & CONVERSION QUEUE</p>
+            <span>next marketing moves</span>
+          </div>
+          <ol className="oracle-wiro-content-list">
+            {wiroContentQueue.map((item, idx) => (
+              <li key={item}>
+                <span>{idx + 1}</span>
+                <p>{item}</p>
+              </li>
+            ))}
+          </ol>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>OPERATIONS CHECKLIST</p>
+            <span>guest-ready signals</span>
+          </div>
+          <div className="oracle-wiro-ops-list">
+            {wiroOpsChecklist.map((item) => (
+              <article className="oracle-wiro-ops-card" key={item.label}>
+                <div className="oracle-status-head">
+                  <strong>{item.label}</strong>
+                  <span>{item.status.toUpperCase()}</span>
+                </div>
+                <p>{item.detail}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>WIRO QUICK ACTIONS</p>
+            <span>business-focused</span>
+          </div>
+          <div className="oracle-wiro-quick-actions">
+            <a href="https://www.wiro4x4indochina.com" target="_blank" rel="noopener noreferrer" className="oracle-preview-button">Open Wiro site ↗</a>
+            {oracle.wiroCi?.url && isHttpUrl(oracle.wiroCi.url) && (
+              <a href={oracle.wiroCi.url} target="_blank" rel="noopener noreferrer" className="oracle-session-secondary">Open Wiro CI ↗</a>
+            )}
+            <button type="button" className="oracle-preview-button" onClick={() => runOracleAction('dispatch-wiro-ci', 'preview')}>Preview Wiro CI dispatch</button>
+            <button type="button" className="oracle-preview-button" onClick={() => runOracleAction('dispatch-wiro-ci', 'execute')} disabled={sessionState.status !== 'authenticated'}>Execute Wiro CI dispatch</button>
+          </div>
         </section>
       )}
 
