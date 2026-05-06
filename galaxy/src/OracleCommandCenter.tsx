@@ -2359,31 +2359,68 @@ export default function OracleCommandCenter({ data }: Props) {
             <span>{terminalReady ? 'ready' : terminalPolicy.terminalEnabled ? 'locked' : 'disabled'}</span>
           </div>
 
-          <div className={`oracle-terminal-status ${terminalReady ? 'ready' : 'locked'}`}>
+          <div className={`oracle-terminal-status ${terminalReady ? 'ready' : terminalPolicy.terminalEnabled ? 'locked' : 'disabled'}`}>
             <div>
-              <strong>{terminalReady ? 'Terminal bridge armed' : 'Terminal bridge protected'}</strong>
-              <p>{terminalPolicy.note}</p>
-              <small>Needs: ORACLE_TERMINAL_ENABLED=true + signed Mike session. This is intended for local/admin runtime, not public open access.</small>
+              <strong>
+                {terminalReady
+                  ? 'Terminal bridge armed'
+                  : terminalPolicy.terminalEnabled
+                    ? 'Terminal needs Mike unlock'
+                    : 'Public dashboard: terminal intentionally off'}
+              </strong>
+              <p>
+                {terminalReady
+                  ? 'Commands can run through the signed-session, same-origin terminal bridge.'
+                  : terminalPolicy.terminalEnabled
+                    ? 'Enter the Mike session passphrase below to unlock this trusted runtime.'
+                    : 'This browser is connected to a safe read-only deployment. Use local admin mode for real terminal execution.'}
+              </p>
+              <small>{terminalPolicy.note}</small>
             </div>
             <span className={`oracle-risk-badge ${terminalReady ? 'low' : terminalPolicy.terminalEnabled ? 'medium' : 'high'}`}>
-              {terminalReady ? 'RUN' : terminalPolicy.terminalEnabled ? 'UNLOCK' : 'OFF'}
+              {terminalReady ? 'RUN' : terminalPolicy.terminalEnabled ? 'UNLOCK' : 'LOCAL ONLY'}
             </span>
           </div>
 
+          <div className="oracle-terminal-mode-grid" aria-label="Terminal mode explanation">
+            <article className={terminalPolicy.terminalEnabled ? 'armed' : 'safe'}>
+              <strong>1 · Public dashboard</strong>
+              <p>Read-only by design. It can show status, recipes, and output history, but it must not run shell commands from the public web.</p>
+              <span>{terminalPolicy.terminalEnabled ? 'trusted runtime detected' : 'safe mode active'}</span>
+            </article>
+            <article className={terminalReady ? 'armed' : 'local'}>
+              <strong>2 · Local admin terminal</strong>
+              <p>On Mike’s Mac, run <code>cd ~/workspace/Moshe/galaxy && npm run dev:terminal</code>, open the printed localhost URL, then unlock with the printed passphrase.</p>
+              <span>{terminalReady ? 'ready now' : 'needs local admin runtime'}</span>
+            </article>
+          </div>
+
           {sessionState.status !== 'authenticated' && (
-            <div className="oracle-terminal-unlock">
-              <label className="oracle-terminal-label">
-                <span>Mike session passphrase</span>
-                <input
-                  type="password"
-                  value={sessionPassphrase}
-                  onChange={(event) => setSessionPassphrase(event.target.value)}
-                  placeholder="Enter local/admin passphrase"
-                />
-              </label>
-              <button type="button" className="oracle-action-button" disabled={!sessionPassphrase || sessionState.status === 'loading'} onClick={unlockSession}>
-                {sessionState.status === 'loading' ? 'Unlocking…' : 'Unlock terminal session'}
-              </button>
+            <div className={`oracle-terminal-unlock ${terminalPolicy.terminalEnabled ? 'enabled' : 'disabled'}`}>
+              <div>
+                <strong>{terminalPolicy.terminalEnabled ? 'Unlock Mike session' : 'Unlock disabled on this deployment'}</strong>
+                <p>
+                  {terminalPolicy.terminalEnabled
+                    ? 'Use the passphrase printed by the local terminal runtime. No passphrase is stored in this browser.'
+                    : 'This is expected on mikewebstudio.com. Start local admin mode first; do not enable public production terminal unless you intentionally want that risk.'}
+                </p>
+              </div>
+              {terminalPolicy.terminalEnabled && (
+                <>
+                  <label className="oracle-terminal-label">
+                    <span>Mike session passphrase</span>
+                    <input
+                      type="password"
+                      value={sessionPassphrase}
+                      onChange={(event) => setSessionPassphrase(event.target.value)}
+                      placeholder="Enter local/admin passphrase"
+                    />
+                  </label>
+                  <button type="button" className="oracle-action-button" disabled={!sessionPassphrase || sessionState.status === 'loading'} onClick={unlockSession}>
+                    {sessionState.status === 'loading' ? 'Unlocking…' : 'Unlock terminal session'}
+                  </button>
+                </>
+              )}
               <small>{sessionState.message} — {sessionState.detail}</small>
             </div>
           )}
