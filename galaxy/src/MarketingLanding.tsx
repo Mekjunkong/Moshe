@@ -90,15 +90,20 @@ export default function MarketingLanding({ onLogin }: MarketingLandingProps) {
           <h1>Websites that make small businesses look trusted, premium, and ready to sell.</h1>
           <p>
             Mike Web Studio builds polished websites, landing pages, and booking flows for tour operators,
-            service businesses, and founders who need credibility fast — not a boring template.
+            service businesses, and founders who need credibility fast, not a boring template.
           </p>
           <div className="marketing-actions">
             <a href="https://wa.me/66929894495?text=Hi%20Mike%20Web%20Studio%2C%20I%20want%20a%20premium%20website" rel="noreferrer noopener">Message on WhatsApp</a>
-            <a href="#work">See the style</a>
+            <a href="#work">See recent builds</a>
           </div>
           <div className="marketing-proof-strip" aria-label="Trust points">
             {proofPoints.map((point) => <span key={point}>{point}</span>)}
           </div>
+        </div>
+
+        <div className="marketing-credibility-card" aria-label="Why clients choose Mike Web Studio">
+          <strong>Built by an operator, not a bloated agency.</strong>
+          <span>Strategy, design, build, deployment, and iteration stay in one focused loop.</span>
         </div>
 
         <div className="marketing-showcase" aria-label="Website design preview">
@@ -126,6 +131,12 @@ export default function MarketingLanding({ onLogin }: MarketingLandingProps) {
         </div>
       </section>
 
+      <section className="marketing-proof-band" aria-label="Delivery promises">
+        <div><strong>01</strong><span>Real business copy before decoration</span></div>
+        <div><strong>02</strong><span>Mobile pages tested for thumb use</span></div>
+        <div><strong>03</strong><span>Booking, WhatsApp, and analytics ready</span></div>
+      </section>
+
       <section className="marketing-band" id="services">
         <div className="marketing-section-head">
           <p>Services</p>
@@ -144,7 +155,7 @@ export default function MarketingLanding({ onLogin }: MarketingLandingProps) {
               <ul>
                 {service.includes.map((item) => <li key={item}>{item}</li>)}
               </ul>
-              <a href="#contact">Talk about this →</a>
+              <a href="#contact">Discuss this package →</a>
             </article>
           ))}
         </div>
@@ -153,10 +164,10 @@ export default function MarketingLanding({ onLogin }: MarketingLandingProps) {
       <section className="marketing-work" id="work">
         <div className="marketing-work-copy">
           <p>Selected builds</p>
-          <h2>Designed for trust, enquiries, and bookings — not decoration.</h2>
+          <h2>Designed for trust, enquiries, and bookings, not decoration.</h2>
           <small>
             The strongest websites show the offer clearly, make the business feel legitimate,
-            and remove friction before the customer messages.
+            and remove friction before the customer messages. Every section is planned around the next click.
           </small>
         </div>
         <div className="marketing-work-grid">
@@ -187,6 +198,18 @@ export default function MarketingLanding({ onLogin }: MarketingLandingProps) {
         </div>
       </section>
 
+      <section className="marketing-decision" aria-label="Best fit">
+        <div>
+          <p>Best fit</p>
+          <h2>Perfect for local businesses that need trust fast: tours, services, consultants, and new offers.</h2>
+        </div>
+        <ul>
+          <li>Clear offer and package structure</li>
+          <li>Proof, FAQ, and CTA flow</li>
+          <li>Launch plan with no agency drag</li>
+        </ul>
+      </section>
+
       <section className="marketing-contact" id="contact">
         <div>
           <p>Start with one message</p>
@@ -194,7 +217,7 @@ export default function MarketingLanding({ onLogin }: MarketingLandingProps) {
           <small>I’ll suggest the simplest premium path: website, landing page, or booking flow.</small>
         </div>
         <a href="https://wa.me/66929894495?text=Hi%20Mike%20Web%20Studio%2C%20I%20want%20to%20build%20a%20premium%20website" rel="noreferrer noopener">
-          Open WhatsApp
+          Start on WhatsApp
         </a>
       </section>
     </main>

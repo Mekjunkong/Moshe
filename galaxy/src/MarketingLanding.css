@@ -9,6 +9,14 @@
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+
+.marketing-page section,
+.marketing-page header,
+.marketing-page div,
+.marketing-page article {
+  max-width: 100%;
+}
+
 .marketing-page::before {
   content: '';
   position: fixed;
@@ -365,9 +373,11 @@
   transform: rotate(3deg);
 }
 
+.marketing-proof-band,
 .marketing-band,
 .marketing-work,
 .marketing-process,
+.marketing-decision,
 .marketing-contact {
   position: relative;
   z-index: 1;
@@ -559,6 +569,108 @@
 .marketing-process-grid h3 { margin: 0; font-size: 25px; letter-spacing: -0.04em; }
 .marketing-process-grid p { color: rgba(226,232,240,0.68); line-height: 1.55; }
 
+
+.marketing-credibility-card {
+  grid-column: 1 / -1;
+  align-self: start;
+  max-width: 760px;
+  border: 1px solid rgba(34, 211, 238, 0.18);
+  border-radius: 24px;
+  padding: 16px 18px;
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.1), rgba(168, 85, 247, 0.08));
+  color: rgba(226, 232, 240, 0.8);
+}
+
+.marketing-credibility-card strong {
+  display: block;
+  color: #f8fafc;
+  margin-bottom: 4px;
+  letter-spacing: -0.02em;
+}
+
+.marketing-proof-band {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  padding-top: 0;
+  padding-bottom: 0;
+  background: #020617;
+}
+
+.marketing-proof-band div {
+  min-height: 132px;
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  padding: 24px;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(34, 211, 238, 0.12), transparent 34%),
+    rgba(15, 23, 42, 0.72);
+}
+
+.marketing-proof-band strong {
+  color: #67e8f9;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+}
+
+.marketing-proof-band span {
+  max-width: 280px;
+  color: rgba(226, 232, 240, 0.82);
+  font-size: 18px;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.marketing-decision {
+  display: grid;
+  grid-template-columns: minmax(0, 0.64fr) minmax(260px, 0.36fr);
+  align-items: center;
+  gap: 28px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(34, 211, 238, 0.18), transparent 28rem),
+    linear-gradient(135deg, #08111f, #111827);
+  color: #f8fafc;
+}
+
+.marketing-decision p {
+  margin: 0 0 14px;
+  color: #67e8f9;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.marketing-decision h2 {
+  margin: 0;
+  max-width: 850px;
+  font-size: clamp(31px, 4.4vw, 56px);
+  line-height: 1.03;
+  letter-spacing: -0.06em;
+}
+
+.marketing-decision ul {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.marketing-decision li {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 18px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.045);
+  color: rgba(226, 232, 240, 0.8);
+  font-weight: 800;
+}
+
 .marketing-contact {
   display: flex;
   align-items: center;
@@ -582,18 +694,30 @@
   .marketing-hero,
   .marketing-section-head,
   .marketing-work,
+  .marketing-decision,
   .marketing-contact { grid-template-columns: 1fr; }
   .marketing-showcase { min-height: 540px; }
+  .marketing-proof-band,
   .marketing-services,
   .marketing-process-grid { grid-template-columns: 1fr; }
   .marketing-work-copy { position: static; }
 }
 
 @media (max-width: 680px) {
-  .marketing-nav { position: static; }
+  .marketing-nav { position: sticky; padding: 12px 16px; gap: 10px; }
   .marketing-nav a:not(.marketing-nav-cta) { display: none; }
-  .marketing-hero { padding-top: 44px; }
-  .marketing-browser-frame { position: relative; inset: auto; }
+  .marketing-brand { font-size: 14px; }
+  .marketing-nav button, .marketing-nav-cta { min-height: 42px; padding-inline: 12px; font-size: 12px; }
+  .marketing-hero h1 { font-size: clamp(36px, 12.4vw, 54px); line-height: 1; letter-spacing: -0.065em; }
+  .marketing-hero-copy > p:not(.marketing-kicker) { color: rgba(226,232,240,0.86); font-size: 17px; }
+  .marketing-actions a { width: 100%; }
+  .marketing-proof-band { padding-inline: 16px; }
+  .marketing-proof-band div { min-height: 112px; padding: 18px; }
+  .marketing-hero { min-height: auto; padding-top: 38px; gap: 24px; }
+  .marketing-showcase { min-height: auto; }
+  .marketing-browser-frame { position: relative; inset: auto; min-height: auto; border-radius: 26px; }
+  .marketing-browser-hero { grid-template-columns: 1fr; min-height: 180px; }
+  .marketing-browser-hero > span { width: 72px; height: 72px; border-radius: 22px; }
   .marketing-phone-card,
   .marketing-floating-badge { position: relative; left: auto; right: auto; bottom: auto; margin-top: 14px; transform: none; width: 100%; }
   .marketing-mini-grid,

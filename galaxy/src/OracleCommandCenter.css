@@ -2605,3 +2605,173 @@
     height: 92px;
   }
 }
+
+
+/* ── Phone usability repair: keep controls reachable and content scrollable ── */
+@media (max-width: 720px) {
+  .oracle-shell {
+    top: 58px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    gap: 6px;
+    padding: 0 8px 8px;
+    overflow: hidden;
+  }
+
+  .oracle-hero-card {
+    min-height: 58px;
+    padding: 10px 12px;
+    border-radius: 18px;
+    align-items: center;
+  }
+
+  .oracle-hero-card h1 {
+    margin: 2px 0 0;
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  .oracle-kicker {
+    font-size: 8px;
+    letter-spacing: 1.4px;
+  }
+
+  .oracle-subtitle,
+  .oracle-pulse {
+    display: none;
+  }
+
+  .oracle-metrics {
+    display: flex;
+    overflow-x: auto;
+    border-radius: 16px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .oracle-metrics > div {
+    min-width: 112px;
+    scroll-snap-align: start;
+    padding: 9px 10px;
+  }
+
+  .oracle-metric dd {
+    font-size: 16px;
+  }
+
+  .oracle-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    border-radius: 16px;
+    padding: 5px;
+    max-height: 54px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .oracle-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .oracle-tab {
+    flex: 0 0 auto;
+    min-width: 88px;
+    min-height: 42px;
+    padding: 8px 10px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  .oracle-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 10px;
+    border-radius: 18px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .oracle-section-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .oracle-today-hero-premium {
+    min-height: auto;
+    padding: 16px;
+    border-radius: 22px;
+  }
+
+  .oracle-today-hero-premium h2 {
+    font-size: 32px;
+    line-height: 1;
+    letter-spacing: -0.05em;
+  }
+
+  .oracle-today-orb {
+    width: 76px;
+    height: 76px;
+    border-radius: 24px;
+  }
+
+  .oracle-today-orb span {
+    width: 52px;
+    height: 52px;
+    border-radius: 18px;
+  }
+
+  .oracle-today-orb b {
+    font-size: 24px;
+  }
+
+  .oracle-readiness-panel,
+  .oracle-deploy-freshness,
+  .oracle-action-grid,
+  .oracle-wiro-business-grid,
+  .oracle-control-action-grid,
+  .oracle-terminal-mode-grid,
+  .oracle-terminal-execute-form,
+  .oracle-control-grid,
+  .oracle-report-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .oracle-intelligence-hero,
+  .oracle-terminal-status,
+  .oracle-control-session {
+    flex-direction: column;
+  }
+
+  .oracle-control-session input,
+  .oracle-terminal-execute-form input,
+  .oracle-terminal-execute-form textarea,
+  .oracle-control-note {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .oracle-safe-executor-row,
+  .oracle-control-action-head,
+  .oracle-approval-inbox-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 380px) {
+  .oracle-shell {
+    padding-inline: 6px;
+  }
+
+  .oracle-tab {
+    min-width: 78px;
+    font-size: 9px;
+  }
+
+  .oracle-metrics > div {
+    min-width: 100px;
+  }
+}

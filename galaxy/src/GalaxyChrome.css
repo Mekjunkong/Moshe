@@ -104,3 +104,31 @@
 }
 
 .chrome-search::placeholder { color: #444; }
+
+
+@media (max-width: 720px) {
+  .chrome {
+    height: 52px;
+    padding: 8px 12px;
+    gap: 10px;
+    align-items: center;
+    overflow: hidden;
+    background: rgba(2, 6, 23, 0.86);
+  }
+
+  .chrome-brand {
+    min-width: 0;
+  }
+
+  .chrome-title {
+    font-size: 14px;
+    letter-spacing: 3px;
+    white-space: nowrap;
+  }
+
+  .chrome-sub,
+  .chrome-legend,
+  .chrome-search {
+    display: none;
+  }
+}
