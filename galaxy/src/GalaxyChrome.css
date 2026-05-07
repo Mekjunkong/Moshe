@@ -132,3 +132,12 @@
     display: none;
   }
 }
+
+
+@media (max-width: 720px) {
+  .chrome {
+    height: calc(46px + env(safe-area-inset-top, 0px));
+    padding-top: calc(6px + env(safe-area-inset-top, 0px));
+    padding-bottom: 6px;
+  }
+}

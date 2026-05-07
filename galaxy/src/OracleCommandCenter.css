@@ -2775,3 +2775,52 @@
     min-width: 100px;
   }
 }
+
+
+/* ── Phone debug pass: reduce fixed chrome so Oracle remains workable ── */
+@media (max-width: 720px) {
+  .oracle-shell {
+    top: calc(46px + env(safe-area-inset-top, 0px));
+    height: calc(100dvh - 46px - env(safe-area-inset-top, 0px));
+    bottom: auto;
+  }
+
+  .oracle-hero-card {
+    display: none;
+  }
+
+  .oracle-metrics {
+    max-height: 42px;
+    border-radius: 14px;
+  }
+
+  .oracle-metrics > div {
+    min-width: 96px;
+    padding: 7px 9px;
+  }
+
+  .oracle-metric dt {
+    font-size: 7px;
+  }
+
+  .oracle-metric dd {
+    margin-top: 2px;
+    font-size: 14px;
+  }
+
+  .oracle-tabs {
+    max-height: 46px;
+    padding: 4px;
+  }
+
+  .oracle-tab {
+    min-height: 36px;
+    min-width: 76px;
+    padding: 7px 9px;
+  }
+
+  .oracle-scroll {
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+  }
+}

@@ -137,8 +137,8 @@
   font-family: Poppins, Inter, sans-serif;
   font-size: clamp(46px, 7vw, 88px);
   font-weight: 900;
-  line-height: 0.94;
-  letter-spacing: -0.075em;
+  line-height: 1.04;
+  letter-spacing: -0.045em;
   text-wrap: balance;
 }
 
@@ -298,8 +298,8 @@
   display: block;
   max-width: 340px;
   font-size: clamp(26px, 3vw, 40px);
-  line-height: 0.98;
-  letter-spacing: -0.06em;
+  line-height: 1.05;
+  letter-spacing: -0.032em;
 }
 
 .marketing-browser-hero > span {
@@ -356,8 +356,8 @@
   display: block;
   margin-top: 56px;
   font-size: 25px;
-  line-height: 1;
-  letter-spacing: -0.04em;
+  line-height: 1.07;
+  letter-spacing: -0.032em;
 }
 
 .marketing-phone-card small { display: block; margin-top: 12px; color: rgba(226, 232, 240, 0.62); }
@@ -403,8 +403,8 @@
   max-width: 930px;
   margin: 0;
   font-size: clamp(32px, 4.6vw, 58px);
-  line-height: 1.02;
-  letter-spacing: -0.06em;
+  line-height: 1.08;
+  letter-spacing: -0.032em;
 }
 
 .marketing-band .marketing-section-head p,
@@ -441,7 +441,7 @@
   color: #0f172a;
   font-size: 27px;
   line-height: 1.04;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.032em;
 }
 
 .marketing-services p {
@@ -541,7 +541,7 @@
 }
 
 .marketing-work-grid small { color: #67e8f9; font-weight: 900; text-transform: uppercase; letter-spacing: 0.12em; }
-.marketing-work-grid h3 { margin: 0; font-size: 27px; letter-spacing: -0.04em; }
+.marketing-work-grid h3 { margin: 0; font-size: 27px; letter-spacing: -0.032em; }
 .marketing-work-grid p { margin: 0; color: rgba(226,232,240,0.68); line-height: 1.55; text-transform: none; letter-spacing: 0; font-family: inherit; font-size: 15px; font-weight: 500; }
 
 .marketing-process-grid {
@@ -566,7 +566,7 @@
   font-weight: 900;
 }
 
-.marketing-process-grid h3 { margin: 0; font-size: 25px; letter-spacing: -0.04em; }
+.marketing-process-grid h3 { margin: 0; font-size: 25px; letter-spacing: -0.032em; }
 .marketing-process-grid p { color: rgba(226,232,240,0.68); line-height: 1.55; }
 
 
@@ -650,8 +650,8 @@
   margin: 0;
   max-width: 850px;
   font-size: clamp(31px, 4.4vw, 56px);
-  line-height: 1.03;
-  letter-spacing: -0.06em;
+  line-height: 1.09;
+  letter-spacing: -0.032em;
 }
 
 .marketing-decision ul {
@@ -708,7 +708,7 @@
   .marketing-nav a:not(.marketing-nav-cta) { display: none; }
   .marketing-brand { font-size: 14px; }
   .marketing-nav button, .marketing-nav-cta { min-height: 42px; padding-inline: 12px; font-size: 12px; }
-  .marketing-hero h1 { font-size: clamp(36px, 12.4vw, 54px); line-height: 1; letter-spacing: -0.065em; }
+  .marketing-hero h1 { font-size: clamp(36px, 12.4vw, 54px); line-height: 1.07; letter-spacing: -0.065em; }
   .marketing-hero-copy > p:not(.marketing-kicker) { color: rgba(226,232,240,0.86); font-size: 17px; }
   .marketing-actions a { width: 100%; }
   .marketing-proof-band { padding-inline: 16px; }
@@ -724,4 +724,36 @@
   .marketing-work-grid article { grid-template-columns: 1fr; }
   .marketing-work-visual { grid-row: auto; }
   .marketing-contact { align-items: flex-start; flex-direction: column; }
+}
+
+
+@media (max-width: 680px) {
+  .marketing-hero h1,
+  .marketing-section-head h2,
+  .marketing-work h2,
+  .marketing-contact h2,
+  .marketing-decision h2 {
+    letter-spacing: -0.028em;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  .marketing-card h3,
+  .marketing-process-grid h3,
+  .marketing-work-card h3 {
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+  }
+
+  .marketing-hero {
+    padding-inline: 18px;
+  }
+
+  .marketing-band,
+  .marketing-work,
+  .marketing-process,
+  .marketing-decision,
+  .marketing-contact {
+    padding-inline: 18px;
+  }
 }
