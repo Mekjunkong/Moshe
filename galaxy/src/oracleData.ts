@@ -157,6 +157,10 @@ export interface OracleAutomationAction {
   transport: 'preview-only' | 'github-api' | 'vercel-api' | 'local-script'
   risk: 'low' | 'medium' | 'high'
   requiresConfirmation: boolean
+  autonomyLevel?: 'safe_now' | 'draft_only' | 'approval_required'
+  businessArea?: string
+  riskReason?: string
+  nextSafeStep?: string
 }
 
 export interface OracleAutomationPolicy {

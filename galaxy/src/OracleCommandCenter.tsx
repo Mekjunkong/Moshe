@@ -180,11 +180,20 @@ function syncBadgeClass(syncState?: string) {
   return 'env-missing'
 }
 
+function friendlyBrowserApiError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error)
+  if (message.includes('Unexpected token') || message.includes('<!DOCTYPE')) {
+    return 'Oracle API endpoint is not available in this static preview. Use the live Vercel runtime or local admin API runtime for unlock/execute controls.'
+  }
+  return message
+}
+
 const tabs = [
   { id: 'today', label: 'Today', alert: true },
   { id: 'intel', label: 'Intel', alert: true },
   { id: 'overview', label: 'Overview' },
   { id: 'wiro', label: 'Wiro' },
+  { id: 'control', label: 'Control', alert: true },
   { id: 'improve', label: 'Improve' },
   { id: 'terminal', label: 'Terminal' },
   { id: 'sites', label: 'Sites' },
@@ -196,8 +205,10 @@ const tabs = [
 export default function OracleCommandCenter({ data }: Props) {
   const [oracleRefreshNonce, setOracleRefreshNonce] = useState(0)
   const oracle = useOracleLiveData(oracleRefreshNonce)
-  const [tab, setTab] = useState<'today' | 'intel' | 'overview' | 'wiro' | 'improve' | 'terminal' | 'sites' | 'repos' | 'sensors' | 'learnings'>('today')
+  const [tab, setTab] = useState<'today' | 'intel' | 'overview' | 'wiro' | 'control' | 'improve' | 'terminal' | 'sites' | 'repos' | 'sensors' | 'learnings'>('today')
   const [previewReason, setPreviewReason] = useState('Refresh the Oracle snapshot before any future action.')
+  const [actionApprovalFlags, setActionApprovalFlags] = useState<Record<string, boolean>>({})
+  const [actionNotes, setActionNotes] = useState<Record<string, string>>({})
   const [previewState, setPreviewState] = useState<{
     status: 'idle' | 'loading' | 'ready' | 'error'
     result: OracleActionPreviewResponse | null
@@ -407,7 +418,7 @@ export default function OracleCommandCenter({ data }: Props) {
         setSessionState({
           status: 'error',
           message: 'Session gate unavailable.',
-          detail: error.message,
+          detail: friendlyBrowserApiError(error),
           configured: false,
           actor: null,
           expiresAt: null,
@@ -485,7 +496,7 @@ export default function OracleCommandCenter({ data }: Props) {
         ...current,
         status: 'error',
         message: 'Failed to unlock session.',
-        detail: error instanceof Error ? error.message : 'Unknown session error.',
+          detail: error instanceof Error ? friendlyBrowserApiError(error) : 'Unknown session error.',
       }))
     }
   }
@@ -515,7 +526,7 @@ export default function OracleCommandCenter({ data }: Props) {
         ...current,
         status: 'error',
         message: 'Failed to lock session.',
-        detail: error instanceof Error ? error.message : 'Unknown session error.',
+          detail: error instanceof Error ? friendlyBrowserApiError(error) : 'Unknown session error.',
       }))
     }
   }
@@ -554,7 +565,8 @@ export default function OracleCommandCenter({ data }: Props) {
           actionId,
           mode,
           confirm: true,
-          reason: previewReason,
+          reason: actionNotes[actionId]?.trim() || previewReason,
+          approvedByMike: actionApprovalFlags[actionId] === true,
         }),
       })
 
@@ -586,7 +598,7 @@ export default function OracleCommandCenter({ data }: Props) {
         setPreviewState({
           status: 'error',
           result: fallback,
-          detail: error instanceof Error ? error.message : 'Preview request failed.',
+          detail: error instanceof Error ? friendlyBrowserApiError(error) : 'Preview request failed.',
         })
         return
       }
@@ -596,12 +608,12 @@ export default function OracleCommandCenter({ data }: Props) {
         result: {
           ok: false,
           error: 'execution_failed',
-          message: error instanceof Error ? error.message : 'Execute request failed.',
+          message: error instanceof Error ? friendlyBrowserApiError(error) : 'Execute request failed.',
           action: action ?? undefined,
           policy: oracle.automation,
           session: sessionState.actor && sessionState.expiresAt ? { actor: sessionState.actor, expiresAt: sessionState.expiresAt } : undefined,
         },
-        detail: error instanceof Error ? error.message : 'Execute request failed.',
+        detail: error instanceof Error ? friendlyBrowserApiError(error) : 'Execute request failed.',
       })
     }
   }
@@ -855,6 +867,9 @@ export default function OracleCommandCenter({ data }: Props) {
     note: 'Terminal policy not loaded yet.',
   }
   const terminalReady = terminalPolicy.enabled && sessionState.status === 'authenticated'
+  const sessionUnlocked = sessionState.status === 'authenticated'
+  const controlActionStatus = previewState.status === 'loading' ? 'RUNNING' : sessionUnlocked ? 'ARMED' : 'LOCKED'
+  const controlActionCount = oracle.automation?.actions.length ?? 0
 
   return (
     <aside className="oracle-shell" aria-label="Oracle OS command center">
@@ -1608,6 +1623,166 @@ export default function OracleCommandCenter({ data }: Props) {
             )}
             <button type="button" className="oracle-preview-button" onClick={() => runOracleAction('dispatch-wiro-ci', 'preview')}>Preview Wiro CI dispatch</button>
             <button type="button" className="oracle-preview-button" onClick={() => runOracleAction('dispatch-wiro-ci', 'execute')} disabled={sessionState.status !== 'authenticated'}>Execute Wiro CI dispatch</button>
+          </div>
+        </section>
+      )}
+
+
+      {/* ── Control tab ── */}
+      {tab === 'control' && (
+        <section id="oracle-panel-control" role="tabpanel" aria-labelledby="oracle-tab-control" className="oracle-section oracle-scroll">
+          <div className="oracle-control-hero">
+            <div>
+              <p>MIKE CONTROL LAYER</p>
+              <h2>Unlock, approve, execute, audit</h2>
+              <small>Read-only by default. Signed Mike session required before any browser-triggered write.</small>
+            </div>
+            <span className={`oracle-risk-badge ${sessionUnlocked ? 'low' : sessionState.configured ? 'medium' : 'high'}`}>{sessionUnlocked ? 'UNLOCKED' : sessionState.configured ? 'LOCKED' : 'NOT CONFIGURED'}</span>
+          </div>
+
+          <div className="oracle-control-grid">
+            <article className="oracle-control-card session">
+              <div className="oracle-status-head">
+                <strong>Session gate</strong>
+                <span className={`oracle-risk-badge ${sessionUnlocked ? 'low' : 'medium'}`}>{sessionState.status.toUpperCase()}</span>
+              </div>
+              <p>{sessionState.message}</p>
+              <small>{sessionState.detail}</small>
+              {sessionState.actor && <small>Actor: {sessionState.actor}</small>}
+              {sessionState.expiresAt && <small>Expires: {new Date(sessionState.expiresAt).toLocaleString()}</small>}
+              {sessionState.configured ? (
+                <>
+                  <label className="oracle-session-field">
+                    <span>Mike passphrase</span>
+                    <input
+                      type="password"
+                      value={sessionPassphrase}
+                      onChange={(event) => setSessionPassphrase(event.target.value)}
+                      placeholder="Enter Mike-only passphrase"
+                      autoComplete="current-password"
+                    />
+                  </label>
+                  <div className="oracle-session-actions">
+                    <button type="button" className="oracle-preview-button" disabled={sessionState.status === 'loading' || !sessionPassphrase.trim()} onClick={unlockSession}>
+                      {sessionState.status === 'loading' ? 'Unlocking…' : sessionUnlocked ? 'Refresh unlock' : 'Unlock control layer'}
+                    </button>
+                    <button type="button" className="oracle-session-secondary" disabled={!sessionUnlocked} onClick={lockSession}>Lock</button>
+                  </div>
+                </>
+              ) : (
+                <small>Set ORACLE_SESSION_SECRET on Vercel/local runtime to enable browser controls.</small>
+              )}
+            </article>
+
+            <article className="oracle-control-card">
+              <div className="oracle-status-head">
+                <strong>Execution policy</strong>
+                <span className={`oracle-risk-badge ${sessionUnlocked ? 'low' : 'medium'}`}>{controlActionStatus}</span>
+              </div>
+              <p>{oracle.automation?.note ?? 'Oracle action policy is loading.'}</p>
+              <small>{controlActionCount} action(s) exposed · confirmation required · same-origin POST · audit logged</small>
+              <small>Approval-required actions need the checkbox below before execute.</small>
+            </article>
+          </div>
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>ACTION CONSOLE</p>
+            <span>{controlActionCount} allowlisted actions</span>
+          </div>
+          <div className="oracle-control-action-list">
+            {(oracle.automation?.actions ?? []).map((action) => (
+              <article className="oracle-control-action" key={`control-${action.id}`}>
+                <div className="oracle-status-head">
+                  <div>
+                    <strong>{action.title}</strong>
+                    <p>{action.description}</p>
+                  </div>
+                  <span className={`oracle-risk-badge ${action.risk}`}>{action.risk.toUpperCase()}</span>
+                </div>
+                <small>{action.transport} · {action.requiresConfirmation ? 'confirm=true required' : 'no explicit confirm'} · {action.autonomyLevel ?? 'classified'}</small>
+                {action.riskReason && <small>Risk: {action.riskReason}</small>}
+                {action.nextSafeStep && <small>Next safe step: {action.nextSafeStep}</small>}
+                <label className="oracle-preview-field compact">
+                  <span>Execution note</span>
+                  <textarea
+                    rows={2}
+                    value={actionNotes[action.id] ?? ''}
+                    onChange={(event) => setActionNotes((current) => ({ ...current, [action.id]: event.target.value }))}
+                    placeholder="Why are we doing this action now?"
+                  />
+                </label>
+                {action.autonomyLevel === 'approval_required' && (
+                  <label className="oracle-control-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={actionApprovalFlags[action.id] === true}
+                      onChange={(event) => setActionApprovalFlags((current) => ({ ...current, [action.id]: event.target.checked }))}
+                    />
+                    <span>Mike explicitly approves this approval-required action.</span>
+                  </label>
+                )}
+                <div className="oracle-action-buttons">
+                  <button type="button" className="oracle-session-secondary" disabled={previewState.status === 'loading'} onClick={() => runOracleAction(action.id, 'preview')}>Preview</button>
+                  <button
+                    type="button"
+                    className="oracle-preview-button"
+                    disabled={!sessionUnlocked || previewState.status === 'loading' || (action.autonomyLevel === 'approval_required' && actionApprovalFlags[action.id] !== true)}
+                    onClick={() => runOracleAction(action.id, 'execute')}
+                  >
+                    Execute
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="oracle-control-grid" style={{ marginTop: 16 }}>
+            <article className="oracle-control-card">
+              <div className="oracle-status-head">
+                <strong>Last result</strong>
+                <span className={`oracle-risk-badge ${previewState.status === 'error' ? 'high' : previewState.status === 'ready' ? 'low' : 'medium'}`}>{previewState.status.toUpperCase()}</span>
+              </div>
+              <p>{previewState.result?.message ?? (previewState.detail || 'No control action has run in this browser session.')}</p>
+              {previewState.result?.requestId && <code>{previewState.result.requestId}</code>}
+              {previewState.result?.nextStep && <small>{previewState.result.nextStep}</small>}
+            </article>
+
+            <article className="oracle-control-card">
+              <div className="oracle-status-head">
+                <strong>Quick feedback</strong>
+                <span>{feedbackState.status.toUpperCase()}</span>
+              </div>
+              <p>{feedbackState.message || 'Rate the current Oracle signal so future reports get less noisy.'}</p>
+              <div className="oracle-preview-actions">
+                {(['useful', 'noisy', 'missing-context', 'action-taken', 'ignored'] as const).map((rating) => (
+                  <button key={`control-feedback-${rating}`} type="button" className="oracle-mini-button" disabled={!sessionUnlocked || feedbackState.status === 'loading'} onClick={() => submitSignalFeedback(`control-${rating}-${Date.now()}`, rating)}>{rating}</button>
+                ))}
+              </div>
+            </article>
+          </div>
+
+          <div className="oracle-audit-panel" style={{ marginTop: 16 }}>
+            <div className="oracle-preview-head">
+              <div>
+                <strong>Audit trail</strong>
+                <p>Recent server-side decisions. Passphrases, cookies, and env vars are never returned.</p>
+              </div>
+              <span className="oracle-risk-badge low">{actionAuditTrail.length} EVENTS</span>
+            </div>
+            {actionAuditTrail.length > 0 ? (
+              <div className="oracle-audit-list">
+                {actionAuditTrail.slice(0, 10).map((entry) => (
+                  <div className="oracle-audit-row" key={`control-${entry.id}-${entry.requestedAt}`}>
+                    <span className={`oracle-risk-badge ${entry.outcome === 'denied' ? 'medium' : 'low'}`}>{entry.outcome.toUpperCase()}</span>
+                    <div>
+                      <strong>{entry.actionId}</strong>
+                      <small>{entry.actor} · {timeAgo(entry.requestedAt)}</small>
+                      <p>{entry.detail}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : <small className="oracle-muted">No audit entries visible from this runtime yet.</small>}
           </div>
         </section>
       )}

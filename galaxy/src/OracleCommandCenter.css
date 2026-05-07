@@ -2304,3 +2304,127 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ── Mike Control Layer ─────────────────────────────────────────────────── */
+.oracle-control-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid rgba(34, 211, 238, 0.28);
+  border-radius: 24px;
+  padding: 16px;
+  background:
+    radial-gradient(circle at top left, rgba(34, 211, 238, 0.18), transparent 38%),
+    linear-gradient(145deg, rgba(8, 47, 73, 0.45), rgba(15, 23, 42, 0.84));
+}
+
+.oracle-control-hero p,
+.oracle-control-hero h2,
+.oracle-control-hero small {
+  margin: 0;
+}
+
+.oracle-control-hero p {
+  color: #22d3ee;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+.oracle-control-hero h2 {
+  margin-top: 6px;
+  color: #f8fafc;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+}
+
+.oracle-control-hero small {
+  display: block;
+  margin-top: 6px;
+  color: rgba(226, 232, 240, 0.74);
+  line-height: 1.45;
+}
+
+.oracle-control-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.oracle-control-card,
+.oracle-control-action {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 18px;
+  padding: 14px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.76));
+}
+
+.oracle-control-card.session {
+  border-color: rgba(34, 211, 238, 0.24);
+  background:
+    radial-gradient(circle at top right, rgba(34, 211, 238, 0.12), transparent 36%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.76));
+}
+
+.oracle-control-card p,
+.oracle-control-action p {
+  margin: 8px 0 0;
+  color: rgba(226, 232, 240, 0.82);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.oracle-control-card small,
+.oracle-control-action small {
+  display: block;
+  margin-top: 7px;
+  color: rgba(203, 213, 225, 0.58);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.oracle-control-action-list {
+  display: grid;
+  gap: 12px;
+}
+
+.oracle-control-action {
+  border-color: rgba(34, 211, 238, 0.14);
+}
+
+.oracle-preview-field.compact textarea {
+  min-height: 54px;
+}
+
+.oracle-control-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 10px;
+  padding: 9px 10px;
+  border: 1px solid rgba(250, 204, 21, 0.24);
+  border-radius: 12px;
+  background: rgba(113, 63, 18, 0.14);
+  color: rgba(254, 240, 138, 0.92);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.oracle-control-checkbox input {
+  accent-color: #22d3ee;
+}
+
+@media (max-width: 960px) {
+  .oracle-control-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .oracle-control-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
