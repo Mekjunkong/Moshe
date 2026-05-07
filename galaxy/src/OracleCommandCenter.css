@@ -2428,3 +2428,180 @@
     flex-direction: column;
   }
 }
+
+
+/* ── Premium Today Cockpit upgrade ───────────────────────────────────────── */
+.oracle-today-hero-premium {
+  position: relative;
+  overflow: hidden;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  min-height: 190px;
+  border-radius: 30px;
+  padding: 22px;
+  border: 1px solid rgba(34, 211, 238, 0.26);
+  background:
+    radial-gradient(circle at 18% 22%, rgba(34, 211, 238, 0.26), transparent 34%),
+    radial-gradient(circle at 88% 12%, rgba(168, 85, 247, 0.22), transparent 32%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.94));
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.oracle-today-hero-premium::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.24;
+  background-image:
+    linear-gradient(rgba(148,163,184,0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148,163,184,0.1) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: radial-gradient(circle at 32% 50%, #000, transparent 70%);
+}
+
+.oracle-today-copy,
+.oracle-today-orb,
+.oracle-today-hero-premium > .oracle-risk-badge {
+  position: relative;
+  z-index: 1;
+}
+
+.oracle-today-hero-premium h2 {
+  margin-top: 4px;
+  font-size: clamp(34px, 7vw, 58px);
+  line-height: 0.92;
+  letter-spacing: -0.075em;
+  text-shadow: 0 0 34px rgba(34,211,238,0.16);
+}
+
+.oracle-today-hero-premium small {
+  max-width: 330px;
+  color: rgba(226, 232, 240, 0.72);
+}
+
+.oracle-today-quickstats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.oracle-today-quickstats span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 999px;
+  padding: 8px 10px;
+  color: rgba(226, 232, 240, 0.72);
+  background: rgba(255, 255, 255, 0.055);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.oracle-today-quickstats strong {
+  color: #f8fafc;
+  font-size: 15px;
+}
+
+.oracle-today-orb {
+  display: grid;
+  place-items: center;
+  width: 112px;
+  height: 112px;
+  border-radius: 36px;
+  border: 1px solid rgba(34, 211, 238, 0.32);
+  background:
+    radial-gradient(circle, rgba(34, 211, 238, 0.2), transparent 62%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.7), rgba(8, 47, 73, 0.58));
+  box-shadow: 0 0 48px rgba(34, 211, 238, 0.2), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.oracle-today-orb span {
+  position: absolute;
+  width: 76px;
+  height: 76px;
+  border-radius: 26px;
+  border: 1px solid rgba(125, 211, 252, 0.3);
+  transform: rotate(45deg);
+  animation: oracle-orb-spin 8s linear infinite;
+}
+
+.oracle-today-orb b {
+  color: #a5f3fc;
+  font-size: 34px;
+  letter-spacing: -0.08em;
+  text-shadow: 0 0 26px rgba(34, 211, 238, 0.56);
+}
+
+.oracle-readiness-panel-premium,
+.oracle-intelligence-hero,
+.oracle-autonomy-router,
+.oracle-intel-card,
+.oracle-approval-card,
+.oracle-status-card,
+.oracle-report-card {
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+.oracle-readiness-panel-premium {
+  border-color: rgba(45, 212, 191, 0.3);
+  background:
+    radial-gradient(circle at 8% 10%, rgba(45, 212, 191, 0.17), transparent 32%),
+    linear-gradient(135deg, rgba(6, 78, 59, 0.62), rgba(15, 23, 42, 0.96));
+}
+
+.oracle-readiness-panel-premium .oracle-readiness-score {
+  min-width: 112px;
+  min-height: 112px;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #5eead4, #22d3ee);
+  color: #022c22;
+  box-shadow: 0 20px 52px rgba(45, 212, 191, 0.22);
+}
+
+.oracle-readiness-panel-premium .oracle-readiness-score span {
+  color: #022c22;
+}
+
+.oracle-intelligence-hero {
+  border-color: rgba(245, 158, 11, 0.32);
+  background:
+    radial-gradient(circle at 86% 14%, rgba(245, 158, 11, 0.25), transparent 34%),
+    linear-gradient(135deg, rgba(69, 26, 3, 0.62), rgba(15, 23, 42, 0.95));
+}
+
+.oracle-intelligence-hero h3 {
+  font-size: 22px;
+  letter-spacing: -0.04em;
+}
+
+.oracle-autonomy-lane,
+.oracle-opportunity-line,
+.oracle-intel-line,
+.oracle-today-actions li,
+.oracle-warning-line {
+  border-radius: 18px;
+}
+
+.oracle-today-actions li {
+  border: 1px solid rgba(34, 211, 238, 0.12);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(8, 47, 73, 0.34));
+}
+
+@keyframes oracle-orb-spin {
+  from { transform: rotate(45deg); }
+  to { transform: rotate(405deg); }
+}
+
+@media (max-width: 720px) {
+  .oracle-today-hero-premium {
+    grid-template-columns: 1fr;
+  }
+  .oracle-today-orb {
+    width: 92px;
+    height: 92px;
+  }
+}

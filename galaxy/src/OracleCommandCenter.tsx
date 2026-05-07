@@ -923,18 +923,27 @@ export default function OracleCommandCenter({ data }: Props) {
       {/* ── Today tab ── */}
       {tab === 'today' && (
         <section id="oracle-panel-today" role="tabpanel" aria-labelledby="oracle-tab-today" className="oracle-section oracle-scroll">
-          <div className="oracle-today-hero">
-            <div>
+          <div className="oracle-today-hero oracle-today-hero-premium">
+            <div className="oracle-today-copy">
               <p>Mike command center</p>
-              <h2>Today</h2>
-              <small>Generated {timeAgo(oracle.generated)} · {onlineSites}/{oracle.websites.length || 0} sites online · {dirtyRepos} dirty repos</small>
+              <h2>Today’s cockpit</h2>
+              <small>Generated {timeAgo(oracle.generated)} · {onlineSites}/{oracle.websites.length || 0} sites online · {dirtyRepos} dirty repos · {githubOk}/{oracle.github.length || 0} GitHub sensors</small>
+              <div className="oracle-today-quickstats" aria-label="Live Oracle quick stats">
+                <span><strong>{readiness.score}</strong> readiness</span>
+                <span><strong>{topMoneyOpportunity?.score ?? '—'}</strong> money radar</span>
+                <span><strong>{highPriorityRecommendations.length}</strong> actions</span>
+              </div>
+            </div>
+            <div className="oracle-today-orb" aria-hidden="true">
+              <span />
+              <b>{criticalIncidents > 0 ? '!' : readiness.score}</b>
             </div>
             <span className={`oracle-risk-badge ${criticalIncidents > 0 ? 'high' : projectWarnings.length > 0 ? 'medium' : 'low'}`}>
               {criticalIncidents > 0 ? 'ACTION NEEDED' : projectWarnings.length > 0 ? 'WATCH' : 'CLEAR'}
             </span>
           </div>
 
-          <div className="oracle-readiness-panel" aria-label="Oracle operational readiness">
+          <div className="oracle-readiness-panel oracle-readiness-panel-premium" aria-label="Oracle operational readiness">
             <div className="oracle-readiness-score">
               <span>{readiness.score}</span>
               <small>/100</small>
