@@ -195,7 +195,7 @@ const tabs = [
   { id: 'wiro', label: 'Wiro' },
   { id: 'control', label: 'Control', alert: true },
   { id: 'improve', label: 'Improve' },
-  { id: 'terminal', label: 'Terminal' },
+  { id: 'tools', label: 'Tools' },
   { id: 'sites', label: 'Sites' },
   { id: 'repos', label: 'Repos' },
   { id: 'sensors', label: 'Sensors' },
@@ -205,7 +205,7 @@ const tabs = [
 export default function OracleCommandCenter({ data }: Props) {
   const [oracleRefreshNonce, setOracleRefreshNonce] = useState(0)
   const oracle = useOracleLiveData(oracleRefreshNonce)
-  const [tab, setTab] = useState<'today' | 'intel' | 'overview' | 'wiro' | 'control' | 'improve' | 'terminal' | 'sites' | 'repos' | 'sensors' | 'learnings'>('today')
+  const [tab, setTab] = useState<'today' | 'intel' | 'overview' | 'wiro' | 'control' | 'improve' | 'tools' | 'sites' | 'repos' | 'sensors' | 'learnings'>('today')
   const [previewReason, setPreviewReason] = useState('Refresh the Oracle snapshot before any future action.')
   const [actionApprovalFlags, setActionApprovalFlags] = useState<Record<string, boolean>>({})
   const [actionNotes, setActionNotes] = useState<Record<string, string>>({})
@@ -2535,123 +2535,73 @@ export default function OracleCommandCenter({ data }: Props) {
         </section>
       )}
 
-      {/* ── Terminal tab ── */}
-      {tab === 'terminal' && (
-        <section id="oracle-panel-terminal" role="tabpanel" aria-labelledby="oracle-tab-terminal" className="oracle-section oracle-scroll">
+      {/* ── Tools tab ── */}
+      {tab === 'tools' && (
+        <section id="oracle-panel-tools" role="tabpanel" aria-labelledby="oracle-tab-tools" className="oracle-section oracle-scroll">
           <div className="oracle-section-head">
-            <p>ADMIN TERMINAL</p>
-            <span>{terminalReady ? 'ready' : terminalPolicy.terminalEnabled ? 'locked' : 'disabled'}</span>
+            <p>MIKE TOOLS</p>
+            <span>safe phone actions</span>
           </div>
 
-          <div className={`oracle-terminal-status ${terminalReady ? 'ready' : terminalPolicy.terminalEnabled ? 'locked' : 'disabled'}`}>
+          <div className="oracle-tools-hero">
             <div>
-              <strong>
-                {terminalReady
-                  ? 'Terminal bridge armed'
-                  : terminalPolicy.terminalEnabled
-                    ? 'Terminal needs Mike unlock'
-                    : 'Public dashboard: terminal intentionally off'}
-              </strong>
+              <strong>Useful tools, no fake terminal</strong>
               <p>
-                {terminalReady
-                  ? 'Commands can run through the signed-session, same-origin terminal bridge.'
-                  : terminalPolicy.terminalEnabled
-                    ? 'Enter the Mike session passphrase below to unlock this trusted runtime.'
-                    : 'This browser is connected to a safe read-only deployment. Use local admin mode for real terminal execution.'}
+                The public website will not pretend to run shell commands. This panel keeps the phone useful with safe checks,
+                quick jumps, and links to the places Mike actually needs.
               </p>
-              <small>{terminalPolicy.note}</small>
             </div>
-            <span className={`oracle-risk-badge ${terminalReady ? 'low' : terminalPolicy.terminalEnabled ? 'medium' : 'high'}`}>
-              {terminalReady ? 'RUN' : terminalPolicy.terminalEnabled ? 'UNLOCK' : 'LOCAL ONLY'}
-            </span>
+            <span>PUBLIC SAFE</span>
           </div>
 
-          <div className="oracle-terminal-mode-grid" aria-label="Terminal mode explanation">
-            <article className={terminalPolicy.terminalEnabled ? 'armed' : 'safe'}>
-              <strong>1 · Public dashboard</strong>
-              <p>Read-only by design. It can show status, recipes, and output history, but it must not run shell commands from the public web.</p>
-              <span>{terminalPolicy.terminalEnabled ? 'trusted runtime detected' : 'safe mode active'}</span>
-            </article>
-            <article className={terminalReady ? 'armed' : 'local'}>
-              <strong>2 · Local admin terminal</strong>
-              <p>On Mike’s Mac, run <code>cd ~/workspace/Moshe/galaxy && npm run dev:terminal</code>, open the printed localhost URL, then unlock with the printed passphrase.</p>
-              <span>{terminalReady ? 'ready now' : 'needs local admin runtime'}</span>
-            </article>
-          </div>
-
-          {sessionState.status !== 'authenticated' && (
-            <div className={`oracle-terminal-unlock ${terminalPolicy.terminalEnabled ? 'enabled' : 'disabled'}`}>
-              <div>
-                <strong>{terminalPolicy.terminalEnabled ? 'Unlock Mike session' : 'Unlock disabled on this deployment'}</strong>
-                <p>
-                  {terminalPolicy.terminalEnabled
-                    ? 'Use the passphrase printed by the local terminal runtime. No passphrase is stored in this browser.'
-                    : 'This is expected on mikewebstudio.com. Start local admin mode first; do not enable public production terminal unless you intentionally want that risk.'}
-                </p>
-              </div>
-              {terminalPolicy.terminalEnabled && (
-                <>
-                  <label className="oracle-terminal-label">
-                    <span>Mike session passphrase</span>
-                    <input
-                      type="password"
-                      value={sessionPassphrase}
-                      onChange={(event) => setSessionPassphrase(event.target.value)}
-                      placeholder="Enter local/admin passphrase"
-                    />
-                  </label>
-                  <button type="button" className="oracle-action-button" disabled={!sessionPassphrase || sessionState.status === 'loading'} onClick={unlockSession}>
-                    {sessionState.status === 'loading' ? 'Unlocking…' : 'Unlock terminal session'}
-                  </button>
-                </>
-              )}
-              <small>{sessionState.message} — {sessionState.detail}</small>
-            </div>
-          )}
-
-          <div className="oracle-terminal-recipes">
-            {terminalRecipes.map((recipe) => (
-              <button
-                key={recipe.label}
-                type="button"
-                onClick={() => {
-                  setTerminalCommand(recipe.command)
-                  setTerminalCwd(recipe.cwd)
-                }}
-              >
-                {recipe.label}
-              </button>
-            ))}
-          </div>
-
-          <label className="oracle-terminal-label">
-            <span>Working directory</span>
-            <input value={terminalCwd} onChange={(event) => setTerminalCwd(event.target.value)} spellCheck={false} />
-          </label>
-
-          <label className="oracle-terminal-label">
-            <span>Command</span>
-            <textarea value={terminalCommand} onChange={(event) => setTerminalCommand(event.target.value)} spellCheck={false} rows={4} />
-          </label>
-
-          <div className="oracle-terminal-actions">
-            <button type="button" className="oracle-action-button" disabled={!terminalReady || terminalState.status === 'loading'} onClick={runTerminalCommand}>
-              {terminalState.status === 'loading' ? 'Running…' : 'Run command'}
+          <div className="oracle-tools-grid" aria-label="Safe Oracle tools">
+            <button type="button" onClick={() => setOracleRefreshNonce((value) => value + 1)}>
+              <strong>Refresh Oracle snapshot</strong>
+              <span>Reload latest status, sites, repos, learnings, and alerts.</span>
             </button>
-            <small>{terminalReady ? 'Commands run through a signed-session, same-origin, denylisted shell bridge.' : 'Unlock session and enable local terminal env first.'}</small>
+            <button type="button" onClick={() => setTab('sites')}>
+              <strong>Check websites</strong>
+              <span>{onlineSites}/{oracle.websites.length} online. Open live URLs and response notes.</span>
+            </button>
+            <button type="button" onClick={() => setTab('repos')}>
+              <strong>Review repos</strong>
+              <span>{dirtyRepos} dirty repo signal. See branch, commit, GitHub, and changes count.</span>
+            </button>
+            <button type="button" onClick={() => setTab('wiro')}>
+              <strong>Wiro business radar</strong>
+              <span>Market signals, booking ideas, and next opportunities for Wiro4x4.</span>
+            </button>
+            <button type="button" onClick={() => setTab('control')}>
+              <strong>Control layer</strong>
+              <span>Preview safe actions and approval-required work without public shell access.</span>
+            </button>
+            <button type="button" onClick={() => setTab('learnings')}>
+              <strong>Oracle memory</strong>
+              <span>Recent learnings, retrospectives, and self-improvement notes.</span>
+            </button>
           </div>
 
-          <div className="oracle-terminal-output">
-            <div className="oracle-status-head">
-              <strong>Output</strong>
-              <span>{terminalState.result?.exitCode ?? terminalState.result?.error ?? terminalState.status}</span>
-            </div>
-            <pre>{terminalState.result ? `${terminalState.result.stdout ?? ''}${terminalState.result.stderr ? `\n[stderr]\n${terminalState.result.stderr}` : ''}${terminalState.result.message ? `\n${terminalState.result.message}` : ''}` : 'No command run yet.'}</pre>
+          <div className="oracle-tools-link-grid" aria-label="Project shortcuts">
+            <a href="https://www.mikewebstudio.com/" target="_blank" rel="noopener noreferrer">
+              <strong>Mike Web Studio</strong>
+              <span>Open public landing page</span>
+            </a>
+            {oracle.websites
+              .filter((site) => isHttpUrl(site.url))
+              .slice(0, 3)
+              .map((site) => (
+                <a key={site.name} href={site.url} target="_blank" rel="noopener noreferrer">
+                  <strong>{site.name}</strong>
+                  <span>{site.ok ? 'Online' : 'Needs check'} · {site.responseMs ? `${site.responseMs}ms` : 'status only'}</span>
+                </a>
+              ))}
           </div>
 
-          <div className="oracle-terminal-note">
-            <strong>Codex usage</strong>
-            <p>For Codex, use this panel to check/install/launch commands. Full interactive PTY should run on Mike local machine; public Vercel stays protected and may not have Codex installed.</p>
+          <div className="oracle-tools-note">
+            <strong>Need real terminal?</strong>
+            <p>
+              Message Moshe in Telegram with the command or use local admin mode on Mike’s Mac. The public phone UI stays safe and useful.
+            </p>
           </div>
         </section>
       )}
