@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="warm" cx="18%" cy="12%" r="70%">
+      <stop offset="0" stop-color="#7c2d12"/>
+      <stop offset="0.52" stop-color="#1c1917"/>
+      <stop offset="1" stop-color="#0b0f14"/>
+    </radialGradient>
+    <linearGradient id="card" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fff8ed"/>
+      <stop offset="1" stop-color="#eadbc8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#warm)"/>
+  <circle cx="1010" cy="80" r="250" fill="#3b2417" opacity="0.72"/>
+  <rect x="42" y="42" width="1116" height="546" rx="42" fill="none" stroke="#a69178" stroke-opacity="0.56" stroke-width="2"/>
+  <text x="86" y="118" fill="#f6c177" font-family="Space Grotesk, Arial, sans-serif" font-size="34" font-weight="800" letter-spacing="5">MIKE WEB STUDIO</text>
+  <text x="86" y="218" fill="#fff8ed" font-family="Space Grotesk, Arial, sans-serif" font-size="78" font-weight="800" letter-spacing="-3">
+    <tspan x="86" dy="0">Websites that make</tspan>
+    <tspan x="86" dy="86">small businesses</tspan>
+    <tspan x="86" dy="86">easier to trust.</tspan>
+  </text>
+  <text x="90" y="514" fill="#e8ddcf" font-family="Arial, sans-serif" font-size="31">Premium websites, landing pages, and WhatsApp enquiry flows.</text>
+  <rect x="790" y="138" width="306" height="344" rx="36" fill="url(#card)" stroke="#f6c177" stroke-width="3"/>
+  <text x="832" y="216" fill="#1c1209" font-family="Space Grotesk, Arial, sans-serif" font-size="45" font-weight="800">
+    <tspan x="832" dy="0">Free</tspan>
+    <tspan x="832" dy="58">homepage</tspan>
+    <tspan x="832" dy="58">mockup</tspan>
+  </text>
+  <rect x="832" y="374" width="218" height="54" rx="27" fill="#d97706"/>
+  <text x="867" y="409" fill="#1c1209" font-family="Arial, sans-serif" font-size="24" font-weight="800">WhatsApp first</text>
+</svg>
