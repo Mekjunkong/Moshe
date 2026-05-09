@@ -188,6 +188,11 @@ function friendlyBrowserApiError(error: unknown) {
   return message
 }
 
+const oracleStudioPhoto = {
+  src: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=640&q=82',
+  alt: 'Abstract architectural light field representing Moshe Galaxy intelligence layers',
+}
+
 const tabs = [
   { id: 'today', label: 'Today', alert: true },
   { id: 'intel', label: 'Intel', alert: true },
@@ -881,6 +886,9 @@ export default function OracleCommandCenter({ data }: Props) {
             Mike's external brain · generated {timeAgo(oracle.generated)}
           </p>
         </div>
+        <figure className="oracle-hero-photo">
+          <img src={oracleStudioPhoto.src} alt={oracleStudioPhoto.alt} loading="eager" />
+        </figure>
         <div className="oracle-pulse" aria-hidden="true">
           <span />
         </div>
