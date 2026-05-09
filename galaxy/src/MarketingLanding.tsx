@@ -23,14 +23,15 @@ const copy = {
   },
   hero: {
     kicker: { en: 'Chiang Mai web studio', th: 'เว็บสตูดิโอเชียงใหม่' },
-    title: { en: 'Premium websites people trust faster.', th: 'เว็บพรีเมียมที่ลูกค้าเชื่อใจเร็วขึ้น' },
+    title: { en: 'Websites that help people trust you faster.', th: 'เว็บที่ช่วยให้ลูกค้าเชื่อใจเร็วขึ้น' },
     body: { en: 'For tours and local services that need a clearer offer, stronger proof, and more WhatsApp enquiries.', th: 'สำหรับธุรกิจทัวร์และบริการที่อยากให้ข้อเสนอชัดขึ้น มีหลักฐานจริง และลูกค้าทักง่ายขึ้น' },
-    primary: { en: 'Get Free Mockup', th: 'ขอดูตัวอย่างฟรี' },
+    primary: { en: 'Get Free Mockup on WhatsApp', th: 'ขอตัวอย่างฟรีทาง WhatsApp' },
     secondary: { en: 'See Real Work', th: 'ดูผลงานจริง' },
-    micro: { en: 'Preview first. Pay only if it feels right.', th: 'ดูก่อน ถูกใจค่อยเริ่มงาน' },
-    bannerLabel: { en: 'Chiang Mai · premium web studio', th: 'เชียงใหม่ · เว็บสตูดิโอพรีเมียม' },
-    bannerTitle: { en: 'Trust, craft, and clear enquiries.', th: 'น่าเชื่อถือ สวย และติดต่อได้ง่าย' },
-    bannerCopy: { en: 'A calmer first impression for serious local businesses.', th: 'ภาพแรกที่ดูจริงจังขึ้นสำหรับธุรกิจบริการ' },
+    micro: { en: 'One homepage concept. Preview before payment.', th: 'ตัวอย่างหน้าแรกหนึ่งแบบ ดูก่อนจ่าย' },
+    proofLine: { en: 'Open live proof: Wiro4x4 and Amporn Tour.', th: 'เปิดดูผลงานจริง: Wiro4x4 และ Amporn Tour' },
+    bannerLabel: { en: 'Live work proof', th: 'หลักฐานจากเว็บจริง' },
+    bannerTitle: { en: 'Published sites, not stock mockups.', th: 'เว็บที่ออนไลน์จริง ไม่ใช่ภาพตัวอย่างปลอม' },
+    bannerCopy: { en: 'Open the references before you message. The free mockup starts after you see the standard.', th: 'เปิดดูผลงานก่อนได้ แล้วค่อยทักมาขอตัวอย่างฟรี' },
     directLabel: { en: 'Direct accountability', th: 'คุยตรงกับคนทำ' },
     directTitle: { en: 'Direct owner.', th: 'เจ้าของดูเอง' },
     trust: { en: 'Trust', th: 'เชื่อใจ' },
@@ -74,9 +75,26 @@ const proofPoints: LocalText[] = [
   { en: 'Preview first', th: 'ดูตัวอย่างก่อน' },
 ]
 
-const heroWorkProof: LocalText[] = [
-  { en: 'Wiro4x4', th: 'Wiro4x4' },
-  { en: 'Amporn Tour', th: 'Amporn Tour' },
+const heroWorkProof = [
+  { label: { en: 'Wiro4x4 live site', th: 'เว็บจริง Wiro4x4' }, link: 'https://www.wiro4x4indochina.com/' },
+  { label: { en: 'Amporn Tour live site', th: 'เว็บจริง Amporn Tour' }, link: 'https://www.amporntourchiangmai.com/' },
+]
+
+const heroLiveWorkCards = [
+  {
+    title: { en: 'Wiro4x4', th: 'Wiro4x4' },
+    detail: { en: 'Adventure tour website', th: 'เว็บทัวร์ผจญภัย' },
+    image: '/images/work/wiro4x4-home.webp',
+    alt: 'Screenshot of the live Wiro4x4 Indochina website homepage',
+    link: 'https://www.wiro4x4indochina.com/',
+  },
+  {
+    title: { en: 'Amporn Tour', th: 'Amporn Tour' },
+    detail: { en: 'Chiang Mai tour website', th: 'เว็บทัวร์เชียงใหม่' },
+    image: '/images/work/amporn-tour-home.webp',
+    alt: 'Screenshot of the live Amporn Tour Chiang Mai website homepage',
+    link: 'https://www.amporntourchiangmai.com/',
+  },
 ]
 
 const trustLedger = [
@@ -132,11 +150,6 @@ const services = [
   },
 ]
 
-const heroBanner = {
-  src: '/images/mikeweb-premium-chiangmai-banner.webp',
-  alt: 'Premium abstract Chiang Mai web studio banner with mountains, warm light, and editorial design shapes',
-}
-
 const mockupSteps = [
   ['01', { en: 'Send basics', th: 'ส่งข้อมูล' }, { en: 'Name, link, photos, offer.', th: 'ชื่อเว็บ ลิงก์ รูป ข้อเสนอ' }],
   ['02', { en: 'Review preview', th: 'ดูตัวอย่าง' }, { en: 'One homepage direction.', th: 'ทิศทางหน้าแรกหนึ่งแบบ' }],
@@ -156,7 +169,7 @@ const mockupGuardrails: LocalText[] = [
   { en: 'One homepage concept', th: 'ตัวอย่างหน้าแรกหนึ่งแบบ' },
   { en: 'One small revision', th: 'แก้เล็กน้อยหนึ่งรอบ' },
   { en: 'Preview before payment', th: 'ดูก่อนจ่าย' },
-  { en: 'Files after approval', th: 'ไฟล์หลังอนุมัติ' },
+  { en: 'Source files after approval/payment', th: 'ไฟล์หลังอนุมัติและชำระเงิน' },
 ]
 
 const workCards = [
@@ -223,9 +236,6 @@ export default function MarketingLanding({ onLogin }: MarketingLandingProps) {
               </button>
             ))}
           </div>
-          <a className="marketing-nav-cta" href={waMockup} target="_blank" rel="noreferrer noopener">
-            {text(copy.nav.free)}
-          </a>
           <button className="marketing-login-link" type="button" onClick={onLogin}>{text(copy.nav.login)}</button>
         </nav>
       </header>
@@ -240,9 +250,14 @@ export default function MarketingLanding({ onLogin }: MarketingLandingProps) {
             <a href="#work">{text(copy.hero.secondary)}</a>
           </div>
           <p className="marketing-microcopy">{text(copy.hero.micro)}</p>
+          <p className="marketing-proof-line">{text(copy.hero.proofLine)}</p>
           <div className="marketing-hero-work-proof" aria-label="Selected live work">
-            <span>{lang === 'en' ? 'Live work:' : 'ผลงานจริง:'}</span>
-            {heroWorkProof.map((project) => <a key={project.en} href="#work">{text(project)}</a>)}
+            <span>{lang === 'en' ? 'Open real sites:' : 'เปิดดูเว็บจริง:'}</span>
+            {heroWorkProof.map((project) => (
+              <a key={project.label.en} href={project.link} target="_blank" rel="noreferrer noopener">
+                {text(project.label)}
+              </a>
+            ))}
           </div>
           <div className="marketing-proof-strip" aria-label="Trust points">
             {proofPoints.map((point) => <span key={point.en}>{text(point)}</span>)}
@@ -251,9 +266,15 @@ export default function MarketingLanding({ onLogin }: MarketingLandingProps) {
 
         <div className="marketing-showcase" aria-label="Website design preview">
           <div className="marketing-banner-panel">
-            <figure className="marketing-hero-banner">
-              <img src={heroBanner.src} alt={heroBanner.alt} loading="eager" />
-            </figure>
+            <div className="marketing-live-work-gallery" aria-label="Screenshots of live client websites">
+              {heroLiveWorkCards.map((project) => (
+                <a key={project.title.en} href={project.link} target="_blank" rel="noreferrer noopener">
+                  <img src={project.image} alt={project.alt} loading="eager" />
+                  <span>{text(project.detail)}</span>
+                  <strong>{text(project.title)}</strong>
+                </a>
+              ))}
+            </div>
             <div className="marketing-banner-caption">
               <span>{text(copy.hero.bannerLabel)}</span>
               <strong>{text(copy.hero.bannerTitle)}</strong>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import GalaxyApp from './GalaxyApp'
 import LoginPage from './LoginPage'
 import MarketingLanding from './MarketingLanding'
@@ -62,6 +62,13 @@ export default function App() {
     return () => window.removeEventListener('popstate', onPopState)
   }, [])
 
+  const navigate = useCallback((nextRoute: Route) => {
+    if (normalizeRoute(window.location.pathname) !== nextRoute) {
+      window.history.pushState({}, '', nextRoute)
+    }
+    setRoute(nextRoute)
+  }, [])
+
   useEffect(() => {
     let alive = true
     fetchSession()
@@ -85,18 +92,18 @@ export default function App() {
     }
   }, [])
 
-  const navigate = (nextRoute: Route) => {
-    if (normalizeRoute(window.location.pathname) !== nextRoute) {
-      window.history.pushState({}, '', nextRoute)
+  useEffect(() => {
+    if (route === '/login' && session.status === 'authenticated') {
+      navigate('/app')
     }
-    setRoute(nextRoute)
-  }
+  }, [navigate, route, session.status])
 
   const authMessage = useMemo(() => {
-    if (session.status === 'checking') return 'Checking Mike-only session...'
-    if (session.status === 'error') return session.message || 'Session API is unavailable.'
-    if (!session.configured) return 'Login is not configured on this deployment.'
-    return ''
+    if (session.status === 'checking') return 'Checking Mike-only session before showing private access controls.'
+    if (session.status === 'authenticated') return 'Session verified. Redirecting to Moshe Galaxy Admin...'
+    if (session.status === 'error') return session.message || 'Session API is unavailable. Private access remains locked.'
+    if (!session.configured) return 'Login is not configured on this deployment. Private access remains locked.'
+    return 'Enter the Mike-only passphrase to open the private command center.'
   }, [session])
 
   if (route === '/') {
@@ -123,9 +130,10 @@ export default function App() {
 
   if (session.status === 'checking') {
     return (
-      <div className="moshe-auth-status">
-        <strong>MOSHE</strong>
-        <span>checking session...</span>
+      <div className="moshe-auth-status" role="status" aria-live="polite">
+        <p>Private access</p>
+        <strong>Moshe Galaxy Admin</strong>
+        <span>Checking Mike-only session...</span>
       </div>
     )
   }

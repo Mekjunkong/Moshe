@@ -4,3 +4,5 @@
 Thumbs.db
 node_modules/
 ψ/learn/**/origin
+.vercel
+.env*.local

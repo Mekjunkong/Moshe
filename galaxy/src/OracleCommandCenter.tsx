@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { KeyboardEvent } from 'react'
 import type { OracleData } from './oracleData'
 import { ORACLE_FALLBACK_DATA } from './oracleData'
 import './OracleCommandCenter.css'
@@ -207,10 +208,18 @@ const tabs = [
   { id: 'learnings', label: 'Learnings' },
 ] as const
 
+type OracleTabId = typeof tabs[number]['id']
+
+const focusOracleTab = (tabId: OracleTabId) => {
+  window.requestAnimationFrame(() => {
+    document.getElementById(`oracle-tab-${tabId}`)?.focus()
+  })
+}
+
 export default function OracleCommandCenter({ data }: Props) {
   const [oracleRefreshNonce, setOracleRefreshNonce] = useState(0)
   const oracle = useOracleLiveData(oracleRefreshNonce)
-  const [tab, setTab] = useState<'today' | 'intel' | 'overview' | 'wiro' | 'control' | 'improve' | 'tools' | 'sites' | 'repos' | 'sensors' | 'learnings'>('today')
+  const [tab, setTab] = useState<OracleTabId>('today')
   const [previewReason, setPreviewReason] = useState('Refresh the Oracle snapshot before any future action.')
   const [actionApprovalFlags, setActionApprovalFlags] = useState<Record<string, boolean>>({})
   const [actionNotes, setActionNotes] = useState<Record<string, string>>({})
@@ -875,6 +884,21 @@ export default function OracleCommandCenter({ data }: Props) {
   const sessionUnlocked = sessionState.status === 'authenticated'
   const controlActionStatus = previewState.status === 'loading' ? 'RUNNING' : sessionUnlocked ? 'ARMED' : 'LOCKED'
   const controlActionCount = oracle.automation?.actions.length ?? 0
+  const localAdminLauncher = 'ORACLE_SESSION_SECRET=... npm run dev'
+  const handleTabsKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const currentIndex = tabs.findIndex((item) => item.id === tab)
+    const moveTo = (nextIndex: number) => {
+      const nextTab = tabs[(nextIndex + tabs.length) % tabs.length]
+      event.preventDefault()
+      setTab(nextTab.id)
+      focusOracleTab(nextTab.id)
+    }
+
+    if (event.key === 'ArrowRight') moveTo(currentIndex + 1)
+    if (event.key === 'ArrowLeft') moveTo(currentIndex - 1)
+    if (event.key === 'Home') moveTo(0)
+    if (event.key === 'End') moveTo(tabs.length - 1)
+  }
 
   return (
     <aside className="oracle-shell" aria-label="Oracle OS command center">
@@ -909,7 +933,7 @@ export default function OracleCommandCenter({ data }: Props) {
         ))}
       </dl>
 
-      <div className="oracle-tabs" role="tablist" aria-label="Oracle sections">
+      <div className="oracle-tabs" role="tablist" aria-label="Oracle sections" onKeyDown={handleTabsKeyDown}>
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -1385,7 +1409,7 @@ export default function OracleCommandCenter({ data }: Props) {
                   </button>
                   <small>Preview-only calls do not mutate the dashboard. Execution stays server-side.</small>
                 </div>
-                <div className="oracle-preview-result">
+                <div className="oracle-preview-result" role="status" aria-live="polite">
                   <div className="oracle-preview-result-head">
                     <strong>{previewAction?.title ?? 'Refresh Oracle snapshot'}</strong>
                     <div className="oracle-preview-result-badges">
@@ -1439,24 +1463,29 @@ export default function OracleCommandCenter({ data }: Props) {
                             Lock session
                           </button>
                         </div>
-                        <small>{sessionState.message}</small>
+                        <small id="overview-session-status" role="status" aria-live="polite">{sessionState.message}</small>
                         <small>{sessionState.detail}</small>
                         {sessionState.actor && <small>Signed in as {sessionState.actor}</small>}
                         {sessionState.expiresAt && <small>Expires at {new Date(sessionState.expiresAt).toLocaleString()}</small>}
                       </>
                     ) : (
-                      <small>Set ORACLE_SESSION_SECRET on the server to enable the Mike-only session gate.</small>
+                      <small>
+                        Session gate is not configured in this runtime. Browser execute controls stay disabled; use local/admin-only runtime with <code>{localAdminLauncher}</code>.
+                      </small>
                     )}
                     <button
                       type="button"
                       className="oracle-preview-button"
                       onClick={runSnapshotExecute}
                       disabled={sessionState.status !== 'authenticated'}
+                      aria-describedby="overview-execute-help"
                     >
                       Execute refresh-oracle-snapshot
                     </button>
-                    <small>
-                      Browser execution is disabled until a signed session cookie exists. The API still keeps a full audit trail.
+                    <small id="overview-execute-help">
+                      {sessionState.status === 'authenticated'
+                        ? 'Signed Mike-only session is active. The API still keeps a full audit trail.'
+                        : `Browser execution is locked here. Use local/admin-only runtime with ${localAdminLauncher} after setting ORACLE_SESSION_SECRET.`}
                     </small>
                   </div>
                 </div>
@@ -1663,7 +1692,7 @@ export default function OracleCommandCenter({ data }: Props) {
                 <strong>Session gate</strong>
                 <span className={`oracle-risk-badge ${sessionUnlocked ? 'low' : 'medium'}`}>{sessionState.status.toUpperCase()}</span>
               </div>
-              <p>{sessionState.message}</p>
+              <p role="status" aria-live="polite">{sessionState.message}</p>
               <small>{sessionState.detail}</small>
               {sessionState.actor && <small>Actor: {sessionState.actor}</small>}
               {sessionState.expiresAt && <small>Expires: {new Date(sessionState.expiresAt).toLocaleString()}</small>}
@@ -1687,7 +1716,7 @@ export default function OracleCommandCenter({ data }: Props) {
                   </div>
                 </>
               ) : (
-                <small>Set ORACLE_SESSION_SECRET on Vercel/local runtime to enable browser controls.</small>
+                <small>Session gate is not configured here. Browser controls remain disabled; use local/admin-only runtime with <code>{localAdminLauncher}</code> after setting ORACLE_SESSION_SECRET.</small>
               )}
             </article>
 
@@ -2608,7 +2637,8 @@ export default function OracleCommandCenter({ data }: Props) {
           <div className="oracle-tools-note">
             <strong>Need real terminal?</strong>
             <p>
-              Message Moshe in Telegram with the command or use local admin mode on Mike’s Mac. The public phone UI stays safe and useful.
+              Message Moshe in Telegram with the command, or start Mike’s local admin runtime with <code>{localAdminLauncher}</code>.
+              The public phone UI stays safe and useful.
             </p>
           </div>
         </section>
