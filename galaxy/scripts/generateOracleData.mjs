@@ -476,11 +476,17 @@ function oracleDashboardStatus() {
   return checkWebsite('Moshe Oracle Dashboard', configuredUrl);
 }
 
+function isSelfGeneratedOracleSnapshot(line, repoPath) {
+  const normalized = String(line).slice(3).trim().replace(/\\/g, '/');
+  return repoPath.endsWith('/Moshe') && normalized === 'galaxy/public/oracleLive.json';
+}
+
 function repoStatus(name, path) {
   if (!existsSync(path) || !existsSync(join(path, '.git'))) return null;
   const changed = safeExec('git', ['status', '--short'], path, '')
     .split('\n')
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter((line) => !isSelfGeneratedOracleSnapshot(line, path));
   const untrackedFiles = changed.filter((line) => line.startsWith('??')).length;
   const modifiedFiles = changed.length - untrackedFiles;
   const protectedTouched = changed.some((line) => /(^|\s)(\.env|\.vercel\/.*env|.*secret.*|.*credential.*|package-lock\.json|pnpm-lock\.yaml|yarn\.lock)/i.test(line));
