@@ -858,6 +858,67 @@ export interface OracleTerminalPolicy {
   note: string
 }
 
+
+export interface OracleReportCandidateScore {
+  id: string
+  name: string
+  cadence: string
+  evidence: number
+  novelty: number
+  actionability: number
+  wiroFit: number
+  annoyancePenalty: number
+  total: number
+  decision: 'send' | 'digest' | 'silent'
+  reason: string
+}
+
+export interface OracleReportNoiseControl {
+  updatedAt: string
+  status: 'active' | 'watch' | 'blocked'
+  sendThreshold: number
+  digestThreshold: number
+  silenceRule: string
+  summary: string
+  candidates: OracleReportCandidateScore[]
+  gates: OracleReportQualityGate[]
+}
+
+export interface OracleMemoryIndexSource {
+  id: string
+  label: string
+  path: string
+  status: 'live' | 'watch' | 'missing'
+  records: number
+  lastUpdated?: string
+  role: string
+}
+
+export interface OracleUnifiedMemoryIndex {
+  updatedAt: string
+  status: 'live' | 'watch' | 'missing'
+  summary: string
+  sources: OracleMemoryIndexSource[]
+  totalRecords: number
+  gaps: string[]
+  reconcileActions: string[]
+}
+
+export interface OracleTruthPanelCheck {
+  id: string
+  label: string
+  status: 'pass' | 'watch' | 'fail'
+  detail: string
+}
+
+export interface OracleTruthPanel {
+  updatedAt: string
+  status: 'healthy' | 'watch' | 'critical'
+  summary: string
+  checks: OracleTruthPanelCheck[]
+  nextSafeAction: string
+}
+
 export interface OracleIntelligenceLayer {
   updatedAt: string
   summary: string
@@ -910,6 +971,9 @@ export interface OracleData {
   phase5H?: OraclePhase5HLayer
   phase5I?: OraclePhase5ILayer
   phase5J?: OraclePhase5JLayer
+  reportNoiseControl?: OracleReportNoiseControl
+  unifiedMemoryIndex?: OracleUnifiedMemoryIndex
+  truthPanel?: OracleTruthPanel
   nextActions: string[]
 }
 
@@ -1180,6 +1244,32 @@ export const ORACLE_FALLBACK_DATA: OracleData = {
     hermesConfig: { configured: false, serverName: 'arra_oracle', restartRequired: true, configPath: '~/.hermes/config.yaml' },
     checks: [],
     nextStep: 'Run npm run build.',
+  },
+  reportNoiseControl: {
+    updatedAt: new Date(0).toISOString(),
+    status: 'watch',
+    sendThreshold: 70,
+    digestThreshold: 45,
+    silenceRule: 'Stay silent unless a report has evidence, novelty, and one clear safe action.',
+    summary: 'Waiting for live report noise-control snapshot.',
+    candidates: [],
+    gates: [],
+  },
+  unifiedMemoryIndex: {
+    updatedAt: new Date(0).toISOString(),
+    status: 'missing',
+    summary: 'Waiting for live unified memory index.',
+    sources: [],
+    totalRecords: 0,
+    gaps: ['Generate a fresh Oracle snapshot.'],
+    reconcileActions: ['Run npm run generate:oracle.'],
+  },
+  truthPanel: {
+    updatedAt: new Date(0).toISOString(),
+    status: 'watch',
+    summary: 'Waiting for live Oracle truth panel.',
+    checks: [],
+    nextSafeAction: 'Run npm run generate:oracle.',
   },
   nextActions: [
     'Run node scripts/generateOracleData.mjs',

@@ -1,11 +1,11 @@
 {
-  "generated": "2026-05-10T01:40:42.051Z",
+  "generated": "2026-05-10T12:56:13.545Z",
   "born": "2026-04-18",
-  "level3Phase": "Phase 5J: Arra Oracle MCP connection fixed for semantic memory",
+  "level3Phase": "Phase 5K: Noise control, unified memory index, and truth panel",
   "stats": {
-    "learnings": 32,
-    "retrospectives": 27,
-    "activeProjects": 15,
+    "learnings": 42,
+    "retrospectives": 29,
+    "activeProjects": 16,
     "inboxItems": 1,
     "writingDocs": 0,
     "labExperiments": 0
@@ -17,37 +17,37 @@
       "summary": "Mike-only signed session cookie issued."
     },
     {
-      "title": "Oracle action feedback loop",
-      "file": "oracle-action-feedback.md",
+      "title": "2026-05-10 — agency-agents repo learning",
+      "file": "2026-05-10-agency-agents-repo.md",
       "date": "2026-05-10",
-      "summary": "updated: 2026-05-10T01:39:26.800Z  Oracle action feedback loop The Oracle now turns session and action audit events into reusable learnings."
+      "summary": "Repo: https://github.com/msitarzewski/agency-agents Local inspection clone: /tmp/moshe-repo-learn/agency-agents. Latest inspected commit: 783f6a7 Fix …"
     },
     {
-      "title": "Mike Web Studio Vercel deploy target",
-      "file": "2026-05-09-mikewebstudio-vercel-project-target.md",
-      "date": "2026-05-09",
-      "summary": "date: 2026-05-09 17:04 +07 tags: [memory, moshe, mikewebstudio, vercel, deploy] source: kanban task t_582afb39"
+      "title": "2026-05-10 — Kanya Massage website details",
+      "file": "2026-05-10-kanya-massage-details.md",
+      "date": "2026-05-10",
+      "summary": "- Repo: ~/workspace/kanya-massage (https://github.com/Mekjunkong/kanya-massage). - Mike supplied updated business details: WhatsApp/phone 061 660 2734…"
     },
     {
-      "title": "Lesson: Separate verified implementation from publish/deploy state",
-      "file": "2026-05-09_wiro-kanban-predeploy-boundary.md",
-      "date": "2026-05-09",
-      "summary": "slug: wiro-kanban-predeploy-boundary tags: [memory, telegram, moshe, wiro, kanban, deploy] source: rrr telegram session"
+      "title": "2026-05-10 — Mixed Money Opportunity Radar",
+      "file": "2026-05-10-mixed-money-radar.md",
+      "date": "2026-05-10",
+      "summary": "Mike asked whether Hermes/Moshe can do more than create websites and help identify real-world money-making use cases through daily research. Decision/…"
     },
     {
-      "title": "2026-05-10 Wiro4x4 market update learning",
-      "file": "2026-05-10-wiro-market-update.md",
-      "date": "2026-05-09",
-      "summary": "Daily 06:00 research signals: - Accessible competitor pricing for private Northern Thailand tours: Green Trails / Chiang Mai à La Carte 5D Mae Hong So…"
+      "title": "Money Pipeline weekly decision review automation — 2026-05-10",
+      "file": "2026-05-10-money-pipeline-weekly-decision-review.md",
+      "date": "2026-05-10",
+      "summary": "Moshe created a weekly decision layer for the Money Pipeline. The new Weekly Money Decision Review cron job (2f2d282caa6d) runs Mondays at 09:30 Chian…"
     }
   ],
-  "retrospectivesCount": 27,
+  "retrospectivesCount": 29,
   "retrospectivesRecent": [
+    "2026-05-10 — Hermes + Oracle Options 1–3 — 2026-05-10",
+    "2026-05-10 — Oracle Phase 5K deploy + cron noise gate — 2026-05-10",
     "2026-05-09 — Oracle dashboard responsive hero push — 2026-05-09",
     "2026-05-09 — WIRO homepage deploy — 2026-05-09 12:16 +07",
-    "2026-05-09 — WIRO homepage Kanban critique execution — 2026-05-09",
-    "2026-05-09 — WIRO homepage Kanban mission — 2026-05-09",
-    "2026-05-07 — Mike Web Studio Free Mockup Offer Deploy — 2026-05-07"
+    "2026-05-09 — WIRO homepage Kanban critique execution — 2026-05-09"
   ],
   "activeCrons": [
     {
@@ -117,7 +117,7 @@
       "ok": true,
       "status": 200,
       "responseMs": null,
-      "checkedAt": "2026-05-10T01:40:30.378Z",
+      "checkedAt": "2026-05-10T12:56:02.467Z",
       "note": "local build target; set ORACLE_DASHBOARD_URL after deploy for public uptime checks"
     },
     {
@@ -125,8 +125,8 @@
       "url": "https://aum-hippie-young.vercel.app/",
       "ok": true,
       "status": 200,
-      "responseMs": 179,
-      "checkedAt": "2026-05-10T01:40:30.557Z",
+      "responseMs": 210,
+      "checkedAt": "2026-05-10T12:56:02.677Z",
       "note": "reachable"
     },
     {
@@ -134,8 +134,8 @@
       "url": "https://www.wiro4x4indochina.com/",
       "ok": true,
       "status": 200,
-      "responseMs": 200,
-      "checkedAt": "2026-05-10T01:40:30.599Z",
+      "responseMs": 186,
+      "checkedAt": "2026-05-10T12:56:02.674Z",
       "note": "reachable"
     }
   ],
@@ -144,15 +144,15 @@
       "name": "Moshe",
       "path": "/Users/pasuthunjunkong/workspace/Moshe",
       "branch": "oracle-terminal-usability-fix",
-      "commit": "1083182",
-      "commitFull": "10831825711afb1026840b2d7826136eb320dd21",
-      "commitSubject": "Refresh Oracle live snapshot after hygiene fix",
-      "dirty": false,
-      "changedFiles": 0,
-      "modifiedFiles": 0,
-      "untrackedFiles": 0,
+      "commit": "9fbdbbf",
+      "commitFull": "9fbdbbf4592605992b654546006fcc98247ac4bf",
+      "commitSubject": "Sync deployed Oracle live snapshot",
+      "dirty": true,
+      "changedFiles": 5,
+      "modifiedFiles": 4,
+      "untrackedFiles": 1,
       "protectedTouched": false,
-      "lastCommitAt": "2026-05-10T08:39:31+07:00",
+      "lastCommitAt": "2026-05-10T08:41:40+07:00",
       "github": "Mekjunkong/Moshe",
       "remoteHost": "github.com"
     },
@@ -194,34 +194,34 @@
       "provider": "vercel",
       "project": "galaxy",
       "state": "READY",
+      "url": "https://galaxy-9ye7wub1v-pasuthun-junkongs-projects.vercel.app",
+      "createdAt": "2026-05-10T12:48:18.473Z",
+      "gitCommitSha": "9fbdbbf4592605992b654546006fcc98247ac4bf",
+      "gitCommitMessage": "Sync deployed Oracle live snapshot",
+      "gitCommitRef": "oracle-terminal-usability-fix",
+      "gitDirty": true,
+      "note": "read via Vercel CLI auth; no token value exposed"
+    },
+    {
+      "provider": "vercel",
+      "project": "galaxy",
+      "state": "READY",
+      "url": "https://galaxy-cwpa4vyuk-pasuthun-junkongs-projects.vercel.app",
+      "createdAt": "2026-05-10T01:40:48.728Z",
+      "gitCommitSha": "10831825711afb1026840b2d7826136eb320dd21",
+      "gitCommitMessage": "Refresh Oracle live snapshot after hygiene fix",
+      "gitCommitRef": "oracle-terminal-usability-fix",
+      "gitDirty": true,
+      "note": "read via Vercel CLI auth; no token value exposed"
+    },
+    {
+      "provider": "vercel",
+      "project": "galaxy",
+      "state": "READY",
       "url": "https://galaxy-riowlb64o-pasuthun-junkongs-projects.vercel.app",
       "createdAt": "2026-05-09T09:57:54.027Z",
       "gitCommitSha": "23a5a4fc05c582ddcce757b0d92d15ec467c4118",
       "gitCommitMessage": "fix: polish Oracle dashboard responsive hero",
-      "gitCommitRef": "oracle-terminal-usability-fix",
-      "gitDirty": true,
-      "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "vercel",
-      "project": "galaxy",
-      "state": "READY",
-      "url": "https://galaxy-i4ycdclu6-pasuthun-junkongs-projects.vercel.app",
-      "createdAt": "2026-05-08T05:26:27.832Z",
-      "gitCommitSha": "77bb9b64985ce73c2bec5fbd649756466137f0bb",
-      "gitCommitMessage": "Refresh Oracle snapshot after tools replacement",
-      "gitCommitRef": "oracle-terminal-usability-fix",
-      "gitDirty": true,
-      "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "vercel",
-      "project": "galaxy",
-      "state": "READY",
-      "url": "https://galaxy-3shctyzca-pasuthun-junkongs-projects.vercel.app",
-      "createdAt": "2026-05-07T23:43:29.298Z",
-      "gitCommitSha": "77bb9b64985ce73c2bec5fbd649756466137f0bb",
-      "gitCommitMessage": "Refresh Oracle snapshot after tools replacement",
       "gitCommitRef": "oracle-terminal-usability-fix",
       "gitDirty": true,
       "note": "read via Vercel CLI auth; no token value exposed"
@@ -235,7 +235,7 @@
       "apiStatus": "ok",
       "private": false,
       "defaultBranch": "main",
-      "pushedAt": "2026-05-10T01:40:01Z",
+      "pushedAt": "2026-05-10T01:41:42Z",
       "openIssues": 0,
       "openPullRequests": 0,
       "latestWorkflow": null,
@@ -311,7 +311,7 @@
       "project": "Oracle OS",
       "title": "5 credential(s) not configured",
       "detail": "VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_PROJECT_NAME, VERCEL_TEAM_ID, GITHUB_TOKEN",
-      "detectedAt": "2026-05-10T01:40:42.051Z"
+      "detectedAt": "2026-05-10T12:56:13.545Z"
     }
   ],
   "recommendations": [
@@ -337,15 +337,43 @@
   },
   "deployTimeline": [
     {
+      "provider": "vercel",
+      "project": "galaxy",
+      "event": "deploy",
+      "state": "READY",
+      "url": "https://galaxy-9ye7wub1v-pasuthun-junkongs-projects.vercel.app",
+      "timestamp": "2026-05-10T12:48:18.473Z",
+      "deployedCommitSha": "9fbdbbf4592605992b654546006fcc98247ac4bf",
+      "deployedCommitMessage": "Sync deployed Oracle live snapshot",
+      "sourceRepo": "Moshe",
+      "sourceCommitSha": "9fbdbbf4592605992b654546006fcc98247ac4bf",
+      "syncState": "in-sync",
+      "note": "read via Vercel CLI auth; no token value exposed"
+    },
+    {
       "provider": "git",
       "project": "Moshe",
       "event": "commit",
-      "state": "clean",
-      "timestamp": "2026-05-10T08:39:31+07:00",
+      "state": "uncommitted-changes",
+      "timestamp": "2026-05-10T08:41:40+07:00",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "10831825711afb1026840b2d7826136eb320dd21",
-      "syncState": "in-sync",
-      "note": "Refresh Oracle live snapshot after hygiene fix"
+      "sourceCommitSha": "9fbdbbf4592605992b654546006fcc98247ac4bf",
+      "syncState": "behind",
+      "note": "Sync deployed Oracle live snapshot"
+    },
+    {
+      "provider": "vercel",
+      "project": "galaxy",
+      "event": "deploy",
+      "state": "READY",
+      "url": "https://galaxy-cwpa4vyuk-pasuthun-junkongs-projects.vercel.app",
+      "timestamp": "2026-05-10T01:40:48.728Z",
+      "deployedCommitSha": "10831825711afb1026840b2d7826136eb320dd21",
+      "deployedCommitMessage": "Refresh Oracle live snapshot after hygiene fix",
+      "sourceRepo": "Moshe",
+      "sourceCommitSha": "9fbdbbf4592605992b654546006fcc98247ac4bf",
+      "syncState": "behind",
+      "note": "read via Vercel CLI auth; no token value exposed"
     },
     {
       "provider": "vercel",
@@ -357,7 +385,7 @@
       "deployedCommitSha": "23a5a4fc05c582ddcce757b0d92d15ec467c4118",
       "deployedCommitMessage": "fix: polish Oracle dashboard responsive hero",
       "sourceRepo": "Moshe",
-      "sourceCommitSha": "10831825711afb1026840b2d7826136eb320dd21",
+      "sourceCommitSha": "9fbdbbf4592605992b654546006fcc98247ac4bf",
       "syncState": "behind",
       "note": "read via Vercel CLI auth; no token value exposed"
     },
@@ -373,34 +401,6 @@
       "note": "Improve WIRO homepage conversion proof"
     },
     {
-      "provider": "vercel",
-      "project": "galaxy",
-      "event": "deploy",
-      "state": "READY",
-      "url": "https://galaxy-i4ycdclu6-pasuthun-junkongs-projects.vercel.app",
-      "timestamp": "2026-05-08T05:26:27.832Z",
-      "deployedCommitSha": "77bb9b64985ce73c2bec5fbd649756466137f0bb",
-      "deployedCommitMessage": "Refresh Oracle snapshot after tools replacement",
-      "sourceRepo": "Moshe",
-      "sourceCommitSha": "10831825711afb1026840b2d7826136eb320dd21",
-      "syncState": "behind",
-      "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
-      "provider": "vercel",
-      "project": "galaxy",
-      "event": "deploy",
-      "state": "READY",
-      "url": "https://galaxy-3shctyzca-pasuthun-junkongs-projects.vercel.app",
-      "timestamp": "2026-05-07T23:43:29.298Z",
-      "deployedCommitSha": "77bb9b64985ce73c2bec5fbd649756466137f0bb",
-      "deployedCommitMessage": "Refresh Oracle snapshot after tools replacement",
-      "sourceRepo": "Moshe",
-      "sourceCommitSha": "10831825711afb1026840b2d7826136eb320dd21",
-      "syncState": "behind",
-      "note": "read via Vercel CLI auth; no token value exposed"
-    },
-    {
       "provider": "git",
       "project": "Aum Hippie Young",
       "event": "commit",
@@ -413,17 +413,17 @@
     }
   ],
   "automation": {
-    "enabled": true,
-    "authConfigured": true,
-    "sessionConfigured": true,
+    "enabled": false,
+    "authConfigured": false,
+    "sessionConfigured": false,
     "endpoint": "/api/oracle/actions",
     "sessionEndpoint": "/api/oracle/session",
     "authHeader": "HttpOnly signed session cookie",
-    "authMethod": "signed-session-cookie",
+    "authMethod": "preview-only",
     "auditPath": "/tmp/oracle-action-audit.jsonl",
-    "executionMode": "server-enabled",
+    "executionMode": "preview-only",
     "sessionTtlMinutes": 480,
-    "note": "Oracle execute mode is gated by a Mike-only signed session cookie with audit logging.",
+    "note": "Preview trigger is wired to the action API path. Set ORACLE_SESSION_SECRET to arm Mike-only session-gated execution.",
     "actions": [
       {
         "id": "refresh-oracle-snapshot",
@@ -464,9 +464,9 @@
     ]
   },
   "operationalReadiness": {
-    "score": 68,
-    "status": "watch",
-    "summary": "1 failing check(s), 2 watch item(s). Fix failures before relying on autonomy.",
+    "score": 82,
+    "status": "steady",
+    "summary": "3 watch item(s). Oracle is usable, but not fully verified.",
     "checks": [
       {
         "label": "Sites online",
@@ -477,7 +477,7 @@
       {
         "label": "Repo cleanliness",
         "status": "watch",
-        "detail": "1 tracked repo(s) have local changes.",
+        "detail": "2 tracked repo(s) have local changes.",
         "weight": 20
       },
       {
@@ -488,14 +488,14 @@
       },
       {
         "label": "Live deploy freshness",
-        "status": "fail",
-        "detail": "galaxy: behind",
+        "status": "pass",
+        "detail": "galaxy: in-sync",
         "weight": 20
       },
       {
         "label": "Session gate",
-        "status": "pass",
-        "detail": "Mike-only signed session gate is configured.",
+        "status": "watch",
+        "detail": "Browser stays preview-only until ORACLE_SESSION_SECRET is configured.",
         "weight": 10
       },
       {
@@ -513,7 +513,7 @@
     ]
   },
   "intelligenceLayer": {
-    "updatedAt": "2026-05-10T01:40:42.336Z",
+    "updatedAt": "2026-05-10T12:56:13.834Z",
     "summary": "Oracle is learning from ψ and opportunity artifacts. Top money radar: AI Inquiry and Quote Copilot for Tour Operators (95/100).",
     "todayLearnings": [
       {
@@ -658,7 +658,7 @@
       }
     ],
     "autonomyRouter": {
-      "updatedAt": "2026-05-10T01:40:42.336Z",
+      "updatedAt": "2026-05-10T12:56:13.834Z",
       "phase": "phase_4",
       "summary": "Phase 4 is active: Oracle classifies every recommendation before action and keeps execution behind safe/draft/approval lanes.",
       "lanes": [
@@ -815,9 +815,9 @@
   "terminal": {
     "enabled": false,
     "terminalEnabled": false,
-    "sessionConfigured": true,
+    "sessionConfigured": false,
     "endpoint": "/api/oracle/terminal",
-    "authMethod": "signed-session-cookie",
+    "authMethod": "preview-only",
     "defaultCwd": "/Users/pasuthunjunkong/workspace/Moshe",
     "allowedCwdPrefixes": [
       "/Users/pasuthunjunkong/workspace/Moshe",
@@ -826,15 +826,15 @@
     "note": "Terminal panel is visible but execution is disabled until ORACLE_TERMINAL_ENABLED=true is set on a trusted runtime."
   },
   "phase5A": {
-    "updatedAt": "2026-05-10T01:40:42.051Z",
+    "updatedAt": "2026-05-10T12:56:13.545Z",
     "phase": "phase_5a",
     "summary": "Phase 5A active: Oracle now has closed-loop signal quality, repo hygiene, and deployment freshness sensors before safe execution.",
     "feedbackLedger": {
-      "updatedAt": "2026-05-10T01:40:42.051Z",
+      "updatedAt": "2026-05-10T12:56:13.545Z",
       "summary": "12 signals tracked; 1 high-actionability; 0 need approval.",
       "signals": [
         {
-          "id": "audit-6bf92219-ed36-41e9-be70-e1b7cd51e06a",
+          "id": "audit-ac334355-1102-4751-b41b-ab0be007e857",
           "source": "audit:oracle-session",
           "businessArea": "oracle_os",
           "actionability": "low",
@@ -845,7 +845,7 @@
           "valueSignal": "Mike-only signed session cookie issued."
         },
         {
-          "id": "audit-1860b201-128c-4925-bf84-958ab1200a9e",
+          "id": "audit-4be41a54-8723-4f20-8135-3135ef7ef16d",
           "source": "audit:oracle-session",
           "businessArea": "oracle_os",
           "actionability": "low",
@@ -856,7 +856,7 @@
           "valueSignal": "Mike-only signed session cookie issued."
         },
         {
-          "id": "audit-3c4fcdbb-caff-43fb-af27-886bf816c30b",
+          "id": "audit-13b08de3-0596-44ff-8ba2-7bd9d40e19f0",
           "source": "audit:oracle-session",
           "businessArea": "oracle_os",
           "actionability": "low",
@@ -867,7 +867,7 @@
           "valueSignal": "Mike-only signed session cookie issued."
         },
         {
-          "id": "audit-f27cc803-d4e4-4c4e-b484-07a5b5be9151",
+          "id": "audit-b1ce49fd-804a-41ed-a20c-d7e6db10199f",
           "source": "audit:oracle-session",
           "businessArea": "oracle_os",
           "actionability": "low",
@@ -878,7 +878,7 @@
           "valueSignal": "Mike-only signed session cookie issued."
         },
         {
-          "id": "audit-14204d06-b0db-4d3e-beb9-5bdf9ae58e8e",
+          "id": "audit-326cb929-f8b1-4beb-8c96-5ce5639c8db8",
           "source": "audit:oracle-session",
           "businessArea": "oracle_os",
           "actionability": "low",
@@ -976,18 +976,18 @@
       "nextLearningStep": "Capture Mike feedback as useful/noisy/missing-context, then prioritize future reports by value signal."
     },
     "repoHygiene": {
-      "updatedAt": "2026-05-10T01:40:42.051Z",
+      "updatedAt": "2026-05-10T12:56:13.545Z",
       "verdict": "review",
-      "summary": "1 repo(s) need review before ship/deploy recommendations.",
+      "summary": "2 repo(s) need review before ship/deploy recommendations.",
       "items": [
         {
           "repo": "Moshe",
           "branch": "oracle-terminal-usability-fix",
-          "changedFiles": 0,
-          "untrackedFiles": 0,
+          "changedFiles": 5,
+          "untrackedFiles": 1,
           "protectedTouched": false,
-          "verdict": "clean",
-          "recommendation": "Clean for read-only monitoring."
+          "verdict": "review",
+          "recommendation": "Review scope before commit/deploy; keep unrelated files uncommitted."
         },
         {
           "repo": "Aum Hippie Young",
@@ -1010,15 +1010,15 @@
       ]
     },
     "deploymentFreshnessGap": {
-      "updatedAt": "2026-05-10T01:40:42.051Z",
+      "updatedAt": "2026-05-10T12:56:13.545Z",
       "verdict": "review_before_ship",
-      "summary": "galaxy: live 23a5a4f vs local 1083182 · behind",
+      "summary": "galaxy: live 9fbdbbf vs local 9fbdbbf · in-sync",
       "liveProject": "galaxy",
-      "liveCommit": "23a5a4fc05c5",
-      "localCommit": "10831825711a",
+      "liveCommit": "9fbdbbf45926",
+      "localCommit": "9fbdbbf45926",
       "snapshotAgeMinutes": 0,
       "worktreeDirty": true,
-      "dirtyRepoCount": 1,
+      "dirtyRepoCount": 2,
       "recommendation": "Review repo hygiene and deployment evidence before recommending ship/deploy."
     },
     "phase5BRequirements": [
@@ -1030,12 +1030,12 @@
     ]
   },
   "phase5B": {
-    "updatedAt": "2026-05-10T01:40:42.051Z",
+    "updatedAt": "2026-05-10T12:56:13.545Z",
     "phase": "phase_5b",
     "summary": "Phase 5B active: feedback now has a signed-session persistence endpoint, evidence chains, safe executor queue, approval inbox states, and value/noise scoring.",
     "feedbackPersistence": {
       "endpoint": "/api/oracle/feedback",
-      "configured": true,
+      "configured": false,
       "pathLabel": "oracle-feedback-ledger.jsonl",
       "entries": [],
       "counts": {
@@ -1054,9 +1054,9 @@
         "status": "complete",
         "summary": "Evidence for regenerating the local Oracle snapshot without external side effects.",
         "proofs": [
-          "snapshot generated 2026-05-10T01:40:42.051Z",
-          "Moshe repo HEAD 1083182",
-          "readiness watch (68)"
+          "snapshot generated 2026-05-10T12:56:13.545Z",
+          "Moshe repo HEAD 9fbdbbf",
+          "readiness steady (82)"
         ],
         "missing": [],
         "rollbackNote": "Re-run the previous committed oracleLive.json or discard the generated JSON diff before commit/deploy."
@@ -1067,14 +1067,13 @@
         "status": "partial",
         "summary": "Evidence chain required before any production dashboard redeploy request.",
         "proofs": [
-          "latest deploy galaxy: behind",
+          "latest deploy galaxy: in-sync",
           "repo hygiene review",
           "deployment freshness review_before_ship"
         ],
         "missing": [
           "clean repo hygiene verdict",
-          "in-sync deployment freshness verdict",
-          "steady/excellent operational readiness"
+          "in-sync deployment freshness verdict"
         ],
         "rollbackNote": "Keep previous Vercel deployment URL available and alias back if a production smoke check fails."
       },
@@ -1126,7 +1125,7 @@
         "risk": "medium",
         "requestedAction": "Prepare options and evidence for Mike, but do not contact prospects.",
         "approvalTrigger": "Mike approval required before execution.",
-        "expiresAt": "2026-05-11T01:40:42.051Z"
+        "expiresAt": "2026-05-11T12:56:13.545Z"
       },
       {
         "id": "approval-approval-outreach-send",
@@ -1135,7 +1134,7 @@
         "risk": "medium",
         "requestedAction": "Keep outreach as a draft and wait for explicit Mike approval.",
         "approvalTrigger": "Mike approval required before execution.",
-        "expiresAt": "2026-05-11T01:40:42.051Z"
+        "expiresAt": "2026-05-11T12:56:13.545Z"
       },
       {
         "id": "approval-approval-publish-landing",
@@ -1144,7 +1143,7 @@
         "risk": "medium",
         "requestedAction": "Prepare review checklist for Mike.",
         "approvalTrigger": "Mike approval required before execution.",
-        "expiresAt": "2026-05-11T01:40:42.051Z"
+        "expiresAt": "2026-05-11T12:56:13.545Z"
       },
       {
         "id": "approval-action-dispatch-wiro-ci",
@@ -1154,7 +1153,7 @@
         "requestedAction": "Preview the workflow request and wait for Mike approval before dispatch.",
         "approvalTrigger": "Creates an external GitHub event and consumes CI minutes.",
         "evidenceChainId": "wiro-ci-evidence",
-        "expiresAt": "2026-05-11T01:40:42.051Z"
+        "expiresAt": "2026-05-11T12:56:13.545Z"
       },
       {
         "id": "approval-action-vercel-redeploy",
@@ -1164,7 +1163,7 @@
         "requestedAction": "Prepare deployment evidence and wait for Mike approval.",
         "approvalTrigger": "Changes live production surface and must be tied to verified commits/artifacts.",
         "evidenceChainId": "oracle-deploy-evidence",
-        "expiresAt": "2026-05-11T01:40:42.051Z"
+        "expiresAt": "2026-05-11T12:56:13.545Z"
       }
     ],
     "businessValueScores": [
@@ -1220,7 +1219,7 @@
     ]
   },
   "phase5C": {
-    "updatedAt": "2026-05-10T01:40:42.051Z",
+    "updatedAt": "2026-05-10T12:56:13.545Z",
     "phase": "phase_5c",
     "summary": "Phase 5C active: dashboard feedback buttons, persistent safe executor run states, promotion gates, Telegram approval payloads, and live smoke readiness are wired.",
     "feedbackButtons": {
@@ -1233,11 +1232,11 @@
         "action-taken",
         "ignored"
       ],
-      "status": "wired"
+      "status": "locked"
     },
     "executorRuns": {
       "endpoint": "/api/oracle/executor",
-      "configured": true,
+      "configured": false,
       "pathLabel": "oracle-executor-runs.jsonl",
       "runs": [],
       "counts": {
@@ -1283,7 +1282,7 @@
           "reject",
           "defer"
         ],
-        "expiresAt": "2026-05-11T01:40:42.051Z"
+        "expiresAt": "2026-05-11T12:56:13.545Z"
       },
       {
         "id": "telegram-approval-approval-outreach-send",
@@ -1294,7 +1293,7 @@
           "reject",
           "defer"
         ],
-        "expiresAt": "2026-05-11T01:40:42.051Z"
+        "expiresAt": "2026-05-11T12:56:13.545Z"
       },
       {
         "id": "telegram-approval-approval-publish-landing",
@@ -1305,7 +1304,7 @@
           "reject",
           "defer"
         ],
-        "expiresAt": "2026-05-11T01:40:42.051Z"
+        "expiresAt": "2026-05-11T12:56:13.545Z"
       },
       {
         "id": "telegram-approval-action-dispatch-wiro-ci",
@@ -1316,7 +1315,7 @@
           "reject",
           "defer"
         ],
-        "expiresAt": "2026-05-11T01:40:42.051Z"
+        "expiresAt": "2026-05-11T12:56:13.545Z"
       },
       {
         "id": "telegram-approval-action-vercel-redeploy",
@@ -1327,7 +1326,7 @@
           "reject",
           "defer"
         ],
-        "expiresAt": "2026-05-11T01:40:42.051Z"
+        "expiresAt": "2026-05-11T12:56:13.545Z"
       }
     ],
     "liveSmokeReadiness": {
@@ -1351,12 +1350,12 @@
         {
           "label": "Snapshot freshness",
           "status": "pass",
-          "detail": "0m old at 2026-05-10T01:40:42.051Z."
+          "detail": "0m old at 2026-05-10T12:56:13.545Z."
         },
         {
           "label": "Repo hygiene blocks blind execution",
           "status": "pass",
-          "detail": "1 repo(s) need review before ship/deploy recommendations."
+          "detail": "2 repo(s) need review before ship/deploy recommendations."
         }
       ],
       "nextStep": "Live smoke readiness is green for a guarded Phase 5C deploy."
@@ -1370,12 +1369,12 @@
     ]
   },
   "phase5D": {
-    "updatedAt": "2026-05-10T01:40:42.051Z",
+    "updatedAt": "2026-05-10T12:56:13.545Z",
     "phase": "phase_5d",
     "summary": "Phase 5D active: approval callback persistence, cron promotion drafts, repo hygiene classification, and deploy smoke gates are wired before top-phase automation.",
     "approvalCallbacks": {
       "endpoint": "/api/oracle/approval",
-      "configured": true,
+      "configured": false,
       "pathLabel": "oracle-approval-decisions.jsonl",
       "decisions": [],
       "counts": {
@@ -1418,12 +1417,12 @@
     "repoHygieneClassifications": [
       {
         "repo": "Moshe",
-        "verdict": "clean",
-        "trackedChanges": 0,
-        "scratchUntracked": 0,
+        "verdict": "mixed",
+        "trackedChanges": 4,
+        "scratchUntracked": 1,
         "docUntracked": 0,
         "sourceUntracked": 0,
-        "note": "No local changes detected."
+        "note": "Source-affecting or mixed changes remain; keep deployment and cron promotion guarded."
       },
       {
         "repo": "Aum Hippie Young",
@@ -1464,7 +1463,7 @@
         "status": "watch",
         "command": "curl -fsS https://mikewebstudio.com/api/oracle/approval",
         "expected": "200 JSON policy for approval/decision callbacks; POST remains session-gated.",
-        "lastObserved": "session secret configured for build context"
+        "lastObserved": "build context missing session secret; GET can still be smoked after deploy, POST stays locked"
       }
     ],
     "topPhaseReadiness": {
@@ -1482,7 +1481,7 @@
     }
   },
   "phase5E": {
-    "updatedAt": "2026-05-10T01:40:42.051Z",
+    "updatedAt": "2026-05-10T12:56:13.545Z",
     "phase": "phase_5e",
     "summary": "Phase 5E active: Oracle now applies a quality/taste filter before proactive reports, keeps Wiro-first opportunity hypotheses, and improves approval UX before more autonomy.",
     "qualityRubric": {
@@ -1644,7 +1643,7 @@
     }
   },
   "phase5F": {
-    "updatedAt": "2026-05-10T01:40:42.051Z",
+    "updatedAt": "2026-05-10T12:56:13.545Z",
     "phase": "phase_5f",
     "summary": "Phase 5F active: Oracle converts feedback, approvals, executor runs, and cron quality rules into action memory before bounded top-phase automation.",
     "learningActionMemory": {
@@ -1746,7 +1745,7 @@
     }
   },
   "phase5G": {
-    "updatedAt": "2026-05-10T01:40:42.051Z",
+    "updatedAt": "2026-05-10T12:56:13.545Z",
     "phase": "phase_5g",
     "summary": "Phase 5G active: Oracle can draft one bounded safe_now cron pilot only when safe executor evidence, report-quality gates, cron-quality rules, and source-safety controls pass.",
     "safeCronPilot": {
@@ -1831,7 +1830,7 @@
     }
   },
   "phase5H": {
-    "updatedAt": "2026-05-10T01:40:42.051Z",
+    "updatedAt": "2026-05-10T12:56:13.545Z",
     "phase": "phase_5h",
     "summary": "Phase 5H active: missing Oracle ecosystem features are now dependency-ordered and visible before engineering work starts.",
     "missingFeatureRoadmap": [
@@ -1903,7 +1902,7 @@
     ]
   },
   "phase5I": {
-    "updatedAt": "2026-05-10T01:40:42.051Z",
+    "updatedAt": "2026-05-10T12:56:13.545Z",
     "phase": "phase_5i",
     "summary": "Phase 5I active: Oracle Consciousness Loop is defined as bounded operational awareness — sense, reflect, wonder, decide, propose, remember — with safe execution limits.",
     "definition": "This is not human sentience. It is a persistent self-observation and reflection loop that notices state changes, recalls memory, forms one useful hypothesis, proposes a safe next action, and writes the learning back to ψ.",
@@ -2048,7 +2047,7 @@
     }
   },
   "phase5J": {
-    "updatedAt": "2026-05-10T01:40:42.051Z",
+    "updatedAt": "2026-05-10T12:56:13.545Z",
     "phase": "phase_5j",
     "summary": "Phase 5J active: oracle-v2/arra-oracle connection is fixed through a local stdio MCP adapter over the Arra Oracle HTTP memory server.",
     "status": "connected",
@@ -2110,6 +2109,267 @@
       }
     ],
     "nextStep": "Restart Hermes/Telegram runtime so native MCP discovers mcp_arra_oracle_health, mcp_arra_oracle_search, and mcp_arra_oracle_oracles."
+  },
+  "reportNoiseControl": {
+    "updatedAt": "2026-05-10T12:56:13.545Z",
+    "status": "active",
+    "sendThreshold": 70,
+    "digestThreshold": 45,
+    "silenceRule": "If there is no new evidence, no Wiro/Mike relevance, or no safe next action, stay silent or bundle into the next digest.",
+    "summary": "Noise control active: 0 send, 3 digest, 2 silent.",
+    "candidates": [
+      {
+        "id": "report-1",
+        "name": "Wiro4x4 Daily QA Check",
+        "cadence": "0 8 * * *",
+        "evidence": 20,
+        "novelty": 10,
+        "actionability": 20,
+        "wiroFit": 20,
+        "annoyancePenalty": 12,
+        "total": 58,
+        "decision": "digest",
+        "reason": "Useful, but bundle into digest unless urgent."
+      },
+      {
+        "id": "report-5",
+        "name": "wiro4x4-daily-lead-check",
+        "cadence": "10 6 * * *",
+        "evidence": 20,
+        "novelty": 10,
+        "actionability": 20,
+        "wiroFit": 20,
+        "annoyancePenalty": 12,
+        "total": 58,
+        "decision": "digest",
+        "reason": "Useful, but bundle into digest unless urgent."
+      },
+      {
+        "id": "report-2",
+        "name": "Weekly Oracle Report for Mike",
+        "cadence": "0 9 * * 1",
+        "evidence": 12,
+        "novelty": 18,
+        "actionability": 12,
+        "wiroFit": 8,
+        "annoyancePenalty": 5,
+        "total": 45,
+        "decision": "digest",
+        "reason": "Useful, but bundle into digest unless urgent."
+      },
+      {
+        "id": "report-4",
+        "name": "wiro4x4-daily-market-research",
+        "cadence": "0 6 * * *",
+        "evidence": 12,
+        "novelty": 10,
+        "actionability": 12,
+        "wiroFit": 20,
+        "annoyancePenalty": 12,
+        "total": 42,
+        "decision": "silent",
+        "reason": "Too weak/noisy; stay silent until there is new evidence."
+      },
+      {
+        "id": "report-3",
+        "name": "Daily Oracle Self-Learning Scan",
+        "cadence": "0 7 * * *",
+        "evidence": 20,
+        "novelty": 10,
+        "actionability": 12,
+        "wiroFit": 8,
+        "annoyancePenalty": 12,
+        "total": 38,
+        "decision": "silent",
+        "reason": "Too weak/noisy; stay silent until there is new evidence."
+      }
+    ],
+    "gates": [
+      {
+        "id": "no-approval-framing",
+        "label": "No idea-approval framing",
+        "status": "pass",
+        "rule": "Reports must not ask Mike to approve speculative business ideas.",
+        "evidence": "approve this idea | approve opportunity | greenlight the business | send outreach now | AI SaaS is obvious"
+      },
+      {
+        "id": "wiro-first-evidence",
+        "label": "Wiro-first evidence attached",
+        "status": "pass",
+        "rule": "At least one opportunity candidate should be tied to a Wiro/Mike observed fact before being suggested.",
+        "evidence": "Wiro inquiry response manual test:test_manually · Wiro internal itinerary OS watch item:keep_watching · Generic AI SaaS idea without Wiro evidence:ignore"
+      },
+      {
+        "id": "single-low-risk-next-action",
+        "label": "Single low-risk next action",
+        "status": "pass",
+        "rule": "Proactive reports should end with at most one optional low-risk next action.",
+        "evidence": "3 Mike-needs-now bullets."
+      },
+      {
+        "id": "annoyance-budget",
+        "label": "Annoyance budget visible",
+        "status": "pass",
+        "rule": "Do not send when annoyance risk is too low/uncertain or quality evidence is weak.",
+        "evidence": "Annoyance score 4; limit 2."
+      },
+      {
+        "id": "send-threshold",
+        "label": "Send threshold enforced",
+        "status": "pass",
+        "rule": "Only reports scoring 70+ can interrupt Mike directly.",
+        "evidence": "0 direct-send candidate(s)."
+      },
+      {
+        "id": "digest-or-silent-default",
+        "label": "Digest/silent default",
+        "status": "pass",
+        "rule": "Most proactive checks should digest or stay silent, not send separate messages.",
+        "evidence": "5/5 are digest/silent."
+      }
+    ]
+  },
+  "unifiedMemoryIndex": {
+    "updatedAt": "2026-05-10T12:56:13.545Z",
+    "status": "live",
+    "summary": "Unified memory index sees 1463 records across 8 sources; 0 gap(s) need review.",
+    "sources": [
+      {
+        "id": "hermes-memory",
+        "label": "Hermes memory",
+        "path": "~/.hermes/memories/MEMORY.md",
+        "status": "live",
+        "records": 1,
+        "lastUpdated": "2026-05-10T07:10:34.793Z",
+        "role": "Always-injected durable preferences and environment facts."
+      },
+      {
+        "id": "psi-learnings",
+        "label": "ψ learnings",
+        "path": "~/workspace/Moshe/ψ/memory/learnings",
+        "status": "live",
+        "records": 42,
+        "lastUpdated": "2026-05-10",
+        "role": "Moshe durable project and preference learnings."
+      },
+      {
+        "id": "psi-retrospectives",
+        "label": "ψ retrospectives",
+        "path": "~/workspace/Moshe/ψ/memory/retrospectives",
+        "status": "live",
+        "records": 29,
+        "lastUpdated": "2026-05-10",
+        "role": "Session summaries for Claude Code ↔ Hermes continuity."
+      },
+      {
+        "id": "psi-active",
+        "label": "ψ active roadmaps",
+        "path": "~/workspace/Moshe/ψ/active",
+        "status": "live",
+        "records": 16,
+        "lastUpdated": "2026-05-10",
+        "role": "Current Oracle/Wiro/business work in progress."
+      },
+      {
+        "id": "obsidian",
+        "label": "Obsidian vault",
+        "path": "~/Documents/MyVault",
+        "status": "live",
+        "records": 274,
+        "lastUpdated": "2026-05-10T12:53:37.129Z",
+        "role": "Mike second brain and business notes."
+      },
+      {
+        "id": "sessions",
+        "label": "Hermes sessions",
+        "path": "~/.hermes/sessions",
+        "status": "live",
+        "records": 720,
+        "lastUpdated": "2026-05-10T12:55:54.269Z",
+        "role": "Searchable raw conversation/session recall."
+      },
+      {
+        "id": "cron-output",
+        "label": "Cron outputs",
+        "path": "~/.hermes/cron/output",
+        "status": "live",
+        "records": 376,
+        "lastUpdated": "2026-05-10T12:55:42.620Z",
+        "role": "Autonomous job result history."
+      },
+      {
+        "id": "cron-jobs",
+        "label": "Cron schedules",
+        "path": "Hermes scheduler",
+        "status": "live",
+        "records": 5,
+        "lastUpdated": "2026-05-10T12:56:13.545Z",
+        "role": "Future proactive work and report cadence."
+      }
+    ],
+    "totalRecords": 1463,
+    "gaps": [],
+    "reconcileActions": [
+      "Use Hermes memory only for durable facts; use session_search for temporary task history.",
+      "Write important Telegram outcomes to ψ retrospectives and Obsidian project notes.",
+      "Nightly reconcile should flag duplicate/stale Wiro, Oracle, and Mike preference notes without deleting anything automatically."
+    ]
+  },
+  "truthPanel": {
+    "updatedAt": "2026-05-10T12:56:13.545Z",
+    "status": "watch",
+    "summary": "1 watch check(s); Oracle is usable but not perfect.",
+    "checks": [
+      {
+        "id": "hermes-version",
+        "label": "Hermes runtime",
+        "status": "pass",
+        "detail": "Hermes Agent v0.13.0 (2026.5.7)"
+      },
+      {
+        "id": "cron-health",
+        "label": "Cron scheduler",
+        "status": "pass",
+        "detail": "5 active/scheduled jobs visible in snapshot."
+      },
+      {
+        "id": "arra-oracle",
+        "label": "Arra Oracle MCP",
+        "status": "pass",
+        "detail": "ok · 26.5.2-alpha.1704"
+      },
+      {
+        "id": "memory-index",
+        "label": "Unified memory index",
+        "status": "pass",
+        "detail": "Unified memory index sees 1463 records across 8 sources; 0 gap(s) need review."
+      },
+      {
+        "id": "noise-control",
+        "label": "Report noise control",
+        "status": "pass",
+        "detail": "Noise control active: 0 send, 3 digest, 2 silent."
+      },
+      {
+        "id": "readiness",
+        "label": "Operational readiness",
+        "status": "pass",
+        "detail": "82/100 · 3 watch item(s). Oracle is usable, but not fully verified."
+      },
+      {
+        "id": "repos",
+        "label": "Repo hygiene",
+        "status": "watch",
+        "detail": "2/3 tracked repo(s) dirty."
+      },
+      {
+        "id": "websites",
+        "label": "Website sensors",
+        "status": "pass",
+        "detail": "3/3 websites reachable."
+      }
+    ],
+    "nextSafeAction": "Review watch checks and refresh the snapshot after resolving them."
   },
   "nextActions": [
     "Set ORACLE_SESSION_SECRET to arm the Mike-only signed session gate.",

@@ -881,6 +881,32 @@ export default function OracleCommandCenter({ data }: Props) {
     note: 'Terminal policy not loaded yet.',
   }
   const terminalReady = terminalPolicy.enabled && sessionState.status === 'authenticated'
+  const reportNoiseControl = oracle.reportNoiseControl ?? {
+    updatedAt: oracle.generated,
+    status: 'watch' as const,
+    sendThreshold: 70,
+    digestThreshold: 45,
+    silenceRule: 'Stay silent unless a report has evidence, novelty, and one safe action.',
+    summary: 'Report noise-control snapshot is not available yet.',
+    candidates: [],
+    gates: [],
+  }
+  const unifiedMemoryIndex = oracle.unifiedMemoryIndex ?? {
+    updatedAt: oracle.generated,
+    status: 'missing' as const,
+    summary: 'Unified memory index is not available yet.',
+    sources: [],
+    totalRecords: 0,
+    gaps: ['Generate a fresh Oracle snapshot.'],
+    reconcileActions: [],
+  }
+  const truthPanel = oracle.truthPanel ?? {
+    updatedAt: oracle.generated,
+    status: 'watch' as const,
+    summary: 'Oracle truth panel is not available yet.',
+    checks: [],
+    nextSafeAction: 'Generate a fresh Oracle snapshot.',
+  }
   const sessionUnlocked = sessionState.status === 'authenticated'
   const controlActionStatus = previewState.status === 'loading' ? 'RUNNING' : sessionUnlocked ? 'ARMED' : 'LOCKED'
   const controlActionCount = oracle.automation?.actions.length ?? 0
@@ -1920,6 +1946,60 @@ export default function OracleCommandCenter({ data }: Props) {
                 <span>{check.weight} pts</span>
               </article>
             ))}
+          </div>
+
+
+          <div className="oracle-section-head" style={{ marginTop: 16 }}>
+            <p>OPTIONS 1–3 LIVE LAYER</p>
+            <span>{truthPanel.status}</span>
+          </div>
+          <div className="oracle-intelligence-grid">
+            <article className="oracle-intel-card money">
+              <div className="oracle-status-head">
+                <strong>1 · Report noise control</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(reportNoiseControl.status)}`}>{reportNoiseControl.status}</span>
+              </div>
+              <p>{reportNoiseControl.summary}</p>
+              <small>Send ≥ {reportNoiseControl.sendThreshold} · digest ≥ {reportNoiseControl.digestThreshold}</small>
+              {reportNoiseControl.candidates.slice(0, 4).map((item) => (
+                <div className="oracle-intel-line" key={item.id}>
+                  <strong>{item.name} · {item.total}</strong>
+                  <p>{item.reason}</p>
+                  <small>{item.decision} · evidence {item.evidence} · novelty {item.novelty} · action {item.actionability} · Wiro {item.wiroFit} · penalty {item.annoyancePenalty}</small>
+                </div>
+              ))}
+              <small>{reportNoiseControl.silenceRule}</small>
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>2 · Unified memory index</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(unifiedMemoryIndex.status)}`}>{unifiedMemoryIndex.status}</span>
+              </div>
+              <p>{unifiedMemoryIndex.summary}</p>
+              <small>{unifiedMemoryIndex.totalRecords} records across {unifiedMemoryIndex.sources.length} sources</small>
+              {unifiedMemoryIndex.sources.slice(0, 5).map((source) => (
+                <div className="oracle-intel-line" key={source.id}>
+                  <strong>{source.label}</strong>
+                  <p>{source.role}</p>
+                  <small>{source.status} · {source.records} records · {source.lastUpdated ? timeAgo(source.lastUpdated) : source.path}</small>
+                </div>
+              ))}
+            </article>
+            <article className="oracle-intel-card">
+              <div className="oracle-status-head">
+                <strong>3 · Truth panel</strong>
+                <span className={`oracle-risk-badge ${phase5Badge(truthPanel.status)}`}>{truthPanel.status}</span>
+              </div>
+              <p>{truthPanel.summary}</p>
+              {truthPanel.checks.slice(0, 6).map((check) => (
+                <div className="oracle-intel-line" key={check.id}>
+                  <strong>{check.label}</strong>
+                  <p>{check.detail}</p>
+                  <small>{check.status}</small>
+                </div>
+              ))}
+              <small>Next safe action: {truthPanel.nextSafeAction}</small>
+            </article>
           </div>
 
           <div className="oracle-section-head" style={{ marginTop: 16 }}>

@@ -2466,6 +2466,160 @@ async function derivePhase5J({ generatedAt }) {
   };
 }
 
+
+function countMarkdownRecursive(dir, maxDepth = 4) {
+  try {
+    if (!existsSync(dir) || maxDepth < 0) return { count: 0, latest: null };
+    let count = 0;
+    let latest = 0;
+    for (const entry of readdirSync(dir)) {
+      if (entry.startsWith('.')) continue;
+      const path = join(dir, entry);
+      const stat = statSync(path);
+      if (stat.isDirectory()) {
+        const child = countMarkdownRecursive(path, maxDepth - 1);
+        count += child.count;
+        if (child.latest && Date.parse(child.latest) > latest) latest = Date.parse(child.latest);
+      } else if (entry.endsWith('.md') || entry.endsWith('.json') || entry.endsWith('.jsonl')) {
+        count += 1;
+        latest = Math.max(latest, stat.mtimeMs);
+      }
+    }
+    return { count, latest: latest ? new Date(latest).toISOString() : null };
+  } catch {
+    return { count: 0, latest: null };
+  }
+}
+
+function deriveReportNoiseControl({ generatedAt, activeCrons, phase5F }) {
+  const relevant = activeCrons.filter((job) => /Oracle|Wiro|Money|Business|Opportunity|Report|Pulse|Brief|Radar|Review/i.test(`${job.name || ''} ${job.schedule || ''}`));
+  const scoreJob = (job, index) => {
+    const text = `${job.name || ''} ${job.schedule || ''} ${job.status || ''}`;
+    const wiroFit = /Wiro|lead|booking|tour/i.test(text) ? 20 : /Money|Opportunity|Business/i.test(text) ? 12 : 8;
+    const evidence = /QA|lead|health|review|self-learning|radar/i.test(text) ? 20 : 12;
+    const novelty = /weekly/i.test(text) ? 18 : /daily|every/i.test(text) ? 10 : 14;
+    const actionability = /lead|QA|health|review|brief|pulse/i.test(text) ? 20 : 12;
+    const annoyancePenalty = /daily|every 5m|6:|7:|8:|9:/i.test(text) ? 12 : 5;
+    const total = Math.max(0, evidence + novelty + actionability + wiroFit - annoyancePenalty);
+    return {
+      id: `report-${index + 1}`,
+      name: job.name || 'Unnamed report',
+      cadence: job.schedule || 'unknown',
+      evidence,
+      novelty,
+      actionability,
+      wiroFit,
+      annoyancePenalty,
+      total,
+      decision: total >= 70 ? 'send' : total >= 45 ? 'digest' : 'silent',
+      reason: total >= 70
+        ? 'Strong enough for direct Telegram delivery when facts changed.'
+        : total >= 45
+          ? 'Useful, but bundle into digest unless urgent.'
+          : 'Too weak/noisy; stay silent until there is new evidence.',
+    };
+  };
+  const candidates = relevant.map(scoreJob).sort((a, b) => b.total - a.total).slice(0, 10);
+  const gates = [
+    ...phase5F.reportQualityGates,
+    {
+      id: 'send-threshold',
+      label: 'Send threshold enforced',
+      status: candidates.every((item) => item.decision !== 'send' || item.total >= 70) ? 'pass' : 'fail',
+      rule: 'Only reports scoring 70+ can interrupt Mike directly.',
+      evidence: `${candidates.filter((item) => item.decision === 'send').length} direct-send candidate(s).`,
+    },
+    {
+      id: 'digest-or-silent-default',
+      label: 'Digest/silent default',
+      status: candidates.filter((item) => item.decision === 'send').length <= 3 ? 'pass' : 'watch',
+      rule: 'Most proactive checks should digest or stay silent, not send separate messages.',
+      evidence: `${candidates.filter((item) => item.decision !== 'send').length}/${candidates.length} are digest/silent.`,
+    },
+  ];
+  const failing = gates.filter((gate) => gate.status === 'fail').length;
+  const watch = gates.filter((gate) => gate.status === 'watch').length;
+  return {
+    updatedAt: generatedAt,
+    status: failing ? 'blocked' : watch ? 'watch' : 'active',
+    sendThreshold: 70,
+    digestThreshold: 45,
+    silenceRule: 'If there is no new evidence, no Wiro/Mike relevance, or no safe next action, stay silent or bundle into the next digest.',
+    summary: failing
+      ? 'Noise control is configured but a report-quality gate is failing.'
+      : `Noise control active: ${candidates.filter((item) => item.decision === 'send').length} send, ${candidates.filter((item) => item.decision === 'digest').length} digest, ${candidates.filter((item) => item.decision === 'silent').length} silent.`,
+    candidates,
+    gates,
+  };
+}
+
+function deriveUnifiedMemoryIndex({ generatedAt, learnings, retrospectives, active, activeCrons }) {
+  const home = process.env.HOME || '';
+  const hermesMemoryPath = join(home, '.hermes/memories/MEMORY.md');
+  const sessionsPath = join(home, '.hermes/sessions');
+  const cronOutputPath = join(home, '.hermes/cron/output');
+  const obsidianPath = join(home, 'Documents/MyVault');
+  const hermesMemory = existsSync(hermesMemoryPath) ? statSync(hermesMemoryPath) : null;
+  const sessions = countMarkdownRecursive(sessionsPath, 2);
+  const cronOutput = countMarkdownRecursive(cronOutputPath, 3);
+  const obsidian = countMarkdownRecursive(obsidianPath, 5);
+  const sources = [
+    { id: 'hermes-memory', label: 'Hermes memory', path: '~/.hermes/memories/MEMORY.md', status: hermesMemory ? 'live' : 'missing', records: hermesMemory ? 1 : 0, lastUpdated: hermesMemory ? hermesMemory.mtime.toISOString() : undefined, role: 'Always-injected durable preferences and environment facts.' },
+    { id: 'psi-learnings', label: 'ψ learnings', path: '~/workspace/Moshe/ψ/memory/learnings', status: learnings.length ? 'live' : 'watch', records: learnings.length, lastUpdated: learnings[0]?.date, role: 'Moshe durable project and preference learnings.' },
+    { id: 'psi-retrospectives', label: 'ψ retrospectives', path: '~/workspace/Moshe/ψ/memory/retrospectives', status: retrospectives.length ? 'live' : 'watch', records: retrospectives.length, lastUpdated: retrospectives[0]?.date, role: 'Session summaries for Claude Code ↔ Hermes continuity.' },
+    { id: 'psi-active', label: 'ψ active roadmaps', path: '~/workspace/Moshe/ψ/active', status: active.length ? 'live' : 'watch', records: active.length, lastUpdated: active[0]?.date, role: 'Current Oracle/Wiro/business work in progress.' },
+    { id: 'obsidian', label: 'Obsidian vault', path: '~/Documents/MyVault', status: obsidian.count ? 'live' : 'missing', records: obsidian.count, lastUpdated: obsidian.latest, role: 'Mike second brain and business notes.' },
+    { id: 'sessions', label: 'Hermes sessions', path: '~/.hermes/sessions', status: sessions.count ? 'live' : 'watch', records: sessions.count, lastUpdated: sessions.latest, role: 'Searchable raw conversation/session recall.' },
+    { id: 'cron-output', label: 'Cron outputs', path: '~/.hermes/cron/output', status: cronOutput.count ? 'live' : 'watch', records: cronOutput.count, lastUpdated: cronOutput.latest, role: 'Autonomous job result history.' },
+    { id: 'cron-jobs', label: 'Cron schedules', path: 'Hermes scheduler', status: activeCrons.length ? 'live' : 'watch', records: activeCrons.length, lastUpdated: generatedAt, role: 'Future proactive work and report cadence.' },
+  ];
+  const gaps = [];
+  if (!hermesMemory) gaps.push('Hermes MEMORY.md not found.');
+  if (!obsidian.count) gaps.push('Obsidian vault not visible to snapshot generator.');
+  if (!cronOutput.count) gaps.push('Cron output archive is empty or not readable.');
+  const totalRecords = sources.reduce((sum, source) => sum + source.records, 0);
+  return {
+    updatedAt: generatedAt,
+    status: sources.some((s) => s.status === 'missing') ? 'watch' : 'live',
+    summary: `Unified memory index sees ${totalRecords} records across ${sources.length} sources; ${gaps.length} gap(s) need review.`,
+    sources,
+    totalRecords,
+    gaps,
+    reconcileActions: [
+      'Use Hermes memory only for durable facts; use session_search for temporary task history.',
+      'Write important Telegram outcomes to ψ retrospectives and Obsidian project notes.',
+      'Nightly reconcile should flag duplicate/stale Wiro, Oracle, and Mike preference notes without deleting anything automatically.',
+    ],
+  };
+}
+
+function deriveTruthPanel({ generatedAt, operationalReadiness, activeCrons, phase5J, repos, websites, reportNoiseControl, unifiedMemoryIndex }) {
+  const hermesVersion = safeExec('bash', ['-lc', 'cd ~/.hermes/hermes-agent && source venv/bin/activate 2>/dev/null || true; hermes --version | head -1'], ROOT, 'Hermes version unavailable');
+  const checks = [
+    { id: 'hermes-version', label: 'Hermes runtime', status: /Hermes Agent v/.test(hermesVersion) ? 'pass' : 'watch', detail: hermesVersion },
+    { id: 'cron-health', label: 'Cron scheduler', status: activeCrons.length > 0 ? 'pass' : 'fail', detail: `${activeCrons.length} active/scheduled jobs visible in snapshot.` },
+    { id: 'arra-oracle', label: 'Arra Oracle MCP', status: phase5J.status === 'connected' ? 'pass' : phase5J.status === 'watch' ? 'watch' : 'fail', detail: phase5J.server.version ? `${phase5J.server.status} · ${phase5J.server.version}` : phase5J.summary },
+    { id: 'memory-index', label: 'Unified memory index', status: unifiedMemoryIndex.status === 'live' ? 'pass' : 'watch', detail: unifiedMemoryIndex.summary },
+    { id: 'noise-control', label: 'Report noise control', status: reportNoiseControl.status === 'active' ? 'pass' : reportNoiseControl.status === 'watch' ? 'watch' : 'fail', detail: reportNoiseControl.summary },
+    { id: 'readiness', label: 'Operational readiness', status: ['excellent', 'steady'].includes(operationalReadiness.status) ? 'pass' : operationalReadiness.status === 'watch' ? 'watch' : 'fail', detail: `${operationalReadiness.score}/100 · ${operationalReadiness.summary}` },
+    { id: 'repos', label: 'Repo hygiene', status: repos.filter((repo) => repo.dirty).length === 0 ? 'pass' : 'watch', detail: `${repos.filter((repo) => repo.dirty).length}/${repos.length} tracked repo(s) dirty.` },
+    { id: 'websites', label: 'Website sensors', status: websites.every((site) => site.ok) ? 'pass' : websites.some((site) => site.ok) ? 'watch' : 'fail', detail: `${websites.filter((site) => site.ok).length}/${websites.length} websites reachable.` },
+  ];
+  const failCount = checks.filter((check) => check.status === 'fail').length;
+  const watchCount = checks.filter((check) => check.status === 'watch').length;
+  return {
+    updatedAt: generatedAt,
+    status: failCount ? 'critical' : watchCount ? 'watch' : 'healthy',
+    summary: failCount ? `${failCount} failing truth check(s).` : watchCount ? `${watchCount} watch check(s); Oracle is usable but not perfect.` : 'Oracle truth panel is healthy: runtime, memory, crons, MCP, reports, repos, and sensors are visible.',
+    checks,
+    nextSafeAction: failCount
+      ? 'Fix failing read-only checks before adding more autonomy.'
+      : watchCount
+        ? 'Review watch checks and refresh the snapshot after resolving them.'
+        : 'Keep monitoring; no extra Telegram noise needed unless a checked signal changes.',
+  };
+}
+
 function deriveOperationalReadiness({ websites, repos, github, credentials, deployments, deployTimeline, automation, incidents }) {
   const criticalIncidents = incidents.filter((i) => i.severity === 'critical').length;
   const dirtyRepos = repos.filter((r) => r.dirty).length;
@@ -2668,11 +2822,14 @@ const phase5G = derivePhase5G({
 const phase5H = derivePhase5H({ generatedAt });
 const phase5I = derivePhase5I({ generatedAt, phase5G, phase5H, learnings, retrospectives, activeCrons: activeCronsSnapshot });
 const phase5J = await derivePhase5J({ generatedAt });
+const reportNoiseControl = deriveReportNoiseControl({ generatedAt, activeCrons: activeCronsSnapshot, phase5F });
+const unifiedMemoryIndex = deriveUnifiedMemoryIndex({ generatedAt, learnings, retrospectives, active, activeCrons: activeCronsSnapshot });
+const truthPanel = deriveTruthPanel({ generatedAt, operationalReadiness, activeCrons: activeCronsSnapshot, phase5J, repos, websites, reportNoiseControl, unifiedMemoryIndex });
 
 const data = {
   generated: generatedAt,
   born: '2026-04-18',
-  level3Phase: 'Phase 5J: Arra Oracle MCP connection fixed for semantic memory',
+  level3Phase: 'Phase 5K: Noise control, unified memory index, and truth panel',
   stats: {
     learnings: learnings.length,
     retrospectives: retrospectives.length,
@@ -2737,6 +2894,9 @@ const data = {
   phase5H,
   phase5I,
   phase5J,
+  reportNoiseControl,
+  unifiedMemoryIndex,
+  truthPanel,
   nextActions: [
     'Set ORACLE_SESSION_SECRET to arm the Mike-only signed session gate.',
     'The Oracle now turns audit trail events into learnings before refreshing live data.',
@@ -2758,7 +2918,7 @@ const data = {
 };
 
 writeFileSync(OUT, `${JSON.stringify(data, null, 2)}\n`);
-console.log(`✅ Oracle live data written to ${OUT} [Phase 5J]`);
+console.log(`✅ Oracle live data written to ${OUT} [Phase 5K]`);
 console.log(`   Websites: ${data.websites.map((w) => `${w.name}=${w.ok ? 'OK' : 'FAIL'}`).join(', ')}`);
 console.log(`   Incidents: ${data.incidents.length} | Recommendations: ${data.recommendations.length} | Wiro CI: ${data.wiroCi?.conclusion ?? 'none'}`);
 console.log(`   Repos: ${data.repos.length} | GitHub sensors: ${data.github.length} | Learnings: ${data.stats.learnings} | Retrospectives: ${data.stats.retrospectives}`);
